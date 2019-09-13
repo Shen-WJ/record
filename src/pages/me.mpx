@@ -14,6 +14,7 @@
     <view class="me_hd_notice_redDot" wx:if="{{isShowNoticeRedDot}}"></view>
     <button class="me_hd_notice me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToNotice">通知 {{noticeCount}}</button>
     <button class="me_hd_favorites me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToFavorites">收藏</button>
+    <button class="me_hd_settings me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSettings">设置</button>
     <block wx:for="{{animations}}" wx:key="{{index}}">
       <view class="me_hd_element{{index}}" animation="{{animations[index]}}">{{animationsText[index]}}</view>
     </block>
@@ -247,6 +248,12 @@
     clickToFavorites: function () {
       wx.navigateTo({
         url: './favorites'
+      })
+    },
+
+    clickToSettings: function () {
+      wx.navigateTo({
+        url: './settings'
       })
     },
 
@@ -615,23 +622,22 @@
     font-size: 30rpx;
     color: white;
     border:3rpx solid white;
-  }
-  .me_hd_notice{
-    width: 240rpx;
 
     position: absolute;
     right: -30rpx;
     top: 50rpx;
     z-index: 1000;
   }
+  .me_hd_notice{
+    width: 240rpx;
+  }
   .me_hd_favorites {
     width: 180rpx;
-
-    color: white;
-    position: absolute;
-    right: -30rpx;
     top: 140rpx;
-    z-index: 1000;
+  }
+  .me_hd_settings {
+    width: 210rpx;
+    top: 230rpx;
   }
   .me_hd_touch_btn {
     color: #ccc;

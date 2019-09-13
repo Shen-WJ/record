@@ -123,7 +123,9 @@
       "./pages/notice",
       "./pages/singleInput",
       "./pages/find",
-      "./pages/userInfo"
+      "./pages/userInfo",
+      "./pages/singleText",
+      "./pages/settings"
     ],
     "window": {
       "backgroundTextStyle": "light",

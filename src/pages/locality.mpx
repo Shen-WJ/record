@@ -248,11 +248,11 @@
 
   .section_header{
     padding:0 20rpx;
-    font-size:24rpx;
-    color:#6a6a6a;
+    font-size: 40rpx;
+    color:#444;
     background-color: #eeeff0;
-    line-height: 60rpx;
-    height: 60rpx;
+    line-height: 100rpx;
+    height: 100rpx;
     width: 710rpx;
   }
   .section_header text{

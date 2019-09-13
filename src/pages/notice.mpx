@@ -1,7 +1,7 @@
 <template>
   <view class='container'>
-  <view class="notice_table">
-    <view class="notice_cell">
+  <view class="table">
+    <view class="cell notice_cell">
       <view wx:if="{{!isReadLocalNotice}}" class="notice_cell_redDot"></view>
       <view class="notice_cell_title">
         <text >给用户的第一封信</text><text class="notice_cell_tag">置顶</text>
@@ -14,7 +14,7 @@
     </view>
 
     <block wx:for="{{noticeList}}" wx:key="{{item.id}}">
-      <view class="notice_cell">
+      <view class="cell notice_cell">
         <view wx:if="{{!item.isRead}}" class="notice_cell_redDot"></view>
         <text class="notice_cell_title">{{item.title}}</text>
         <text class="notice_cell_time">{{item.timeStr}}</text>
@@ -93,15 +93,9 @@
 
   .container {} 
   .notice_table {
-    margin-top: 10rpx;
-    margin-bottom: 10rpx;
   }
   .notice_cell {
     position: relative;
-    margin: 20rpx;
-    padding: 20rpx;
-    border-radius: 10rpx;
-    box-shadow: 5rpx 5rpx 15rpx 0rpx #777;
   }
 
   .notice_cell_redDot {

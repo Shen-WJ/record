@@ -236,3 +236,16 @@ display: none;
   height: 23rpx;
   background-color: #2ab3f3;
 }
+
+/* table and cell */
+
+.table {
+  margin-top: 10rpx;
+  margin-bottom: 10rpx;
+}
+.cell {
+  margin: 20rpx;
+  padding: 20rpx;
+  border-radius: 10rpx;
+  box-shadow: 5rpx 5rpx 15rpx 0rpx #777;
+}

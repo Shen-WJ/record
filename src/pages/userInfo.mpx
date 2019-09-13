@@ -1,14 +1,14 @@
 <template>
-  <view class="table">
-    <view class="cell" bindtap="clickCell" data-index="0">
+  <view class="table user_table">
+    <view class="cell user_cell" bindtap="clickCell" data-index="0">
         <text class="title">头像</text>
         <image class="headPhoto" src="{{headUrl}}" mode="aspectFit"></image>
     </view>
-    <view class="cell" bindtap="clickCell" data-index="1">
+    <view class="cell user_cell" bindtap="clickCell" data-index="1">
         <text class="title">昵称</text>
         <text class="description">{{nickname}}</text>
     </view>
-    <view class="cell" bindtap="clickCell" data-index="2">
+    <view class="cell user_cell" bindtap="clickCell" data-index="2">
         <text class="title">性别</text>
         <text class="description">{{genders[sex]}}</text>
     </view>
@@ -107,18 +107,11 @@
 </script>
 
 <style >
-  .table {
-    margin-top: 10rpx;
-    margin-bottom: 10rpx;
+  .user_table {
   }
-  .cell {
+  .user_cell {
     display: flex;
     justify-content: space-between;
-
-    margin: 20rpx;
-    padding: 20rpx;
-    border-radius: 10rpx;
-    box-shadow: 5rpx 5rpx 15rpx 0rpx #777;
   }
 
   .headPhoto {
