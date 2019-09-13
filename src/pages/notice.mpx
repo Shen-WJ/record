@@ -1,0 +1,149 @@
+<template>
+  <view class='container'>
+  <view class="notice_table">
+    <view class="notice_cell">
+      <view wx:if="{{!isReadLocalNotice}}" class="notice_cell_redDot"></view>
+      <view class="notice_cell_title">
+        <text >给用户的第一封信</text><text class="notice_cell_tag">置顶</text>
+      </view>
+      <text class="notice_cell_time">2019-8-20</text>
+      <text class="notice_cell_content">欢迎来到这个与你有关的虚拟世界，可爱的陌生人。
+      你现在在哪里呀？想些什么呢？我猜猜哈。
+      你可能刚下高速、火车、飞机，亦或正准备离开一个美妙/简单的城。前者让你满心期待，后者让你依依不舍。可这样的感情，不记录下来，会很容易溜走的。以后你会忘了发现这座青石古桥时的欣喜，忘记曾在某个街角遇到可爱的流浪猫一家时融化的心，忘记在夏日最炎热的那个下午吹到的最凉爽的风吃过的最棒的炒冰。
+      那就记下来吧，给自己的回忆，也给后来的陌生人了解这里。</text>
+    </view>
+
+    <block wx:for="{{noticeList}}" wx:key="{{item.id}}">
+      <view class="notice_cell">
+        <view wx:if="{{!item.isRead}}" class="notice_cell_redDot"></view>
+        <text class="notice_cell_title">{{item.title}}</text>
+        <text class="notice_cell_time">{{item.timeStr}}</text>
+        <text class="notice_cell_content">{{item.content}}</text>
+      </view>
+    </block>
+  </view>
+
+  </view>
+</template>
+
+<script>
+  import { createPage } from '@mpxjs/core'
+  import net from '../utils/net'
+  const common = require('../utils/common.js')
+
+  const getRequest = function (that, isRefresh) {
+    let pageNum = isRefresh ? 0 : that.httpsData.nextPage
+
+    net.reqGet({
+      url: 'notice/list',
+      query: {
+        pageNum: pageNum
+      }
+    }).then(data => {
+      let list = isRefresh ? [] : that.data.noticeList
+
+      for (let i in data.data.list) {
+        let item = data.data.list[i]
+        item['timeStr'] = common.timeToStr(item.time)
+        list.push(item)
+      }
+      that.httpsData = data.data
+      that.setData({
+        noticeList: list
+      })
+    })
+  }
+
+  createPage({
+    data: {
+      noticeList: [],
+      isReadLocalNotice: false
+    },
+
+    onLoad: function (options) {
+      getRequest(this, true)
+      this.setData({
+        isReadLocalNotice: wx.getStorageSync('isReadLocalNotice') || false
+      })
+      wx.setStorageSync('isReadLocalNotice', true)
+    },
+
+    onUnload: function () {
+      net.reqDelete({
+        url: 'notice/read'
+      })
+    },
+
+    onReachBottom: function () {
+      if (!common.isEmpty(this.httpsData) && this.httpsData.hasNextPage) {
+        getRequest(this, false)
+      }
+    },
+
+    onShareAppMessage: function () {
+      return {
+        title: '了解身边的过去，记录过去的身边',
+        path: '/pages/locality/locality'
+      }
+    }
+  })
+</script>
+
+<style >
+
+  .container {} 
+  .notice_table {
+    margin-top: 10rpx;
+    margin-bottom: 10rpx;
+  }
+  .notice_cell {
+    position: relative;
+    margin: 20rpx;
+    padding: 20rpx;
+    border-radius: 10rpx;
+    box-shadow: 5rpx 5rpx 15rpx 0rpx #777;
+  }
+
+  .notice_cell_redDot {
+    position: absolute;
+    top: 10rpx;
+    left: 10rpx;
+    background-color: red;
+    height: 16rpx;
+    width: 16rpx;
+    border-radius: 50%;
+  }
+  .notice_cell_title {
+
+    font-size: 32rpx;
+    color: #222;
+  }
+  .notice_cell_tag {
+    padding: 0 10rpx;
+    font-size: 24rpx;
+    color: #fff;
+    background-color: rgb(21, 224, 140);
+    border-radius: 10rpx;
+  }
+  .notice_cell_time {
+    margin-top: 10rpx;
+
+    display: block;
+
+    color: #888;
+    font-size: 26rpx;
+  }
+  .notice_cell_content {
+    margin-top: 10rpx;
+    display: block;
+
+    color: #555;
+    font-size: 30rpx;
+  }
+</style>
+
+<script  type='application/json'>
+  {
+    "usingComponents": {}
+  }
+</script>

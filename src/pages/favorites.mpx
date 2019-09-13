@@ -1,0 +1,187 @@
+<template>
+  <import src="../utils/recordItem.wxml"/>
+  <import src="../utils/common.wxml"/>
+
+
+  <view class="favorites">
+  <template is="emptyView" data="{{isShow: !recordListRac[0].length, type:0, textArr:['还没有收藏哦！快去','添加','吧～0v0']}}"/>
+  <block wx:for="{{recordListRac[0]}}" wx:key="{{item.recordId}}" wx:for-index="row">
+    <template is="recordItem" data="{{record:item, rcdIndex:{section:0, row:row}, rcdType:2}}"/>
+  </block>
+  </view>
+</template>
+
+<script>
+  import { createPage } from '@mpxjs/core'
+  import net from '../utils/net'
+
+  const common = require('../utils/common.js')
+
+  let getRequest = function (that, isRefresh) {
+    let pageNum = isRefresh ? 0 : that.data.resData.nextPage
+
+    net.reqGet({
+      url: 'record/list/byCollection',
+      query: {
+        pageNum: pageNum
+      }
+    }).then(data => {
+      if (isRefresh) {
+        wx.stopPullDownRefresh()
+      }
+
+      let records = isRefresh ? [] : that.recordList[0]
+
+      records = records.concat(common.getRecordListFrom(data.data.list))
+      that.httpsData = data.data
+      that.recordList = [records, []]
+      // that.setData({
+      //     'recordList[0]': records,
+      // })
+    })
+  }
+
+  createPage({
+    data: {
+      recordList: [[], []]
+    },
+
+    computed: {
+      recordListRac: function () {
+        return this.recordList || [[], []]
+      }
+    },
+
+    onLoad: function (options) {
+      getRequest(this, true)
+    },
+
+    onPullDownRefresh: function () {
+      getRequest(this, true)
+    },
+
+    onReachBottom: function () {
+      if (!common.isEmpty(this.httpsData) && this.httpsData.hasNextPage) {
+        getRequest(this, false)
+      }
+    },
+
+    onShareAppMessage: function (res) {
+      if (res.from === 'button') {
+        const record = this.getRecord(res.target.dataset.index)
+        const title = common.isEmpty(record.content) ? (record.nickname + '在' + record.location + '说') : record.content
+        return {
+          title: title,
+          path: '/pages/recordDetail/recordDetail?recordId=' + record.recordId
+        }
+      } else {
+        return {
+          title: '了解身边的过去，记录过去的身边',
+          path: '/pages/locality/locality'
+        }
+      }
+    },
+
+    clickToDetail: function (e) {
+      const index = e.currentTarget.dataset.index
+      const record = this.getRecord(index)
+
+      wx.navigateTo({
+        url: './recordDetail?recordId=' + record.recordId + '&section=' + index.section + '&row=' + index.row
+      })
+    },
+
+    clickLike: function (e) {
+      common.clickLike({
+        index: e.currentTarget.dataset.index,
+        that: this
+      })
+    },
+
+    clickShare: function (e) {
+      console.log('clickShare')
+      if (!((typeof wx.canIUse === 'function') && wx.canIUse('button.open-type.share'))) {
+        wx.showModal({
+          title: '当前版本不支持转发按钮',
+          content: '请升级至最新版本微信客户端',
+          showCancel: false
+        })
+      }
+    },
+
+    clickMore: function (e) {
+      const index = e.currentTarget.dataset.index
+
+      wx.showActionSheet({
+        itemList: ['删除收藏'],
+        itemColor: '#ff0000',
+        success: (res) => {
+          if (res.tapIndex === 0) {
+            common.clickFavorites({
+              index: index,
+              that: this,
+              success: (res) => {
+                this.deleteRecord(index)
+              }
+            })
+          }
+        }
+      })
+    },
+
+    clickToMap: function (e) {
+      const index = e.currentTarget.dataset.index
+      let record = this.getRecord(index)
+
+      wx.openLocation({
+        latitude: record.lat,
+        longitude: record.lng
+      })
+    },
+
+    clickToSwitch: function () {
+      wx.switchTab({
+        url: './find'
+      })
+    },
+
+    previewImage: function (e) {
+      const current = e.target.dataset.src
+      const record = this.getRecord(e.target.dataset.index)
+      wx.previewImage({
+        current,
+        urls: record.imageList
+      })
+    },
+
+    getRecord: function (index) {
+      return this.recordList[index.section][index.row]
+    },
+    changeRecord: function (index, record) {
+      this.recordList[index.section].splice(index.row, 1, record)
+    },
+    deleteRecord: function (index) {
+      this.recordList[index.section].splice(index.row, 1)
+    },
+
+    // 0点赞，1收藏
+    changeStatus: function (type, index) {
+      common.changeStatus({
+        type,
+        index,
+        that: this
+      })
+    }
+  })
+</script>
+
+<style >
+  .container {} 
+</style>
+
+<script  type='application/json'>
+  {
+    "enablePullDownRefresh": true,
+    "usingComponents": {}
+  }
+</script>

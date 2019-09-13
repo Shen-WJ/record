@@ -1,0 +1,244 @@
+<template>
+  <view class='container'>
+
+  <!-- 暂时不做组件化处理，以后增加其他分享页面时再做处理 -->
+  <view class='nav' style='height:{{navH}}px'>
+    <view class='title_icon'>
+      <image src='../image/icon/nav_back.png' mode='aspectFit' class='back' bindtap='navBack'></image>
+      <view></view>
+      <image src='../image/icon/nav_home.png' mode='aspectFit' class='home' bindtap='navHome'></image>
+    </view>
+    <view class='title_text'>
+      详情
+    </view>
+  </view>
+
+  <import src="../utils/recordItem.wxml"/>
+
+  <view class="detail_container" style="margin-top: {{navH}}px;">
+    <template is="recordItem" data="{{record:record, rcdIndex:0, rcdType:0}}"/>
+  </view>
+  </view>
+</template>
+
+<script>
+  import { createPage } from '@mpxjs/core'
+  import net from '../utils/net'
+  const common = require('../utils/common.js')
+  const app = getApp()
+
+  const getRequest = function (that) {
+    net.reqGet({
+      url: 'record/detail',
+      query: {
+        recordId: that.data.recordId
+      }
+    }).then(data => {
+      wx.stopPullDownRefresh()
+
+      that.setData({
+        record: common.getRecordListFrom([data.data], 1)[0]
+      })
+    })
+  }
+
+  createPage({
+
+    data: {
+      navH: app.globalData.navHeight,
+      record: {},
+      locDigit: {}
+    },
+
+    onLoad: function (options) {
+      this.data.recordId = options.recordId
+      if (!common.isEmpty(options.row)) {
+        this.oldIndex = {
+          section: parseInt(options.section),
+          row: parseInt(options.row)
+        }
+      }
+
+      getRequest(this)
+    },
+
+    onPullDownRefresh: function () {
+      getRequest(this)
+    },
+
+    onShareAppMessage: function (res) {
+      return {
+        title: this.data.record.location,
+        path: '/pages/recordDetail/recordDetail?recordId=' + this.data.recordId
+      }
+    },
+
+    navHome: function () {
+      wx.switchTab({
+        url: './locality'
+      })
+    },
+    navBack: function () {
+      let that = this
+      wx.navigateBack({
+        delta: 1,
+        fail (res) {
+          console.log(res)
+          that.navHome()
+        }
+      })
+    },
+
+    clickLike: function (e) {
+      common.clickLike({
+        index: 0,
+        that: this,
+        success: (res) => {
+          this.changeFormerPageStatus(0)
+        }
+      })
+    },
+
+    clickFavorites: function (e) {
+      common.clickFavorites({
+        index: 0,
+        that: this,
+        success: (res) => {
+          this.changeFormerPageStatus(1)
+        }
+      })
+    },
+
+    clickShare: function (e) {
+      console.log('clickShare')
+      if (!((typeof wx.canIUse === 'function') && wx.canIUse('button.open-type.share'))) {
+        wx.showModal({
+          title: '当前版本不支持转发按钮',
+          content: '请升级至最新版本微信客户端',
+          showCancel: false
+        })
+      }
+    },
+
+    clickMore: function (e) {
+      wx.showActionSheet({
+        itemList: ['举报'],
+        success: res => {
+          if (res.tapIndex === 0) {
+            let list = wx.getStorageSync('reportList')
+            if (common.isEmpty(list[this.data.recordId])) {
+              wx.showActionSheet({
+                itemList: ['黄赌毒暴骗', '侵犯隐私/人身攻击', '政治', '广告/垃圾信息', '其他'],
+                success: res => {
+                  wx.navigateTo({
+                    url: './singleInput?pageType=report&recordId=' + this.data.recordId + '&reportType=' + res.tapIndex
+                  })
+                }
+              })
+            } else {
+              wx.showToast({
+                title: '已举报过此内容',
+                icon: 'none'
+              })
+            }
+          }
+        }
+      })
+    },
+
+    previewImage: function (e) {
+      const current = e.target.dataset.src
+      wx.previewImage({
+        current,
+        urls: this.data.record.imageList
+      })
+    },
+
+    clickToMap: function (e) {
+      let record = this.data.record
+
+      wx.openLocation({
+        latitude: record.lat,
+        longitude: record.lng
+      })
+    },
+
+    getRecord: function (index) {
+      return this.data.record
+    },
+    changeRecord: function (index, record) {
+      this.setData({
+        record: record
+      })
+    },
+
+    // 0点赞，1收藏
+    changeFormerPageStatus: function (type) {
+      const pages = getCurrentPages()
+      let toSetPage = pages[pages.length - 2]
+      toSetPage.changeStatus(type, this.oldIndex)
+    }
+  })
+</script>
+
+<style >
+
+  .container {} 
+  
+  .nav {
+    width: 100%;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    background: #2ab3f3;
+  }
+  
+  .title_text {
+    color: white;
+    width: 100%;
+    height: 45px;
+    line-height: 45px;
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 10;
+    font-size: 26rpx;
+  }
+  
+  .title_icon {
+    position: absolute;
+    bottom: 10rpx;
+    left: 10rpx;
+    box-sizing: border-box;
+    display: flex;
+    z-index: 20;
+  }
+  
+  .title_icon image {
+    display: inline-block;
+    overflow: hidden;
+    width: 32rpx;
+    height: 36rpx;
+    padding: 16rpx 32rpx;
+    text-align: center;
+  }
+  
+  .title_icon view {
+    height: 18px;
+    border-left: 1px solid #ffffff;
+    margin-top: 6px;
+  }
+
+</style>
+
+<script  type='application/json'>
+  {
+    "enablePullDownRefresh": true,
+    "usingComponents": {},
+    "navigationStyle": "custom"
+  }
+</script>
+

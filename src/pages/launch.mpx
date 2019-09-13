@@ -1,0 +1,75 @@
+<template>
+  <view class="skip" catchtap="skipLaunch">跳过{{counter}}</view>
+  <image class="launch_img" mode="aspectFill" src="../image/launch.jpeg"></image>
+</template>
+
+<script>
+  import { createPage } from '@mpxjs/core'
+  let stop = false
+  createPage({
+    data: {
+      counter: 3
+    },
+    onLoad () {
+      let timer = setTimeout(() => {
+        clearTimeout(timer)
+        this.direct()
+      }, 3000)
+
+      let timer1 = setTimeout(() => {
+        clearTimeout(timer1)
+        this.setData({
+          counter: 2
+        })
+      }, 1000)
+      let timer2 = setTimeout(() => {
+        clearTimeout(timer2)
+        this.setData({
+          counter: 1
+        })
+      }, 2000)
+    },
+
+    direct () {
+      if (!stop) {
+        wx.switchTab({
+          url: './locality'
+        })
+      }
+    },
+    skipLaunch () {
+      stop = true
+      wx.switchTab({
+        url: './locality'
+      })
+    }
+  })
+</script>
+
+<style>
+  page{
+    height: 100%;
+  }
+  .launch_img {
+    height: 100%;
+    width: 100%;
+  }
+  .skip {
+    position: absolute;
+    top: 150rpx;
+    right: 30rpx;
+    padding: 5rpx 15rpx;
+    border-radius: 10rpx;
+    background-color: #444;
+    color: #fff;
+    opacity: 0.6;
+  }
+</style>
+
+<script  type='application/json'>
+  {
+    "usingComponents": {},
+    "navigationBarTitleText": "",
+    "navigationStyle": "custom"
+  }
+</script>

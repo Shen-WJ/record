@@ -1,0 +1,142 @@
+<template>
+  <view class="table">
+    <view class="cell" bindtap="clickCell" data-index="0">
+        <text class="title">头像</text>
+        <image class="headPhoto" src="{{headUrl}}" mode="aspectFit"></image>
+    </view>
+    <view class="cell" bindtap="clickCell" data-index="1">
+        <text class="title">昵称</text>
+        <text class="description">{{nickname}}</text>
+    </view>
+    <view class="cell" bindtap="clickCell" data-index="2">
+        <text class="title">性别</text>
+        <text class="description">{{genders[sex]}}</text>
+    </view>
+  </view>
+</template>
+
+<script>
+  import { createPage } from '@mpxjs/core'
+  import net from '../utils/net'
+  const app = getApp()
+
+  createPage({
+
+    data: {
+      nickname: app.globalData.userInfo.nickname,
+      sex: app.globalData.userInfo.sex,
+      headUrl: app.globalData.userInfo.headUrl,
+      genders: ['未知', '男', '女']
+    },
+
+    onLoad: function (options) {
+      this.setData({
+        nickname: app.globalData.userInfo.nickname,
+        sex: app.globalData.userInfo.sex,
+        headUrl: app.globalData.userInfo.headUrl
+      })
+    },
+
+    onShareAppMessage: function () {
+      return {
+        title: '了解身边的过去，记录过去的身边',
+        path: '/pages/locality/locality'
+      }
+    },
+
+    clickCell: function (e) {
+      app.globalData.isTabbarPageRefresh[2] = true
+      const index = parseInt(e.currentTarget.dataset.index)
+      switch (index) {
+        case 0: {
+          wx.showModal({
+            title: '确定更新头像？',
+            content: '点击“确定”以使用当前微信头像。(由于微信后台的延迟，新头像可能无法及时获取。如此，请过几小时再试。)',
+            confirmColor: '#2ab3f3',
+            success: (res) => {
+              if (res.confirm) {
+                wx.getUserInfo({
+                  success: res => {
+                    net.reqPut({
+                      url: 'user/headUrl',
+                      body: {
+                        headUrl: res.userInfo.avatarUrl
+                      }
+                    }).then(data => {
+                      this.setData({
+                        headUrl: res.userInfo.avatarUrl
+                      })
+                      app.globalData.userInfo.headUrl = res.userInfo.avatarUrl
+                    })
+                  }
+                })
+              }
+            }
+          })
+          break
+        }
+        case 1: {
+          wx.navigateTo({
+            url: './singleInput?pageType=nickname'
+          })
+          break
+        }
+        case 2: {
+          wx.showActionSheet({
+            itemList: ['男', '女'],
+            success: res => {
+              const sex = (res.tapIndex + 1).toString()
+              net.reqPut({
+                url: 'user/info/sexUpdate',
+                body: {
+                  sex: sex
+                }
+              }).then(data => {
+                this.setData({
+                  sex: sex
+                })
+                app.globalData.userInfo.sex = sex
+              })
+            }
+          })
+          break
+        }
+      }
+    }
+  })
+</script>
+
+<style >
+  .table {
+    margin-top: 10rpx;
+    margin-bottom: 10rpx;
+  }
+  .cell {
+    display: flex;
+    justify-content: space-between;
+
+    margin: 20rpx;
+    padding: 20rpx;
+    border-radius: 10rpx;
+    box-shadow: 5rpx 5rpx 15rpx 0rpx #777;
+  }
+
+  .headPhoto {
+    width: 150rpx;
+    height: 150rpx;
+  }
+  .title {
+    font-size: 32rpx;
+    color: #222;
+  }
+  .description {
+    color: #888;
+    font-size: 26rpx;
+  }
+</style>
+<script  type='application/json'>
+  {
+    "usingComponents": {}
+  }
+</script>
+

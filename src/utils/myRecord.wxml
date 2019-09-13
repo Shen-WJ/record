@@ -1,0 +1,60 @@
+<template name="myRecord">
+  <block wx:for="{{recordList}}" wx:for-item="record" wx:for-index="row" wx:key="{{record.recordId}}">
+    <view class="record_item" bindtap="clickToDetail" data-index="{{row}}">
+      <!-- 位置icon -->
+      <view class="position_icon_line">
+        <view wx:if="{{row!=0}}" class="line1"></view>
+        <image class="position_icon" mode="aspectFit" src="../image/icon/me_pin.png" />
+        <view class="line2" style="height:{{recordListH[row]}}px;"></view>
+      </view>
+      <!-- record主体 -->
+      <view class="record_main">
+        <!-- 头部，包括昵称、时间等 -->
+        <view class="rm_header">
+          <view catchtap="clickToMap" data-index="{{row}}">
+            <text class="rmh_location">{{record.location}}</text><text class="rmc_jin_wei">{{record.distance}}</text>
+          </view>
+          <text class="rmh_time">{{record.timeStr}}</text>
+        </view>
+        <!-- 内容，包括地点文字图片点赞等 -->
+        <view class="rm_content">
+          <!-- 定位与地点 -->
+          <text class="rmc_jin_wei">{{record.locStr}}</text>
+
+          <view class="rmc_text rmc_text_break">
+            <text>{{record.content}}</text>
+            <!-- <text wx:if="{{record.hasMoreText}}" class="rmc_text_hasMore"> ...更多</text> -->
+          </view>        
+          <view class="rmc_image">
+            <block wx:for-items="{{record.imageList}}" wx:key="">
+              <image lazy-load="true" mode="aspectFill" src="{{item}}" data-src="{{item}}" data-index="{{row}}" catchtap="previewImage" />
+            </block>
+          </view>
+          <!-- icon's color is #777 and #d81e06 -->
+          <view class="rmc_icons" catchtap="blankTap">
+            <view class="icons4_1" catchtap="clickLike" data-index="{{row}}">
+              <image wx:if="{{record.isLiked}}"  src="../image/icon/like1.png"></image>
+              <image wx:else src="../image/icon/like0.png"></image>
+              <text>{{record.love}}</text>
+            </view>
+            
+            <view class="icons4_2" catchtap="clickFavorites" data-index="{{row}}">
+              <image wx:if="{{record.isFavorited}}" src="../image/icon/favorites1.png"/>
+              <image wx:else src="../image/icon/favorites0.png"/>
+            </view>
+
+            <button class="hided" open-type="share" catchtap="clickShare" id="hidedBtn" data-index="{{row}}" />
+            <label for="hidedBtn">
+              <view class="icons4_3">
+                <image src="../image/icon/share.png" />
+              </view>
+            </label>
+
+            <image class="icons4_4" catchtap="clickMore" data-index="{{row}}" src="../image/icon/more.png" />
+
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+</template>

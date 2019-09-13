@@ -1,0 +1,15 @@
+<!-- 
+@param textArr
+@param isShow
+ -->
+<template name="emptyView">
+  <block wx:if="{{isShow}}">
+    <view wx:if="{{textArr.length!=3}}" class="empty_view" catchtap="clickToSwitch" data-type="{{type}}">
+      <text class="empty_text">还没人哦，在附近留下你的<text class="can_click" >点滴痕迹</text>吧～0v0</text>
+    </view>
+    
+    <view wx:else class="empty_view" catchtap="clickToSwitch" data-type="{{type}}">
+      <text class="empty_text">{{textArr[0]}}<text class="can_click" >{{textArr[1]}}</text>{{textArr[2]}}</text>
+    </view>
+  </block>
+</template>

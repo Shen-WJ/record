@@ -1,0 +1,268 @@
+<template>
+  <view class='container'>
+  
+  <import src="../utils/recordItem.wxml"/>
+  <import src="../utils/common.wxml"/>
+
+  <view class="locality">
+  <block wx:for="{{sections}}" wx:for-item="sectionName" wx:for-index="section" wx:key="{{sectionName}}">
+    <!-- section0即使为空也要显示 -->
+    <block wx:if="{{recordListRac[section].length || section==0}}">
+      <view class="section_header">{{sectionName}}</view>
+      <template is="emptyView" data="{{isShow: (!recordListRac[0].length && section==0), type:0}}"/>
+      <block wx:for="{{recordListRac[section]}}" wx:key="{{item.recordId}}" wx:for-index="row">
+      <template is="recordItem" data="{{record:item, rcdIndex:{section:section, row:row}, rcdType:1}}"/>
+      </block>
+    </block>
+  </block>
+
+  <template is="emptyView" data="{{isShow: isReachBottom, type: 1, textArr:['已经到底啦！去','发现','查看更多内容吧～0v0']}}"/>
+  </view>
+
+  </view>
+</template>
+
+<script>
+  import { createPage } from '@mpxjs/core'
+  import net from '../utils/net'
+  const common = require('../utils/common.js')
+  const app = getApp()
+
+  const getRequest = function (that, isRefresh) {
+    let pageNum = isRefresh ? 0 : that.httpsData.nextPage
+
+    net.reqGet({
+      url: 'record/list/byLocation',
+      query: {
+        pageNum: pageNum,
+        lng: app.globalData.location.longitude,
+        lat: app.globalData.location.latitude
+      }
+    }).then(data => {
+      if (isRefresh) {
+        wx.stopPullDownRefresh()
+      }
+
+      let records = isRefresh ? [] : that.recordList[0]
+
+      if (!data.data.hasNextPage) {
+        getHotList(that)
+      }
+      if (data.data.total > 0) {
+        records = records.concat(common.getRecordListFrom(data.data.list))
+        that.httpsData = data.data
+      }
+      that.recordList = [records, []]
+    })
+  }
+
+  const getHotList = function (that) {
+    net.reqGet({
+      url: 'record/list/hot',
+      query: {
+        size: 5
+      }
+    }).then(data => {
+      let hotList = []
+      hotList = hotList.concat(common.getRecordListFrom(data.data))
+      that.recordList.splice(1, 1, hotList)
+
+      that.setData({
+        isReachBottom: true
+      })
+    })
+  }
+
+  createPage({
+    data: {
+      recordList: [[], []],
+      sections: ['附近', '全网热说'],
+      scrollTop: 0,
+      isReachBottom: false
+    },
+
+    computed: {
+      recordListRac: function () {
+        return this.recordList || [[], []]
+      }
+    },
+
+    onLoad: function (options) {
+      net.reqGet({
+        url: 'notice/count'
+      }).then(data => {
+        if (data.data > 0 || !wx.getStorageSync('isReadLocalNotice')) {
+          wx.showTabBarRedDot({
+            index: 3
+          })
+        }
+      })
+    },
+
+    onShow: function () {
+      common.getLocation({
+        success: (res) => {
+          if (!common.isEmpty(app.globalData.location)) {
+            if (common.getKilometerDistance(res.latitude, res.longitude, app.globalData.location.latitude, app.globalData.location.longitude) > 1) {
+              // 定位离开了1km才强制刷新
+              app.globalData.isTabbarPageRefresh[0] = true
+            }
+          }
+
+          if (app.globalData.isTabbarPageRefresh[0]) {
+            wx.pageScrollTo({
+              scrollTop: 0,
+              duration: 0
+            })
+            getRequest(this, true)
+            app.globalData.isTabbarPageRefresh[0] = false
+          }
+        }
+      })
+    },
+
+    onReady: function () {
+      common.getLocation({
+        success: (res) => {
+          getRequest(this, true)
+        }
+      })
+    },
+
+    onPullDownRefresh: function () {
+      getRequest(this, true)
+    },
+
+    onReachBottom: function () {
+      if (!common.isEmpty(this.httpsData) && this.httpsData.hasNextPage) {
+        getRequest(this, false)
+      }
+    },
+
+    onShareAppMessage: function (res) {
+      if (res.from === 'button') {
+        const record = this.getRecord(res.target.dataset.index)
+        const title = common.isEmpty(record.content) ? (record.nickname + '在' + record.location + '说') : record.content
+        return {
+          title: title,
+          path: '/pages/recordDetail/recordDetail?recordId=' + record.recordId
+        }
+      } else {
+        return {
+          title: '了解身边的过去，记录过去的身边',
+          path: '/pages/locality/locality'
+        }
+      }
+    },
+
+    clickToDetail: function (e) {
+      const index = e.currentTarget.dataset.index
+      const record = this.getRecord(index)
+
+      wx.navigateTo({
+        url: './recordDetail?recordId=' + record.recordId + '&section=' + index.section + '&row=' + index.row
+      })
+    },
+
+    clickLike: function (e) {
+      common.clickLike({
+        index: e.currentTarget.dataset.index,
+        that: this
+      })
+    },
+
+    clickFavorites: function (e) {
+      common.clickFavorites({
+        index: e.currentTarget.dataset.index,
+        that: this
+      })
+    },
+
+    clickShare: function (e) {
+      console.log('clickShare')
+      if (!((typeof wx.canIUse === 'function') && wx.canIUse('button.open-type.share'))) {
+        wx.showModal({
+          title: '当前版本不支持转发按钮',
+          content: '请升级至最新版本微信客户端',
+          showCancel: false
+        })
+      }
+    },
+
+    previewImage: function (e) {
+      const current = e.target.dataset.src
+      const record = this.getRecord(e.target.dataset.index)
+      console.log(e)
+      wx.previewImage({
+        current,
+        urls: record.imageList
+      })
+    },
+
+    clickToSwitch: function (e) {
+      console.log(e)
+      let type = parseInt(e.target.dataset.type)
+      if (type === 0) {
+        wx.switchTab({
+          url: './release'
+        })
+      } else {
+        wx.switchTab({
+          url: './find'
+        })
+      }
+    },
+
+    clickToMap: function (e) {
+      const index = e.currentTarget.dataset.index
+      let record = this.getRecord(index)
+
+      wx.openLocation({
+        latitude: record.lat,
+        longitude: record.lng
+      })
+    },
+
+    getRecord: function (index) {
+      return this.recordList[index.section][index.row]
+    },
+    changeRecord: function (index, record) {
+      this.recordList[index.section].splice(index.row, 1, record)
+    },
+
+    // 0点赞，1收藏，isAdd是否为添加
+    changeStatus: function (type, index) {
+      common.changeStatus({
+        type,
+        index,
+        that: this
+      })
+    }
+  })
+</script>
+
+<style >
+  .locality {
+    width: 750rpx;
+  }
+
+  .section_header{
+    padding:0 20rpx;
+    font-size:24rpx;
+    color:#6a6a6a;
+    background-color: #eeeff0;
+    line-height: 60rpx;
+    height: 60rpx;
+    width: 710rpx;
+  }
+  .section_header text{
+    color: #aaa
+  }
+</style>
+
+<script  type='application/json'>
+  {
+    "enablePullDownRefresh": true,
+    "usingComponents": {}
+  }
+</script>

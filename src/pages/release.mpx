@@ -1,0 +1,741 @@
+<template>
+  <view class='container'>
+  <wxs module="common" src="../utils/common.wxs"></wxs>
+
+  <view class="release">
+  <view class="top_buttons">
+    <button class="btn_clear" hover-class="touch_btn" bindtap="clickBtnClear">清空</button>
+    <button class="btn_release" hover-class="touch_btn" bindtap="clickBtnRelease">发布</button>
+  </view>
+  <view class="release_content">
+    <view class="location">
+      <input class="location_input" value="{{locationName}}" bindinput="locationInput" maxlength="{{loactionNameLength}}" placeholder="这里，是哪里？(1~{{loactionNameLength}}字)" placeholder-style="color:#aaa;"/>
+      <image class="location_choose" mode="aspectFit" src="../image/icon/toMap.png" catchtap="chooseLocation" />
+      <text class="location_text" catchtap="chooseLocation">地图选点</text>
+    </view>
+    <view class="sub_text">
+      <text class="location_digit">{{locationGPS}}\t</text>
+      <text class="location_length_count">{{loactionNameCount}}/{{loactionNameLength}}</text>
+    </view>
+    <textarea class="text_area" value="{{contentText}}" bindinput="textInput" maxlength="{{contentTextLength}}" placeholder="在这里，留下属于你的痕迹...(0~{{contentTextLength}}字)" placeholder-style="color:#aaa;"/>
+    <view class="sub_text">
+    <text class="text_length_count">{{contentTextCount}}/{{contentTextLength}}</text>
+    </view>  
+    <view class="img_area">
+    <view class="img_files">
+      <block wx:for="{{imageList}}" wx:for-item="image" wx:key="{{index}}">
+      <view class="img_file">
+        <image class="img" mode="aspectFill" src="{{image}}" data-src="{{image}}" bindtap="previewImage"><image class="img_remove" src="../image/icon/img_remove.png" catchtap="removeImg" data-index="{{index}}"/></image>
+      </view>
+      </block>
+    </view>
+    <view class="add_img_box">
+      <view class="add_img" bindtap="chooseImage"></view>
+    </view>
+    </view>
+  </view>
+  <view class="anonymous_choose">
+    <text>匿名发布</text>
+    <switch class="switch" checked="{{isAnonymous}}" bindchange="changeAnonymous"></switch>
+  </view>
+  <view class="private_choose">
+    <text>给后来者也看看吧？</text>
+    <picker class="private_choose_picker" mode="multiSelector" range="{{privateType}}" range-key="text" bindchange="changePrivateType" bindcolumnchange="columnchange" bindcancel="cancelChange" bindtap="clickPicker"><text>{{privateType[0][privateTypeIndex].text}}</text><image src="../image/icon/arrow_right.png" /></picker>
+  </view>
+  <button class="bottom_btn" bindtap="clickBtnRelease">发布</button>
+
+  </view>
+
+  <dialog isShow="{{isShowDialog}}" title='发布需要头像/昵称' content='在这里，留下你的点滴痕迹。没有头像/昵称可没法发布哦' showCancel="{{false}}" confirmText="去授权" open_type="getUserInfo" bindSuccess='authorizeUserInfo'></dialog>
+
+
+  </view>
+</template>
+
+<script>
+  import { createPage } from '@mpxjs/core'
+  import net from '../utils/net'
+  const common = require('../utils/common.js')
+
+  const app = getApp()
+
+  const loactionNameLength = 25
+  const contentTextLength = 500
+  const imgListLength = 9
+  const strReleaseLocationName = 'release_locationName'
+  const strReleaseLocationDigit = 'release_locationDigit'
+  const strReleaseLocationGPS = 'release_locationGPS'
+  const strReleaseContentText = 'release_contentText'
+  const strReleaseImageList = 'release_ImageList'
+
+  createPage({
+
+    data: {
+      locationName: '',
+      contentText: '',
+      loactionNameCount: 0,
+      contentTextCount: 0,
+      locationGPS: '',
+      imageList: [],
+      privateTypeIndex: 0,
+      privateTypeIndexTemp: 0,
+      privateType: [[{ text: '公开', value: 1 }, { text: '私密', value: 0 }]],
+      isAnonymous: 0,
+
+      loactionNameLength: loactionNameLength,
+      contentTextLength: contentTextLength,
+
+      isShowDialog: false
+    },
+
+    onLoad: function (options) {
+      const name = wx.getStorageSync(strReleaseLocationName)
+      if (name) {
+        this.setData({
+          locationName: name
+        })
+      }
+
+      const digit = wx.getStorageSync(strReleaseLocationDigit)
+      if (digit) {
+        this.locationDigit = digit
+        this.setData({
+          locationGPS: common.formatLocation(digit.longitude, digit.latitude)
+        })
+      }
+
+      const text = wx.getStorageSync(strReleaseContentText)
+      if (text) {
+        this.setData({
+          contentText: text
+        })
+      }
+
+      const list = wx.getStorageSync(strReleaseImageList)
+      if (list) {
+        this.setData({
+          imageList: list
+        })
+      }
+    },
+
+    onShow: function () {
+      wx.getSetting({
+        success: (res) => {
+          console.log(res)
+          if (!res.authSetting['scope.userInfo']) {
+            this.setData({
+              isShowDialog: true
+            })
+          } else {
+            this.setData({
+              isShowDialog: false
+            })
+          }
+        }
+      })
+
+      if (common.isEmpty(this.data.locationName) && common.isEmpty(this.data.contentText) && common.isEmpty(this.data.imageList)) {
+        common.getLocation({
+          success: (res) => {
+            this.locationDigit = { latitude: res.latitude, longitude: res.longitude }
+            this.setData({
+              locationGPS: common.formatLocation(res.longitude, res.latitude)
+            })
+            this.autoSave(1)
+          }
+        })
+      }
+    },
+
+    onShareAppMessage: function () {
+      return {
+        title: '了解身边的过去，记录过去的身边',
+        path: '/pages/locality/locality'
+      }
+    },
+
+    // type:0:定位名，1，定位经纬度，2，内容文字，3，图片
+    autoSave: function (type) {
+      let key, data
+      switch (type) {
+        case 0: {
+          key = strReleaseLocationName
+          data = this.data.locationName
+          break
+        }
+        case 1: {
+          key = strReleaseLocationDigit
+          data = this.locationDigit
+          wx.setStorageSync(strReleaseLocationGPS, this.data.locationGPS)
+          break
+        }
+        case 2: {
+          key = strReleaseContentText
+          data = this.data.contentText
+          break
+        }
+        case 3: {
+          key = strReleaseImageList
+          data = this.data.imageList
+          break
+        }
+      }
+      wx.setStorageSync(key, data)
+    },
+
+    clearSave: function () {
+      wx.removeStorageSync(strReleaseLocationName)
+      wx.removeStorageSync(strReleaseLocationDigit)
+      wx.removeStorageSync(strReleaseContentText)
+      wx.removeStorageSync(strReleaseImageList)
+    },
+
+    clickBtnClear: function (e) {
+      console.log('clickBtnClear')
+
+      this.clearSave()
+
+      let that = this
+      common.getLocation({
+        success: (res) => {
+          that.locationDigit = { latitude: res.latitude, longitude: res.longitude }
+          that.setData({
+            locationGPS: common.formatLocation(res.longitude, res.latitude)
+          })
+        }
+      })
+
+      this.setData({
+        locationName: '',
+        contentText: '',
+        loactionNameCount: 0,
+        contentTextCount: 0,
+        imageList: [],
+        isAnonymous: 0,
+        privateTypeIndex: 0
+      })
+    },
+
+    clickBtnRelease: function (e) {
+      console.log('clickBtnRelease')
+
+      if (common.isEmpty(this.data.locationName)) {
+        wx.showToast({
+          title: '一定要说清楚这是哪儿哦\nOvO',
+          icon: 'none'
+        })
+        return
+      } else if (common.isEmpty(this.data.contentText) && common.isEmpty(this.data.imageList)) {
+        wx.showToast({
+          title: '正文或图片，至少要有一个呐~',
+          icon: 'none'
+        })
+        return
+      }
+      // 检查定位
+      let that = this
+      let digitLoc = this.locationDigit
+      common.getLocation({
+        success: (res) => {
+          let resLoc = { latitude: res.latitude, longitude: res.longitude }
+          let distance = common.getKilometerDistance(digitLoc.latitude, digitLoc.longitude, resLoc.latitude, resLoc.longitude)
+          if (distance > 1) {
+            wx.showModal({
+              title: '初始定位与当前定位不符',
+              content: '你最初编辑时使用的定位与此刻的定位相差' + distance + 'km，是否使用当前定位？',
+              cancelText: '旧定位',
+              confirmText: '新定位',
+              showCancel: true,
+              success (res) {
+                if (res.confirm) {
+                  digitLoc = { latitude: resLoc.latitude, longitude: resLoc.longitude }
+                  that.upLoadFiles()
+                } else if (res.cancel) {
+                  // 此为点击cancel“旧定位”，为了避免安卓的微信区分点击蒙层还是界面的取消按钮
+                  that.upLoadFiles()
+                }
+              }
+            })
+          } else {
+            that.upLoadFiles()
+          }
+        },
+        fail: function (res) {
+          that.upLoadFiles()
+        }
+      })
+    },
+    // 发布图片和文字
+    upLoadFiles: function () {
+      if (this.isRequesting) return
+      this.isRequesting = true
+      wx.showLoading({
+        title: ''
+      })
+      if (this.data.imageList.length > 0) { // 有图片，需要考虑异步处理
+        // 上传图片文件，获取URL列表
+        let imgUrls = []
+        let imgs = this.data.imageList
+        let waitingCount = imgs.length
+        var that = this
+        for (let i = 0; i < imgs.length; i++) {
+          wx.uploadFile({
+            url: net.baseUrl + 'upload',
+            filePath: imgs[i],
+            name: 'file',
+            complete: res => {
+              console.log('uploadFile_complete',res)
+              let jsonData = common.strToJson(res.data)
+
+              if (jsonData.code === 0) {
+                let url = jsonData.data
+                console.log(url)
+
+                if (!common.isEmpty(url)) {
+                  imgUrls[i] = url
+                } else {
+                  imgUrls[i] = ''
+                }
+
+                waitingCount--
+                console.log('i:' + i + '\twait:' + waitingCount)
+                console.log(imgUrls)
+                // 最后一个返回的图片url
+                if (waitingCount === 0) {
+                  console.log('the last one---i:' + i + '\twait:' + waitingCount)
+                  // 发布
+                  that.requestRelease(imgUrls)
+                }
+              } else {
+                this.isRequesting = false
+                wx.showToast({
+                  title: '上传图片失败，请重试',
+                  icon: 'none',
+                  duration: 2000
+                })
+              }
+            }
+          })
+        }
+      } else { // 无图直接上传
+        // 发布
+        this.requestRelease([])
+      }
+    },
+
+    requestRelease: function (imgUrls) {
+      // 剩余的URL用‘’填充
+      let count = imgListLength - imgUrls.length
+      while (count) {
+        imgUrls.push('')
+        count--
+      }
+      console.log(imgUrls)
+
+      const param = {
+        location: this.data.locationName,
+        content: this.data.contentText,
+        img1: imgUrls[0],
+        img2: imgUrls[1],
+        img3: imgUrls[2],
+        img4: imgUrls[3],
+        img5: imgUrls[4],
+        img6: imgUrls[5],
+        img7: imgUrls[6],
+        img8: imgUrls[7],
+        img9: imgUrls[8],
+        lng: this.locationDigit.longitude,
+        lat: this.locationDigit.latitude,
+        isAnonymous: this.data.isAnonymous,
+        isPublic: this.data.privateType[0][this.data.privateTypeIndex].value
+      }
+
+      net.reqPost({
+        url: 'record/info',
+        body: param
+      }).then(data => {
+        this.isRequesting = false
+        this.clickBtnClear()
+        app.globalData.isTabbarPageRefresh = [true, true, true]
+        wx.showToast({
+          title: '成功'
+        })
+      }).catch(err => {
+        this.isRequesting = false
+        console.log(err)
+      })
+    },
+
+    locationInput: function (e) {
+      this.setData({
+        locationName: e.detail.value,
+        loactionNameCount: e.detail.value.length
+      })
+      this.autoSave(0)
+    },
+
+    chooseLocation: function (e) {
+      wx.chooseLocation({
+        success: res => {
+          this.setData({
+            locationName: res.name,
+            locationGPS: common.formatLocation(res.longitude, res.latitude)
+          })
+          this.locationDigit = { latitude: res.latitude, longitude: res.longitude }
+        }
+      })
+    },
+
+    textInput: function (e) {
+      this.setData({
+        contentText: e.detail.value,
+        contentTextCount: e.detail.value.length
+      })
+      this.autoSave(2)
+    },
+
+    chooseImage () {
+      const that = this
+      var imgs = this.data.imageList
+      if (imgListLength - imgs.length > 0) {
+        wx.chooseImage({
+          sourceType: ['camera', 'album'],
+          sizeType: ['compressed'],
+          count: (imgListLength - imgs.length),
+          success (res) {
+            console.log(res)
+            for (let i = 0; i < res.tempFilePaths.length; i++) {
+              imgs.push(res.tempFilePaths[i])
+            }
+            that.setData({
+              imageList: imgs
+            })
+
+            that.autoSave(3)
+          }
+        })
+      } else {
+        wx.showToast({
+          title: '图片上限9张,请删除后重选',
+          icon: 'none',
+          duration: 3000
+        })
+      }
+    },
+
+    previewImage (e) {
+      const current = e.target.dataset.src
+      wx.previewImage({
+        current,
+        urls: this.data.imageList
+      })
+    },
+
+    removeImg (e) {
+      console.log(e)
+      let imgs = this.data.imageList
+      imgs.splice(e.currentTarget.dataset.index, 1)
+      this.setData({
+        imageList: imgs
+      })
+      this.autoSave(3)
+    },
+
+    changeAnonymous: function (e) {
+      this.setData({
+        isAnonymous: e.detail.value ? 1 : 0
+      })
+    },
+
+    changePrivateType: function (e) {
+      console.log(e)
+
+      this.setData({
+        privateTypeIndex: e.detail.value[0]
+      })
+    },
+    columnchange: function (e) {
+      this.setData({
+        privateTypeIndex: e.detail.value
+      })
+    },
+    // 恢复当前状态
+    cancelChange: function (e) {
+      console.log(e)
+      this.setData({
+        privateTypeIndex: this.data.privateTypeIndexTemp
+      })
+    },
+    // 保存当前状态
+    clickPicker: function (e) {
+      console.log(e)
+      this.data.privateTypeIndexTemp = this.data.privateTypeIndex
+    },
+
+    authorizeUserInfo (e) {
+      wx.getSetting({
+        success: (res) => {
+          console.log(res)
+          if (!res.authSetting['scope.userInfo']) {
+            this.setData({
+              isShowDialog: true
+            })
+          } else {
+            this.setData({
+              isShowDialog: false
+            })
+            common.updateUserInfo({ userInfo: e.detail.detail.userInfo })
+          }
+        }
+      })
+    }
+  })
+</script>
+
+<style >
+
+  .container {} 
+  .top_buttons{
+    height: 100rpx;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .top_buttons button{
+    line-height: 60rpx;
+    height: 60rpx;
+    width: 160rpx;
+    padding: 0rpx;
+    border-radius: 30rpx;
+    background-color: transparent;
+    font-size: 30rpx;
+    text-align: center;
+  }
+  .btn_clear{
+    color: red;
+    position: absolute;
+    left: -30rpx;
+    top: 10rpx;
+    border:3rpx solid red;
+
+  }
+
+  .btn_release{
+    color: #2ab3f3;
+    position: absolute;
+    right: -30rpx;
+    top: 10rpx;
+    border:3rpx solid #2ab3f3;
+
+  }
+  .touch_btn{
+    color: white;
+    border-color: white;
+  }
+
+  .release_content {
+    margin: 0 10rpx;
+  }
+  .location {
+    display: flex;
+    align-items: center;
+
+    margin: 20rpx 15rpx 5rpx;
+  }
+  .location_input {
+    border-bottom: 1rpx solid #888;
+    flex-grow: 1;
+    margin-right: 20rpx;
+  }
+  .location_choose {
+    width: 50rpx;
+    height: 50rpx;
+  }
+  .location_text {
+    font-size: 30rpx;
+    color: #2ab3f3;
+  }
+  .sub_text {
+    margin: 5rpx 15rpx 0rpx;
+    height: 30rpx;
+  }
+  .sub_text text {
+    color: #888;
+    font-size: 26rpx;
+  }
+  .sub_text .location_digit{
+    color: #aaa;
+    font-size: 24rpx;
+    float: left;
+  }
+  .sub_text .location_length_count{
+    float: right;
+  }
+  .release_content .text_area {
+    box-sizing: border-box;
+    margin: 40rpx 15rpx 5rpx;
+    border: 1rpx solid #888;
+    border-radius: 4rpx;
+    padding: 5rpx 10rpx;
+    width: 700rpx;
+  }
+  .text_length_count{
+    float: right;
+  }
+
+  .img_area {
+    margin-left: 15rpx;
+    margin-bottom: -4px;
+    margin-right: 0px;
+    overflow: hidden;
+  }
+  .img_area .img_file {
+    float: left;
+    margin-right: 9px;
+    margin-bottom: 9px;
+  }
+  .img_area .img {
+    display: block;
+    position: relative;
+    width: 79px;
+    height: 79px;
+  }
+  .img_area .img_remove{
+    position: absolute;
+    height: 15px;
+    width: 15px;
+    right: 0rpx;
+    top: 0rpx;
+  }
+  .add_img_box {
+    float: left;
+    position: relative;
+    margin-right: 9px;
+    margin-bottom: 9px;
+    width: 77px;
+    height: 77px;
+    border: 1px solid #D9D9D9;
+  }
+  .add_img_box:before,
+  .add_img_box:after {
+    content: " ";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+    background-color: #D9D9D9;
+  }
+  .add_img_box:before {
+    width: 2px;
+    height: 39.5px;
+  }
+  .add_img_box:after {
+    width: 39.5px;
+    height: 2px;
+  }
+  .add_img_box:active {
+    border-color: #999999;
+  }
+  .add_img_box:active:before,
+  .add_img_box:active:after {
+    background-color: #999999;
+  }
+  .add_img {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+  }
+
+
+  .anonymous_choose{
+    padding: 30rpx 20rpx;
+  }
+  .anonymous_choose text{
+    color: #666;
+  }
+  .anonymous_choose switch{
+    float: right;
+  }
+
+  .private_choose {
+    padding: 30rpx 20rpx;
+  }
+  .private_choose text{
+    color: #666;
+  }
+  .private_choose_picker{
+    width: 120rpx;
+    float: right;
+  }
+  .private_choose_picker text{
+    color: #888;
+  }
+  .private_choose_picker image{
+    position: relative;
+    top: 50%;
+    width: 40rpx;
+    height: 40rpx;
+    float: right;
+  }
+  /* .wx-switch-input{width:40px !important;height:20px !important;}
+  .wx-switch-input::before{width:41px !important;height: 20px !important;}
+  .wx-switch-input::after{width: 18px !important;height: 18px !important;} */
+
+  .bottom_btn{
+    margin-top: 50rpx;
+    color: white;
+    background-color: #2ab3f3;
+    width: 90%;
+  }
+
+
+
+  .zan-dialog__mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100000;
+    background: rgba(0, 0, 0, 0);
+    display: none;
+  }
+
+  .zan-dialog__container {
+    position: fixed;
+    bottom: 400rpx;
+    width: 650rpx;
+    height: 350rpx;
+    margin-left: 50rpx;
+    background: #f8f8f8;
+    transform: translateY(300%);
+    transition: all 0.4s ease;
+    z-index: 1000002;
+    border-radius: 20rpx;
+    box-shadow: 0px 3px 3px 2px gainsboro;
+  }
+
+  .zan-dialog--show .zan-dialog__container {
+    transform: translateY(0);
+  }
+
+  .zan-dialog--show .zan-dialog__mask {
+    display: block;
+  }
+
+
+</style>
+
+<script  type='application/json'>
+  {
+    "usingComponents": {
+      "dialog": "../components/dialog"
+    }
+  }
+</script>

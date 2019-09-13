@@ -1,0 +1,163 @@
+<template>
+  <view class='container'>
+  <cover-view class='mask' wx:if='{{isShow}}'>
+    <cover-view class='modal'>
+      <cover-view class='title' wx:if='{{title}}'>{{title}}</cover-view>
+      <cover-view class='content'>{{content}}</cover-view>
+      <cover-view class='btns'>
+      <button class='cancel' bindtap='Cancel' wx:if='{{showCancel}}'>取消</button>
+      <button wx:if="{{open_type === 'contact'}}" class='success' bindcontact='Success' open-type='{{open_type}}'>{{confirmText}}</button>
+      <button wx:elif="{{open_type === 'getUserInfo'}}" class='success' bindgetuserinfo='Success' open-type='{{open_type}}'>{{confirmText}}</button>
+      <button wx:elif="{{open_type === 'getPhoneNumber'}}" class='success' bindgetphonenumber='Success' open-type='{{open_type}}'>{{confirmText}}</button>
+      <button wx:else class='success' bindtap='Success' open-type='{{open_type}}'>{{confirmText}}</button>
+      </cover-view>
+    </cover-view>
+  </cover-view>
+  </view>
+</template>
+
+<script>
+  import { createComponent } from '@mpxjs/core'
+  createComponent({
+    /**
+    * 组件的属性列表
+    */
+    properties: {
+      // 是否显示
+      isShow: {
+        type: Boolean,
+        value: true
+      },
+      // 弹框标题
+      title: {
+        type: String,
+        value: ''
+      },
+      // 弹框内容
+      content: {
+        type: String,
+        value: ''
+      },
+      // 是否显示取消按钮
+      showCancel: {
+        type: Boolean,
+        value: true
+      },
+      // 确认按钮文本
+      confirmText: {
+        type: String,
+        value: '确定'
+      },
+      // 确认按钮的open-type
+      open_type: {
+        type: String,
+        value: ''
+      }
+      // bindSuccess 在HTML使用该属性可将 使用页面 的函数绑定到确认按钮的事件当中去
+      // bindCancel 在HTML使用该属性可将 使用页面 的函数绑定到取消按钮的事件当中去
+    },
+
+    /**
+    * 组件的初始数据
+    */
+    data: {
+    },
+    /**
+    * 组件的方法列表
+    */
+    methods: {
+      close: function () {
+        this.setData({
+          isShow: true
+        })
+      },
+      Success: function (e) {
+        console.log('Success')
+        var myEventDetail = e // detail对象，提供给事件监听函数
+        var myEventOption = {} // 触发事件的选项
+        this.triggerEvent('Success', myEventDetail, myEventOption)
+        this.close()
+      },
+      Cancel: function (e) {
+        var myEventDetail = e // detail对象，提供给事件监听函数
+        var myEventOption = {} // 触发事件的选项
+        this.triggerEvent('Cancel', myEventDetail, myEventOption)
+        this.close()
+      }
+    }
+  })
+</script>
+
+<style >
+  .container {} 
+  .mask {
+    background-color: rgba(0, 0, 0, 0.7);
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+  }
+  
+  .modal {
+    width: 580rpx;
+    background-color: #fff;
+    border-radius: 8rpx;
+    position: absolute;
+    left: 50%;
+    top: 45%;
+    transform: translate(-50%, -50%);
+  }
+  
+  .title {
+    font-size: 32rpx;
+    color: #0e0e0e;
+    text-align: center;
+    line-height: 105rpx;
+    margin: 0 20rpx;
+    box-sizing: border-box;
+    border-bottom: 1rpx solid #e6e6e6;
+    font-weight: 700;
+  }
+  
+  .content {
+    color: #878787;
+    font-size: 28rpx;
+    line-height: 47rpx;
+    white-space: pre-wrap;
+    padding: 30rpx 86rpx 40rpx;
+    text-align: center;
+    letter-spacing: 1rpx;
+  }
+  
+  .btns {
+    height: 100rpx;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f6f6f6;
+    font-size: 32rpx;
+    border-top: 1rpx solid #e6e6e6;
+  }
+  
+  .cancel {
+    line-height: 100rpx;
+    flex-grow: 1;
+    border-right: 1rpx solid #e6e6e6;
+  }
+  
+  .success {
+    line-height: 100rpx;
+    flex-grow: 1;
+    color: #2ab3f3;
+  }
+</style>
+
+<script  type='application/json'>
+  {
+    "component": true,
+    "usingComponents": {}
+  }
+</script>
+
