@@ -16,33 +16,13 @@
   import { createPage } from '@mpxjs/core'
   import net from '../utils/net'
   import { storeMode } from '../stores/storeCommon'
+  import { behaviorOnRecord } from '../behavior/behaviorOnRecord'
 
   const common = require('../utils/common.js')
 
-  let getRequest = function (that, isRefresh) {
-    let pageNum = isRefresh ? 0 : that.data.resData.nextPage
-
-    net.reqGet({
-      url: 'record/list/byCollection',
-      query: {
-        pageNum: pageNum
-      }
-    }).then(data => {
-      if (isRefresh) {
-        wx.stopPullDownRefresh()
-      }
-
-      let records = isRefresh ? [] : that.recordList[0]
-
-      records = records.concat(common.getRecordListFrom(data.data.list))
-      that.httpsData = data.data
-      that.recordList = [records, []]
-    })
-  }
-
   createPage({
+    behaviors: [behaviorOnRecord],
     data: {
-      recordList: [[], []]
     },
     computed: {
       recordListRac: function () {
@@ -50,62 +30,29 @@
       },
       ...storeMode.mapState(['darkMode'])
     },
-
     onLoad: function (options) {
-      getRequest(this, true)
+      this.getRequest(true)
     },
 
-    onPullDownRefresh: function () {
-      getRequest(this, true)
-    },
+    getRequest: function (isRefresh) {
+      let pageNum = isRefresh ? 0 : this.data.resData.nextPage
 
-    onReachBottom: function () {
-      if (!common.isEmpty(this.httpsData) && this.httpsData.hasNextPage) {
-        getRequest(this, false)
-      }
-    },
-
-    onShareAppMessage: function (res) {
-      if (res.from === 'button') {
-        const record = this.getRecord(res.target.dataset.index)
-        const title = common.isEmpty(record.content) ? (record.nickname + '在' + record.location + '说') : record.content
-        return {
-          title: title,
-          path: '/pages/recordDetail/recordDetail?recordId=' + record.recordId
+      net.reqGet({
+        url: 'record/list/byCollection',
+        query: {
+          pageNum: pageNum
         }
-      } else {
-        return {
-          title: '了解身边的过去，记录过去的身边',
-          path: '/pages/locality/locality'
+      }).then(data => {
+        if (isRefresh) {
+          wx.stopPullDownRefresh()
         }
-      }
-    },
 
-    clickToDetail: function (e) {
-      const index = e.currentTarget.dataset.index
-      const record = this.getRecord(index)
+        let records = isRefresh ? [] : this.recordList[0]
 
-      wx.navigateTo({
-        url: './recordDetail?recordId=' + record.recordId + '&section=' + index.section + '&row=' + index.row
+        records = records.concat(common.getRecordListFrom(data.data.list))
+        this.httpsData = data.data
+        this.recordList = [records, []]
       })
-    },
-
-    clickLike: function (e) {
-      common.clickLike({
-        index: e.currentTarget.dataset.index,
-        that: this
-      })
-    },
-
-    clickShare: function (e) {
-      console.log('clickShare')
-      if (!((typeof wx.canIUse === 'function') && wx.canIUse('button.open-type.share'))) {
-        wx.showModal({
-          title: '当前版本不支持转发按钮',
-          content: '请升级至最新版本微信客户端',
-          showCancel: false
-        })
-      }
     },
 
     clickMore: function (e) {
@@ -128,49 +75,15 @@
       })
     },
 
-    clickToMap: function (e) {
-      const index = e.currentTarget.dataset.index
-      let record = this.getRecord(index)
-
-      wx.openLocation({
-        latitude: record.lat,
-        longitude: record.lng
-      })
-    },
-
     clickToSwitch: function () {
       wx.switchTab({
         url: './find'
       })
     },
 
-    previewImage: function (e) {
-      const current = e.target.dataset.src
-      const record = this.getRecord(e.target.dataset.index)
-      wx.previewImage({
-        current,
-        urls: record.imageList
-      })
-    },
-
-    getRecord: function (index) {
-      return this.recordList[index.section][index.row]
-    },
-    changeRecord: function (index, record) {
-      this.recordList[index.section].splice(index.row, 1, record)
-    },
     deleteRecord: function (index) {
       this.recordList[index.section].splice(index.row, 1)
     },
-
-    // 0点赞，1收藏
-    changeStatus: function (type, index) {
-      common.changeStatus({
-        type,
-        index,
-        that: this
-      })
-    }
   })
 </script>
 

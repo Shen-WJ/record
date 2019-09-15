@@ -68,9 +68,6 @@
                         headUrl: res.userInfo.avatarUrl
                       }
                     }).then(data => {
-                      this.setData({
-                        headUrl: res.userInfo.avatarUrl
-                      })
                       storeUser.commit('updateUserInfo', { headUrl: res.userInfo.avatarUrl })
                     })
                   }
@@ -97,9 +94,6 @@
                   sex: sex
                 }
               }).then(data => {
-                this.setData({
-                  sex: sex
-                })
                 storeUser.commit('updateUserInfo', { sex: sex })
               })
             }

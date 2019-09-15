@@ -16,7 +16,7 @@ export const storeUser = createStore({
       if (headUrl) {
         state.headUrl = headUrl
       }
-      if (typeof sex === 'Number') {
+      if (typeof sex === 'number' || (typeof sex === 'string' && sex.toString() > 0)) {
         state.sex = sex
       }
     },

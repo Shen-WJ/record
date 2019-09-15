@@ -26,36 +26,11 @@
   import { createPage } from '@mpxjs/core'
   import net from '../utils/net'
   import { storeMode } from '../stores/storeCommon'
+  import { behaviorOnRecord } from '../behavior/behaviorOnRecord'
+
   const common = require('../utils/common.js')
   const app = getApp()
 
-  const getRequest = function (that, isRefresh) {
-    let pageNum = isRefresh ? 0 : that.httpsData.nextPage
-
-    net.reqGet({
-      url: 'record/list/byLocation',
-      query: {
-        pageNum: pageNum,
-        lng: app.globalData.location.longitude,
-        lat: app.globalData.location.latitude
-      }
-    }).then(data => {
-      if (isRefresh) {
-        wx.stopPullDownRefresh()
-      }
-
-      let records = isRefresh ? [] : that.recordList[0]
-
-      if (!data.data.hasNextPage) {
-        getHotList(that)
-      }
-      if (data.data.total > 0) {
-        records = records.concat(common.getRecordListFrom(data.data.list))
-        that.httpsData = data.data
-      }
-      that.recordList = [records, []]
-    })
-  }
 
   const getHotList = function (that) {
     net.reqGet({
@@ -75,6 +50,7 @@
   }
 
   createPage({
+    behaviors: [behaviorOnRecord],
     data: {
       recordList: [[], []],
       sections: ['附近', '全网热说'],
@@ -123,7 +99,7 @@
               scrollTop: 0,
               duration: 0
             })
-            getRequest(this, true)
+            this.getRequest(true)
             app.globalData.isTabbarPageRefresh[0] = false
           }
         }
@@ -133,78 +109,38 @@
     onReady: function () {
       common.getLocation({
         success: (res) => {
-          getRequest(this, true)
+          this.getRequest(true)
         }
       })
     },
 
-    onPullDownRefresh: function () {
-      getRequest(this, true)
-    },
-
-    onReachBottom: function () {
-      if (!common.isEmpty(this.httpsData) && this.httpsData.hasNextPage) {
-        getRequest(this, false)
-      }
-    },
-
-    onShareAppMessage: function (res) {
-      if (res.from === 'button') {
-        const record = this.getRecord(res.target.dataset.index)
-        const title = common.isEmpty(record.content) ? (record.nickname + '在' + record.location + '说') : record.content
-        return {
-          title: title,
-          path: '/pages/recordDetail/recordDetail?recordId=' + record.recordId
+    getRequest: function (isRefresh) {
+      let pageNum = isRefresh ? 0 : this.httpsData.nextPage
+      let distance = isRefresh ? -1 : this.distance
+      net.reqGet({
+        url: 'record/list/byLocation',
+        query: {
+          pageNum: pageNum,
+          distance: distance,
+          lng: app.globalData.location.longitude,
+          lat: app.globalData.location.latitude
         }
-      } else {
-        return {
-          title: '了解身边的过去，记录过去的身边',
-          path: '/pages/locality/locality'
+      }).then(data => {
+        if (isRefresh) {
+          wx.stopPullDownRefresh()
+          this.distance = data.data.distance
         }
-      }
-    },
 
-    clickToDetail: function (e) {
-      const index = e.currentTarget.dataset.index
-      const record = this.getRecord(index)
+        let records = isRefresh ? [] : this.recordList[0]
 
-      wx.navigateTo({
-        url: './recordDetail?recordId=' + record.recordId + '&section=' + index.section + '&row=' + index.row
-      })
-    },
-
-    clickLike: function (e) {
-      common.clickLike({
-        index: e.currentTarget.dataset.index,
-        that: this
-      })
-    },
-
-    clickFavorites: function (e) {
-      common.clickFavorites({
-        index: e.currentTarget.dataset.index,
-        that: this
-      })
-    },
-
-    clickShare: function (e) {
-      console.log('clickShare')
-      if (!((typeof wx.canIUse === 'function') && wx.canIUse('button.open-type.share'))) {
-        wx.showModal({
-          title: '当前版本不支持转发按钮',
-          content: '请升级至最新版本微信客户端',
-          showCancel: false
-        })
-      }
-    },
-
-    previewImage: function (e) {
-      const current = e.target.dataset.src
-      const record = this.getRecord(e.target.dataset.index)
-      console.log(e)
-      wx.previewImage({
-        current,
-        urls: record.imageList
+        if (!data.data.hasNextPage) {
+          getHotList(this)
+        }
+        if (data.data.total > 0) {
+          records = records.concat(common.getRecordListFrom(data.data.list))
+          this.httpsData = data.data
+        }
+        this.recordList = [records, []]
       })
     },
 
@@ -220,32 +156,6 @@
           url: './find'
         })
       }
-    },
-
-    clickToMap: function (e) {
-      const index = e.currentTarget.dataset.index
-      let record = this.getRecord(index)
-
-      wx.openLocation({
-        latitude: record.lat,
-        longitude: record.lng
-      })
-    },
-
-    getRecord: function (index) {
-      return this.recordList[index.section][index.row]
-    },
-    changeRecord: function (index, record) {
-      this.recordList[index.section].splice(index.row, 1, record)
-    },
-
-    // 0点赞，1收藏，isAdd是否为添加
-    changeStatus: function (type, index) {
-      common.changeStatus({
-        type,
-        index,
-        that: this
-      })
     }
   })
 </script>

@@ -1,9 +1,9 @@
 <template>
   <view class="navbar {{showThemeBgColor&&!darkMode?'themeMode':''}} {{darkMode?'darkMode':'dayMode'}}" style='height:{{navH}}px'>
     <view wx:if="{{showBackIcon}}" class='navbar-icon'>
-      <image src='../image/icon/nav_back.png' mode='aspectFit' bindtap='navBack'></image>
+      <image src='{{navBackIcon}}' mode='aspectFit' bindtap='navBack'></image>
       <view></view>
-      <image src='../image/icon/nav_home.png' mode='aspectFit' bindtap='navHome'></image>
+      <image src='{{navHomeIcon}}' mode='aspectFit' bindtap='navHome'></image>
     </view>
     <view class="navbar-title {{darkMode?'fontColorW0':'fontColorB0'}}">
       点迹
@@ -40,7 +40,13 @@
       navH: app.globalData.navHeight
     },
     computed: {
-      ...storeMode.mapState(['darkMode'])
+      ...storeMode.mapState(['darkMode']),
+      navBackIcon () {
+        return require('../image/icon/nav_back' + (storeMode.state.darkMode ? 1 : 0) + '.png')
+      },
+      navHomeIcon () {
+        return require('../image/icon/nav_home' + (storeMode.state.darkMode ? 1 : 0) + '.png')
+      }
     },
     methods: {
       navBack: function () {

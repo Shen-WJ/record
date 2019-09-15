@@ -1,45 +1,22 @@
 <template>
-  <personalPage id="personalPage" pageType="me" isShowDialog="{{isShowDialog}}" />
+  <personalPage id="personalPage" pageType="others" otherUserId="{{otherUserId}}" showBackIcon="{{true}}"/>
 </template>
 
 <script>
   import { createPage } from '@mpxjs/core'
-
-  const app = getApp()
   const common = require('../utils/common.js')
 
   createPage({
     data: {
-      isShowDialog: false
+      otherUserId: 10001,
+      recordListH: []
     },
-    onShow: function () {
-      if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-        this.getTabBar().setData({
-          selected: 3
+
+    onLoad: function (option) {
+      if (option.otherUserId) {
+        this.setData({
+          otherUserId: parseInt(option.otherUserId)
         })
-      }
-      // 查看是否有权限，有则消失或从不显示
-      wx.getSetting({
-        success: (res) => {
-          if (!res.authSetting['scope.userInfo']) {
-            this.setData({
-              isShowDialog: true
-            })
-          } else {
-            this.setData({
-              isShowDialog: false
-            })
-          }
-        }
-      })
-      // 显示后相应其他页面要求的刷新
-      if (app.globalData.isTabbarPageRefresh[2]) {
-        wx.pageScrollTo({
-          scrollTop: 0,
-          duration: 0
-        })
-        this._getRequest(true)
-        app.globalData.isTabbarPageRefresh[2] = false
       }
     },
     onReady: function () {
@@ -49,15 +26,13 @@
       this._getRequest(true)
     },
     onReachBottom: function () {
-      let component = this.selectComponent('#personalPage')
-      if (!common.isEmpty(component.httpsData) && component.httpsData.hasNextPage) {
+      if (!common.isEmpty(this.httpsData) && this.httpsData.hasNextPage) {
         this._getRequest(false)
       }
     },
     onShareAppMessage: function (res) {
-      let component = this.selectComponent('#personalPage')
       if (res.from === 'button') {
-        const record = component.getRecord(res.target.dataset.index)
+        const record = this.getRecord(res.target.dataset.index)
         const title = common.isEmpty(record.content) ? (record.nickname + '在' + record.location + '说') : record.content
         return {
           title: title,
@@ -91,4 +66,3 @@
     }
   }
 </script>
-

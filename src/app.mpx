@@ -108,7 +108,8 @@
       "./pages/find",
       "./pages/userInfo",
       "./pages/singleText",
-      "./pages/settings"
+      "./pages/settings",
+      "./pages/otherPeople"
     ],
     "window": {
       "backgroundTextStyle": "light",

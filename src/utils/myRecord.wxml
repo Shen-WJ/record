@@ -32,26 +32,42 @@
           </view>
           <!-- icon's color is #777 and #d81e06 -->
           <view class="rmc_icons" catchtap="blankTap">
-            <view class="icons4_1" catchtap="clickLike" data-index="{{row}}">
-              <image wx:if="{{record.isLiked}}"  src="../image/icon/like1.png"></image>
-              <image wx:else src="../image/icon/like0.png"></image>
-              <text>{{record.love}}</text>
-            </view>
-            
-            <view class="icons4_2" catchtap="clickFavorites" data-index="{{row}}">
-              <image wx:if="{{record.isFavorited}}" src="../image/icon/favorites1.png"/>
-              <image wx:else src="../image/icon/favorites0.png"/>
-            </view>
-
-            <button class="hided" open-type="share" catchtap="clickShare" id="hidedBtn" data-index="{{row}}" />
-            <label for="hidedBtn">
-              <view class="icons4_3">
-                <image src="../image/icon/share.png" />
+            <block wx:if="{{rcdType==0}}">
+              <view class="icons4_1" catchtap="clickLike" data-index="{{rcdIndex}}">
+                <image wx:if="{{record.isLiked}}"  src="../image/icon/like1.png"></image>
+                <image wx:else src="../image/icon/like0.png"></image>
+                <text>{{record.love}}</text>
               </view>
-            </label>
+              <view class="icons4_2" catchtap="clickFavorites" data-index="{{rcdIndex}}">
+                <image wx:if="{{record.isFavorited}}" src="../image/icon/favorites1.png"/>
+                <image wx:else src="../image/icon/favorites0.png"/>
+              </view>
+              <button class="hided" open-type="share" catchtap="clickShare" id="hidedBtn" data-index="{{rcdIndex}}" />
+              <label for="hidedBtn">
+                <view class="icons4_3">
+                  <image src="../image/icon/share.png" />
+                </view>
+              </label>
+              <image class="icons4_4" catchtap="clickMore" data-index="{{rcdIndex}}" src="../image/icon/more.png" />
+            </block>
 
-            <image class="icons4_4" catchtap="clickMore" data-index="{{row}}" src="../image/icon/more.png" />
-
+            <block wx:elif="{{rcdType==1}}">
+              <view class="icons3_1" catchtap="clickLike" data-index="{{rcdIndex}}">
+                <image wx:if="{{record.isLiked}}"  src="../image/icon/like1.png"></image>
+                <image wx:else src="../image/icon/like0.png"></image>
+                <text>{{record.love}}</text>
+              </view>
+              <view class="icons3_2" catchtap="clickFavorites" data-index="{{rcdIndex}}">
+                <image wx:if="{{record.isFavorited}}" src="../image/icon/favorites1.png"/>
+                <image wx:else src="../image/icon/favorites0.png"/>
+              </view>
+              <button class="hided" open-type="share" catchtap="clickShare" id="hidedBtn" data-index="{{rcdIndex}}" />
+              <label for="hidedBtn">
+                <view class="icons3_3">
+                  <image src="../image/icon/share.png" />
+                </view>
+              </label>
+            </block>
           </view>
         </view>
       </view>
