@@ -1,4 +1,4 @@
-import storeUser from '../stores/storeUser'
+import { storeUser } from '../stores/storeUser'
 
 const md5 = require('../utils/md5.js')
 const hexMD5From = md5.hexMD5From

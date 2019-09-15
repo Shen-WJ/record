@@ -1,29 +1,20 @@
 <template>
-  <view class='container'>
+  <navigationBar pageName="点迹"/>
 
-  <!-- 暂时不做组件化处理，以后增加其他分享页面时再做处理 -->
-  <view class='nav' style='height:{{navH}}px'>
-    <view class='title_icon'>
-      <image src='../image/icon/nav_back.png' mode='aspectFit' class='back' bindtap='navBack'></image>
-      <view></view>
-      <image src='../image/icon/nav_home.png' mode='aspectFit' class='home' bindtap='navHome'></image>
+  <view class="container {{darkMode?'darkMode':''}}">
+    <import src="../utils/recordItem.wxml"/>
+
+    <view class="detail_container">
+      <template is="recordItem" data="{{record:record, rcdIndex:0, rcdType:0, darkMode:darkMode}}"/>
     </view>
-    <view class='title_text'>
-      详情
-    </view>
-  </view>
-
-  <import src="../utils/recordItem.wxml"/>
-
-  <view class="detail_container" style="margin-top: {{navH}}px;">
-    <template is="recordItem" data="{{record:record, rcdIndex:0, rcdType:0}}"/>
-  </view>
   </view>
 </template>
 
 <script>
   import { createPage } from '@mpxjs/core'
   import net from '../utils/net'
+  import { storeMode } from '../stores/storeCommon'
+
   const common = require('../utils/common.js')
   const app = getApp()
 
@@ -43,13 +34,14 @@
   }
 
   createPage({
-
     data: {
       navH: app.globalData.navHeight,
       record: {},
       locDigit: {}
     },
-
+    computed: {
+      ...storeMode.mapState(['darkMode'])
+    },
     onLoad: function (options) {
       this.data.recordId = options.recordId
       if (!common.isEmpty(options.row)) {
@@ -237,8 +229,9 @@
 <script  type='application/json'>
   {
     "enablePullDownRefresh": true,
-    "usingComponents": {},
-    "navigationStyle": "custom"
+    "usingComponents": {
+      "navigationBar": "../components/navigationBar"
+    }
   }
 </script>
 

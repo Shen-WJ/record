@@ -1,30 +1,31 @@
 <template>
-  <view class='container'>
+  <navigationBar pageName="点迹" showBackIcon="{{false}}"/>
+  <view class="container {{darkMode?'darkMode':''}}">
   
-  <import src="../utils/recordItem.wxml"/>
-  <import src="../utils/common.wxml"/>
-
-  <view class="locality">
-  <block wx:for="{{sections}}" wx:for-item="sectionName" wx:for-index="section" wx:key="{{sectionName}}">
-    <!-- section0即使为空也要显示 -->
-    <block wx:if="{{recordListRac[section].length || section==0}}">
-      <view class="section_header">{{sectionName}}</view>
-      <template is="emptyView" data="{{isShow: (!recordListRac[0].length && section==0), type:0}}"/>
-      <block wx:for="{{recordListRac[section]}}" wx:key="{{item.recordId}}" wx:for-index="row">
-      <template is="recordItem" data="{{record:item, rcdIndex:{section:section, row:row}, rcdType:1}}"/>
+    <import src="../utils/recordItem.wxml"/>
+    <import src="../utils/common.wxml"/>
+    <view class="locality">
+    <block wx:for="{{sections}}" wx:for-item="sectionName" wx:for-index="section" wx:key="{{sectionName}}">
+      <!-- section0即使为空也要显示 -->
+      <block wx:if="{{recordListRac[section].length || section==0}}">
+        <view class="section_header {{darkMode?'bgColorB0 fontColorW1':'bgColorW0 fontColorB1'}}">{{sectionName}}</view>
+        <template is="emptyView" data="{{isShow: (!recordListRac[0].length && section==0), type:0}}"/>
+        <block wx:for="{{recordListRac[section]}}" wx:key="{{item.recordId}}" wx:for-index="row">
+        <template is="recordItem" data="{{record:item, rcdIndex:{section:section, row:row}, rcdType:1, darkMode:darkMode}}"/>
+        </block>
       </block>
     </block>
-  </block>
 
-  <template is="emptyView" data="{{isShow: isReachBottom, type: 1, textArr:['已经到底啦！去','发现','查看更多内容吧～0v0']}}"/>
+    <template is="emptyView" data="{{isShow: isReachBottom, type: 1, textArr:['已经到底啦！去','发现','查看更多内容吧～0v0']}}"/>
+    </view>
   </view>
-
-  </view>
+  <view class="bottomHolder"/>
 </template>
 
 <script>
   import { createPage } from '@mpxjs/core'
   import net from '../utils/net'
+  import { storeMode } from '../stores/storeCommon'
   const common = require('../utils/common.js')
   const app = getApp()
 
@@ -84,10 +85,12 @@
     computed: {
       recordListRac: function () {
         return this.recordList || [[], []]
-      }
+      },
+      ...storeMode.mapState(['darkMode'])
     },
 
     onLoad: function (options) {
+      // wx.hideTabBar()
       net.reqGet({
         url: 'notice/count'
       }).then(data => {
@@ -100,6 +103,12 @@
     },
 
     onShow: function () {
+      if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+        this.getTabBar().setData({
+          selected: 0
+        })
+      }
+
       common.getLocation({
         success: (res) => {
           if (!common.isEmpty(app.globalData.location)) {
@@ -242,27 +251,29 @@
 </script>
 
 <style >
+  .container {
+    padding-bottom: env(safe-area-inset-bottom);
+    margin-bottom: 48px; 
+  }
   .locality {
     width: 750rpx;
   }
 
   .section_header{
     padding:0 20rpx;
-    font-size: 40rpx;
-    color:#444;
-    background-color: #eeeff0;
-    line-height: 100rpx;
-    height: 100rpx;
+    font-size: 36rpx;
+    font-weight: bold;
+    line-height: 70rpx;
+    height: 70rpx;
     width: 710rpx;
-  }
-  .section_header text{
-    color: #aaa
   }
 </style>
 
 <script  type='application/json'>
   {
     "enablePullDownRefresh": true,
-    "usingComponents": {}
+    "usingComponents": {
+      "navigationBar": "../components/navigationBar"
+    }
   }
 </script>

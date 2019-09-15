@@ -2,6 +2,7 @@
 <!-- {record, //动态的主体
       rcdIndex, //动态的index，由调用者自行决定数据类型
       rcdType //动态类型，决定底部icon显示类型和正文是否截取
+      darkMode //决定是否黑夜模式
       } 
       -->
 <template name="recordItem">
@@ -9,13 +10,13 @@
     <!-- 头像 -->
     <view class="record_avatar">
       <image wx:if="{{!record.isAnonymous}}"  class="user_avator" mode="aspectFill" src="{{record.headUrl}}"/>
-      <view wx:else class="avator_ni">匿</view>
+      <view wx:else class="avator_anonymous">匿</view>
     </view>
     <!-- record主体 -->
     <view class="record_main">
       <!-- 头部，包括昵称、时间等 -->
       <view class="rm_header">
-        <text class="rmh_name">{{record.nickname}}</text>
+        <text class="rmh_name {{darkMode?'fontColorW0':'fontColorB0'}}">{{record.nickname}}</text>
         <text class="rmh_time">{{record.timeStr}}</text>
       </view>
       <!-- 内容，包括地点文字图片点赞等 -->
@@ -23,7 +24,7 @@
         <!-- 定位与地点 -->
         <text class="rmc_location" catchtap="clickToMap" data-index="{{rcdIndex}}">{{record.location}}<text class="rmc_jin_wei">{{record.distance}}</text></text>
 
-        <view class="rmc_text {{rcdType == 0 ? '' : 'rmc_text_break'}}">
+        <view class="rmc_text {{rcdType == 0 ? '' : 'rmc_text_break'}} {{darkMode?'fontColorW1 bgColorB0':'fontColorB1 bgColorW0'}}">
           <text>{{record.content}}</text>
           <!-- <text wx:if="{{record.hasMoreText}}" class="rmc_text_hasMore"> ...更多</text> -->
         </view>

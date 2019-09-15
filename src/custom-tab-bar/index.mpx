@@ -1,0 +1,119 @@
+<template>
+  <view class="tab-bar {{darkMode?'darkMode':'dayMode'}}">
+    <view wx:for="{{list}}" wx:key="index" class="tab-bar-item" data-path="{{item.pagePath}}" data-index="{{index}}" bindtap="switchTab">
+      <image src="{{icons[index]}}"></image>
+      <view style="color: {{selected === index ? selectedColor : color}}">{{item.text}}</view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import { createComponent } from '@mpxjs/core'
+  import { storeMode } from '../stores/storeCommon'
+  import home from '../image/tabBar/home.png'
+  import home1 from '../image/tabBar/home1.png'
+  import find from '../image/tabBar/find.png'
+  import find1 from '../image/tabBar/find1.png'
+  import add from '../image/tabBar/add.png'
+  import add1 from '../image/tabBar/add1.png'
+  import me from '../image/tabBar/me.png'
+  import me1 from '../image/tabBar/me1.png'
+  const iconList = [home, home1, find, find1, add, add1, me, me1]
+  createComponent({
+    options: {
+      styleIsolation: 'shared'
+    },
+    properties: {
+    },
+    data: {
+      selected: 0,
+      color: '#7A7E83',
+      selectedColor: '#2ab3f3',
+      list: [{
+          'pagePath': '../pages/locality',
+          'text': '周围',
+        },
+        {
+          'pagePath': '../pages/find',
+          'text': '发现',
+        },
+        {
+          'pagePath': '../pages/release',
+          'text': '发布',
+        },
+        {
+          'pagePath': '../pages/me',
+          'text': '我',
+        }]
+    },
+    computed: {
+      icons: function () {
+        let icons = []
+        for (let i = 0; i < this.data.list.length; i++) {
+          icons.push(this.selected === i ? iconList[i * 2 + 1] : iconList[i * 2])
+        }
+        return icons
+      },
+      ...storeMode.mapState(['darkMode'])
+    },
+    pageShow() {
+      // 所在页面显示之后就会执行一次
+      console.log('page show')
+
+    },
+    pageHide() {
+      // 页面切入后台执行
+      console.log('page hide')
+
+    },
+    methods: {
+      switchTab(e) {
+        const data = e.currentTarget.dataset
+        const url = data.path
+        wx.switchTab({url})
+        this.setData({
+          selected: data.index
+        })
+      }
+    }
+  })
+</script>
+
+<style>
+  .tab-bar {
+    position: fixed;
+    bottom: env(safe-area-inset-bottom);
+    left: 50rpx;
+    right: 50rpx;
+    height: 48px;
+    width: 650rpx;
+    display: flex;
+    border-radius: 24px;
+    border: 2rpx solid #888;
+  }
+
+  .tab-bar-item {
+    flex: 1;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .tab-bar-item image {
+    width: 27px;
+    height: 27px;
+  }
+
+  .tab-bar-item view {
+    font-size: 10px;
+  }
+</style>
+
+<script type='application/json' lang='json'>
+  {
+    "component": true
+  }
+</script>
+

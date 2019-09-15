@@ -1,5 +1,7 @@
 <template>
-  <view class='container'>
+  <navigationBar pageName="点迹"/>
+
+  <view class="container {{darkMode?'darkMode':''}}">
     <block wx:if="{{type == 'userAgreement'}}">
       <import src="../utils/userAgreement.wxml"/>
       <template is="userAgreement" />
@@ -13,10 +15,15 @@
 </template>
 
 <script>
-import { createPage } from '@mpxjs/core'
+  import { createPage } from '@mpxjs/core'
+  import { storeMode } from '../stores/storeCommon'
+
   createPage({
     data: {
-      type: '',
+      type: ''
+    },
+    computed: {
+      ...storeMode.mapState(['darkMode'])
     },
 
     onLoad: function (option) {
@@ -42,7 +49,9 @@ import { createPage } from '@mpxjs/core'
 
 <script  type='application/json' lang='json'>
   {
-    "usingComponents": {}
+    "usingComponents": {
+      "navigationBar": "../components/navigationBar"
+    }
   }
 </script>
 

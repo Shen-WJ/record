@@ -1,17 +1,19 @@
 <template>
-  <view class='container'>
+  <navigationBar pageName="点迹"/>
+
+  <view class="container {{darkMode?'darkMode':''}}">
     <view class="table">
-      <view class="cell" catchtap="clickToPage" data-type="userInfo">
+      <view class="cell {{darkMode?'fontColorW0':'fontColorB0'}}" catchtap="clickToPage" data-type="userInfo">
         修改个人信息
       </view>
-      <view class="cell dark_mode_cell">
+      <view class="cell dark_mode_cell {{darkMode?'fontColorW1':'fontColorB1'}}">
         开启夜间模式
-        <switch class="switch" checked="{{true}}" bindchange="changeAnonymous"></switch>
+        <switch class="switch" checked="{{darkMode}}" bindchange="openDarkMode"></switch>
       </view>
-      <view class="cell" catchtap="clickToPage" data-type="about">
+      <view class="cell {{darkMode?'fontColorW2':'fontColorB2'}}" catchtap="clickToPage" data-type="about">
         关于
       </view>
-      <view class="cell" catchtap="clickToPage" data-type="userAgreement">
+      <view class="cell {{darkMode?'fontColorC bgColorB0':'fontColorC bgColorW0'}}" catchtap="clickToPage" data-type="userAgreement">
         用户协议
       </view>
     </view>
@@ -20,10 +22,37 @@
 
 <script>
   import { createPage } from '@mpxjs/core'
+  import { storeMode } from '../stores/storeCommon'
+
   createPage({
     data: {
     },
-
+    computed: {
+      ...storeMode.mapState(['darkMode'])
+    },
+    openDarkMode: function (res) {
+      storeMode.commit('openDarkMode',{
+        isOpen: res.detail.value
+      })
+      if (res.detail.value) { // dark
+        wx.setNavigationBarColor({
+          frontColor:"#ffffff",
+          backgroundColor:'#000000'
+        })
+        wx.setTabBarStyle({
+          backgroundColor: '#000000'
+        })
+      } else {
+        wx.setNavigationBarColor({
+          frontColor:"#ffffff",
+          backgroundColor:'#2ab3f3'
+        })
+        wx.setTabBarStyle({
+          backgroundColor: '#000000'
+        })
+      }
+      console.log(storeMode.state)
+    },
     clickToPage: function (res) {
       let type = res.currentTarget.dataset.type
       switch (type) {
@@ -33,7 +62,7 @@
           })
           break
         }
-        case 'about': 
+        case 'about':
         case 'userAgreement': {
           wx.navigateTo({
             url: './singleText?type=' + type
@@ -46,21 +75,22 @@
 </script>
 
 <style>
-
   .container {}
   .dark_mode_cell {
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
- .switch {
-   float: right;
- }
+  .switch {
+    float: right;
+  }
 </style>
 
 <script  type='application/json' lang='json'>
   {
-    "usingComponents": {}
+    "usingComponents": {
+      "navigationBar": "../components/navigationBar"
+    }
   }
 </script>
 

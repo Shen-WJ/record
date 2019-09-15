@@ -1,16 +1,24 @@
 <template>
-  <view class="table user_table">
-    <view class="cell user_cell" bindtap="clickCell" data-index="0">
-        <text class="title">头像</text>
-        <image class="headPhoto" src="{{headUrl}}" mode="aspectFit"></image>
-    </view>
-    <view class="cell user_cell" bindtap="clickCell" data-index="1">
-        <text class="title">昵称</text>
-        <text class="description">{{nickname}}</text>
-    </view>
-    <view class="cell user_cell" bindtap="clickCell" data-index="2">
-        <text class="title">性别</text>
-        <text class="description">{{genders[sex]}}</text>
+  <navigationBar pageName="点迹"/>
+
+  <view class="container {{darkMode?'darkMode':''}}">
+    <view class="table user_table">
+      <view class="cell1 user_cell {{darkMode?'bgColorB0':'bgColorW0'}}" bindtap="clickCell" data-index="0">
+          <text class="title {{darkMode?'fontColorW1':'fontColorB1'}}">头像</text>
+          <image class="headPhoto" src="{{headUrl}}" mode="aspectFit"></image>
+      </view>
+      <view class="cell1 user_cell {{darkMode?'bgColorB0':'bgColorW0'}}" bindtap="clickCell" data-index="1">
+          <text class="title {{darkMode?'fontColorW1':'fontColorB1'}}">昵称</text>
+          <text class="description">{{nickname}}</text>
+      </view>
+      <view class="cell1 user_cell {{darkMode?'bgColorB0':'bgColorW0'}}" bindtap="clickCell" data-index="2">
+          <text class="title {{darkMode?'fontColorW1':'fontColorB1'}}">性别</text>
+          <text class="description">{{genders[sex]}}</text>
+      </view>
+      <view class="cell1 user_cell {{darkMode?'bgColorB0':'bgColorW0'}}" bindtap="clickCell" data-index="3">
+          <text class="title {{darkMode?'fontColorW1':'fontColorB1'}}">个性签名</text>
+          <text class="description">{{signature}}</text>
+      </view>
     </view>
   </view>
 </template>
@@ -18,23 +26,21 @@
 <script>
   import { createPage } from '@mpxjs/core'
   import net from '../utils/net'
+  import { storeMode } from '../stores/storeCommon'
+  import { storeUser } from '../stores/storeUser'
+
   const app = getApp()
 
   createPage({
-
     data: {
-      nickname: app.globalData.userInfo.nickname,
-      sex: app.globalData.userInfo.sex,
-      headUrl: app.globalData.userInfo.headUrl,
       genders: ['未知', '男', '女']
+    },
+    computed: {
+      ...storeMode.mapState(['darkMode']),
+      ...storeUser.mapState(['nickname', 'headUrl', 'sex', 'signature'])
     },
 
     onLoad: function (options) {
-      this.setData({
-        nickname: app.globalData.userInfo.nickname,
-        sex: app.globalData.userInfo.sex,
-        headUrl: app.globalData.userInfo.headUrl
-      })
     },
 
     onShareAppMessage: function () {
@@ -45,7 +51,6 @@
     },
 
     clickCell: function (e) {
-      app.globalData.isTabbarPageRefresh[2] = true
       const index = parseInt(e.currentTarget.dataset.index)
       switch (index) {
         case 0: {
@@ -66,7 +71,7 @@
                       this.setData({
                         headUrl: res.userInfo.avatarUrl
                       })
-                      app.globalData.userInfo.headUrl = res.userInfo.avatarUrl
+                      storeUser.commit('updateUserInfo', { headUrl: res.userInfo.avatarUrl })
                     })
                   }
                 })
@@ -95,9 +100,15 @@
                 this.setData({
                   sex: sex
                 })
-                app.globalData.userInfo.sex = sex
+                storeUser.commit('updateUserInfo', { sex: sex })
               })
             }
+          })
+          break
+        }
+        case 3: {
+          wx.navigateTo({
+            url: './singleInput?pageType=signature'
           })
           break
         }
@@ -120,7 +131,6 @@
   }
   .title {
     font-size: 32rpx;
-    color: #222;
   }
   .description {
     color: #888;
@@ -129,7 +139,9 @@
 </style>
 <script  type='application/json'>
   {
-    "usingComponents": {}
+    "usingComponents": {
+      "navigationBar": "../components/navigationBar"
+    }
   }
 </script>
 

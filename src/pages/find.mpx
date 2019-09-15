@@ -1,12 +1,13 @@
 <template>
-  <view class='container'>
+  <navigationBar pageName="点迹" showBackIcon="{{false}}"/>
 
-    <view class="header">
+  <view class="container {{darkMode?'darkMode':''}}">
+    <view class="header {{darkMode?'bgColorB0':'bgColorW0'}}" style="top:{{navH}}px">
       <picker class="picker_distance" range="{{distanceType}}" range-key="text" value="{{distanceIndex}}" bindchange="changeFilter" data-type="0">
-        <button class="picker_btn" hover-class="touch_btn">{{distanceType[distanceIndex].text}}</button>
+        <button class="picker_btn {{darkMode ? 'fontColorW2':'fontColorB2'}}" hover-class="{{darkMode?'bgColorB1':'bgColorW1'}}">{{distanceType[distanceIndex].text}}</button>
       </picker>
       <picker class="picker_sort" range="{{sortType}}" range-key="text" value="{{sortIndex}}" bindchange="changeFilter" data-type="1">
-        <button class="picker_btn" hover-class="touch_btn">{{sortType[sortIndex].text}}</button>
+        <button class="picker_btn {{darkMode ? 'fontColorW2':'fontColorB2'}}" hover-class="{{darkMode?'bgColorB1':'bgColorW1'}}">{{sortType[sortIndex].text}}</button>
       </picker>
     </view>
     <view class="header_holder"></view>
@@ -16,7 +17,7 @@
     <view class="find">
       <template is="emptyView" data="{{isShow: !recordListRac[0].length, type:0}}"/>
       <block wx:for="{{recordListRac[0]}}" wx:key="{{item.recordId}}" wx:for-index="row">
-      <template is="recordItem" data="{{record:item, rcdIndex:{section:0, row:row}, rcdType:1}}"/>
+      <template is="recordItem" data="{{record:item, rcdIndex:{section:0, row:row}, rcdType:1, darkMode:darkMode}}"/>
       </block>
     </view>
   </view>
@@ -25,6 +26,8 @@
 <script>
   import { createPage } from '@mpxjs/core'
   import net from '../utils/net'
+  import { storeMode } from '../stores/storeCommon'
+
   const common = require('../utils/common.js')
   const app = getApp()
 
@@ -37,7 +40,8 @@
     { text: '全网', distance: -1 }
   ]
   const sortType = [
-    { text: '最热', type: 3 },
+    { text: '今日最热', type: 3 },
+    { text: '本周最热', type: 4 },
     { text: '最新', type: 1 },
     { text: '最早', type: 2 }
   ]
@@ -76,18 +80,25 @@
       distanceType: distanceType,
       distanceIndex: 0,
       sortType: sortType,
-      sortIndex: 0
+      sortIndex: 0,
+      navH: app.globalData.navHeight
     },
 
     computed: {
       recordListRac: function () {
         return this.recordList || [[], []]
-      }
+      },
+      ...storeMode.mapState(['darkMode'])
     },
 
     onShow: function () {
-      let that = this
+      if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+        this.getTabBar().setData({
+          selected: 1
+        })
+      }
 
+      let that = this
       common.getLocation({
         success: (res) => {
           if (!common.isEmpty(app.globalData.location)) {
@@ -259,11 +270,9 @@
     width: 100%;
     height: 80rpx;
     position: fixed;
-    top: 0; 
     margin-top: 0; 
     z-index: 99999;
 
-    background-color: #fff;
     opacity: 0.8;
     border-bottom: 1rpx solid #ccc;
   }
@@ -300,7 +309,6 @@
     line-height: 50rpx;
 
     font-size: 28rpx;
-    color: #6a6a6a;
     background-color: transparent;
 
     border-top-left-radius: 0rpx;
@@ -310,15 +318,13 @@
 
     border-bottom: 1px solid #bbb;
   }
-
-  .touch_btn {
-    background-color: #ddd;
-  }
 </style>
 
 <script  type='application/json'>
   {
     "enablePullDownRefresh": true,
-    "usingComponents": {}
+    "usingComponents": {
+      "navigationBar": "../components/navigationBar"
+    }
   }
 </script>

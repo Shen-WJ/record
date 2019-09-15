@@ -1,64 +1,66 @@
 <template>
-  <view class="me_hd" bindtap="clickHead">
-  <image class="me_hd_bg_img" mode="aspectFill">
-    <navigator url="./userInfo">
-      <image class="me_hd_photo" mode="aspectFit" src="{{headUrl}}"></image>
-    </navigator>
-    <view class="me_hd_name">
-    <navigator url="./userInfo">
-      <text class="me_hd_nameStr">{{nickname}}</text>
-      <image class="me_hd_gender" src="{{genderImg}}"  mode="aspectFit" ></image>
-    </navigator>
+  <navigationBar pageName="点迹" showBackIcon="{{false}}" showThemeBgColor="{{true}}"/>
+
+  <view class="container {{darkMode?'darkMode':''}}">
+    <view class="me_hd" bindtap="clickHead">
+    <image class="me_hd_bg_img {{darkMode?'darkMode':''}}" mode="aspectFill">
+      <navigator url="./userInfo">
+        <image class="me_hd_photo" mode="aspectFit" src="{{headUrl}}"></image>
+      </navigator>
+      <view class="me_hd_name">
+      <navigator url="./userInfo">
+        <text class="me_hd_nameStr">{{nickname}}</text>
+        <image class="me_hd_gender" src="{{genderImg}}"  mode="aspectFit" ></image>
+      </navigator>
+      </view>
+      <text class="me_hd_describe">{{signature}}</text>
+      <text class="me_hd_describe">{{recordsTotal}}个地点的记忆</text>
+      <view class="me_hd_notice_redDot" wx:if="{{isShowNoticeRedDot}}"></view>
+      <button class="me_hd_notice me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToNotice">通知 {{noticeCount}}</button>
+      <button class="me_hd_favorites me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToFavorites">收藏</button>
+      <button class="me_hd_settings me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSettings">设置</button>
+      <block wx:for="{{animations}}" wx:key="{{index}}">
+        <view class="me_hd_element{{index}}" animation="{{animations[index]}}">{{animationsText[index]}}</view>
+      </block>
+    </image>
     </view>
-    <text class="me_hd_describe">{{recordsTotal}}个地点的记忆</text>
-    <view class="me_hd_notice_redDot" wx:if="{{isShowNoticeRedDot}}"></view>
-    <button class="me_hd_notice me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToNotice">通知 {{noticeCount}}</button>
-    <button class="me_hd_favorites me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToFavorites">收藏</button>
-    <button class="me_hd_settings me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSettings">设置</button>
-    <block wx:for="{{animations}}" wx:key="{{index}}">
-      <view class="me_hd_element{{index}}" animation="{{animations[index]}}">{{animationsText[index]}}</view>
-    </block>
-  </image>
-  </view>
 
 
-  <import src="../utils/common.wxml"/>
-  <import src="../utils/myRecord.wxml"/>
-
-
-  <view class="me_template" wx:if="{{recordList.length<=0}}">
-
-    <template is="emptyView" data="{{isShow: !recordList.length, type:0, textArr:['以下是自定义的一些点迹模版，快','发布','自己的点迹吧～0v0\\n发布后以下内容会消失']}}"/>
-    <view class="me_template_bd">
-      <template is="myRecord" data="{{recordList:templateList, recordListH:recordListH}}" />
+    <import src="../utils/common.wxml"/>
+    <import src="../utils/myRecord.wxml"/>
+    <view id="{{darkMode?'darkMode':''}}" class="me_template" wx:if="{{recordList.length<=0}}">
+      <template is="emptyView" data="{{isShow: !recordList.length, type:0, textArr:['以下是自定义的一些点迹模版，快','发布','自己的点迹吧～0v0\\n发布后以下内容会消失']}}"/>
+      <view class="me_template_bd">
+        <template is="myRecord" data="{{recordList:templateList, recordListH:recordListH, darkMode:darkMode}}" />
+      </view>
+      <view class="me_template_bd_cover" style="height:{{templateListH}}px" catchtap="templateCatch"></view>
+      <template is="emptyView" data="{{isShow: !recordList.length, type:0, textArr:['以上是自定义的一些点迹模版，快','发布','自己的点迹吧～0v0\\n发布后以上内容会自动消失']}}"/>
     </view>
-    <view class="me_template_bd_cover" style="height:{{templateListH}}px" catchtap="templateCatch"></view>
-    <template is="emptyView" data="{{isShow: !recordList.length, type:0, textArr:['以上是自定义的一些点迹模版，快','发布','自己的点迹吧～0v0\\n发布后以上内容会自动消失']}}"/>
+
+    <view class="me_bd" wx:if="{{recordList.length>0}}">
+      <template is="myRecord" data="{{recordList:recordList, recordListH:recordListH, darkMode:darkMode}}" />
+    </view>
+
+    <dialog isShow="{{isShowDialog}}" title='获取信息' content='个人页面的展示需要昵称和头像。之后可以点击头像/昵称进行修改。' showCancel="{{false}}" confirmText="去授权" open_type="getUserInfo" bindSuccess='authorizeUserInfo'></dialog>
   </view>
-
-  <view class="me_bd" wx:if="{{recordList.length>0}}">
-    <template is="myRecord" data="{{recordList:recordList, recordListH:recordListH}}" />
-  </view>
-
-  <dialog isShow="{{isShowDialog}}" title='获取信息' content='个人页面的展示需要昵称和头像。之后可以点击头像/昵称进行修改。' showCancel="{{false}}" confirmText="去授权" open_type="getUserInfo" bindSuccess='authorizeUserInfo'></dialog>
-
-
 </template>
 
 <script>
   import { createPage } from '@mpxjs/core'
   import net from '../utils/net'
+  import { storeMode } from '../stores/storeCommon'
+  import { storeUser } from '../stores/storeUser'
 
   const common = require('../utils/common.js')
   const app = getApp()
 
   let elements = [
-    wx.createAnimation({ timingFunction: 'ease' }),
-    wx.createAnimation({ timingFunction: 'ease-in' }),
-    wx.createAnimation({ timingFunction: 'ease-in-out' }),
-    wx.createAnimation({ timingFunction: 'ease-out', duration: 800 })
+    wx.createAnimation({ timingFunction: 'ease', duration: 1000 }),
+    wx.createAnimation({ timingFunction: 'ease-in', duration: 1000  }),
+    wx.createAnimation({ timingFunction: 'ease-in-out', duration: 1000  }),
+    wx.createAnimation({ timingFunction: 'ease-out', duration: 1000 })
   ]
-  let animationCount = 0
+  let isAnimating = false
 
   const creattemplateList = function (that) {
     let templateList = []
@@ -102,12 +104,12 @@
       net.reqGet({
         url: 'user/info'
       }).then(data => {
-        app.globalData.userInfo = data.data
-        that.setData({
+        storeUser.commit('updateUserInfo', {
+          sex: data.data.sex,
           nickname: data.data.nickname,
-          headUrl: data.data.headUrl
+          headUrl: data.data.headUrl,
+          signature: data.data.signature
         })
-        that.sex = data.data.sex
       })
 
       net.reqGet({
@@ -169,9 +171,6 @@
       isShowDialog: false,
       animations: [],
       animationsText: ['分', '享', '生', '活'],
-      nickname: '',
-      sex: 0,
-      headUrl: '',
       templateList: [],
       templateListH: 0,
       recordListH: [],
@@ -179,16 +178,23 @@
     },
     computed: {
       genderImg: function () {
-        return require('../image/icon/gender' + (this.sex || '0') + '.png')
-      }
-    },
-
-    onLoad: function (options) {
+        return require('../image/icon/gender' + (storeUser.state.sex || '0') + '.png')
+      },
+      ...storeMode.mapState(['darkMode']),
+      ...storeUser.mapState(['nickname', 'headUrl', 'sex', 'signature'])
     },
 
     onShow () {
-      this.clickHead()
+      if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+        this.getTabBar().setData({
+          selected: 3
+        })
+      }
 
+      this.clickHead()
+      wx.setTabBarStyle({
+        backgroundColor: '#000000'
+      })
       common.getLocation()
 
       wx.getSetting({
@@ -272,44 +278,52 @@
     },
 
     clickHead (e) {
+      if (isAnimating) return
+      isAnimating = true
+      let timer = setTimeout(() => {
+        clearTimeout(timer)
+        this.animationOnHead(0)
+      }, 0)
+      let timer1 = setTimeout(() => {
+        clearTimeout(timer1)
+        this.animationOnHead(1)
+      }, 3000)
+    },
+
+    animationOnHead (type) {
+
       let exports = []
-      if (animationCount === 0) {
-        for (let j = 0; j < elements.length; j++) {
-          let animation1 = elements[j]
-          switch (j) {
+      if (type === 0) {
+        for (let i = 0; i < elements.length; i++) {
+          let animation = elements[i]
+          switch (i) {
             case 0: {
-              animation1.left('120rpx').top('20rpx').scale(1).rotate3d(0, 0, 0, 0).step()
+              animation.left('0rpx').top('0rpx').step()
               break
             }
             case 1: {
-              animation1.left('530rpx').top('20rpx').scale(1).rotate3d(0, 0, 0, 0).step()
+              animation.left('650rpx').top('0rpx').step()
               break
             }
             case 2: {
-              animation1.left('120rpx').top('250rpx').scale(1).rotate3d(0, 0, 0, 0).step()
+              animation.left('0rpx').top('260rpx').step()
               break
             }
             case 3: {
-              animation1.left('530rpx').top('250rpx').scale(1).rotate3d(0, 0, 0, 0).step()
+              animation.left('650rpx').top('260rpx').step()
               break
             }
           }
-          exports.push(animation1.export())
+          exports.push(animation.export())
         }
-        animationCount = 5
       } else {
         for (let i = 0; i < elements.length; i++) {
           let animation = elements[i]
-          let left = (Math.random() * 650) + 'rpx'
-          let top = (Math.random() * 260)
-          animation.left(left).top(`${top}rpx`)
-            .scale(Math.random() * 2, Math.random() * 2)
-            .rotate3d(300, 300, 300, Math.random() * 720 - 360).step()
+          animation.left('325rpx').top('75rpx').step()
           exports.push(animation.export())
         }
-        animationCount--
+        isAnimating = false
       }
-
       this.setData({
         animations: exports
       })
@@ -552,9 +566,7 @@
 </script>
 
 <style >
-  .container {} 
-  .page{
-    background-color: #2ab3f3;
+  .container {
   }
   .me_hd_bg_img {
     background-color: #2ab3f3;
@@ -645,8 +657,8 @@
   }
   .me_hd_element0{
     position: absolute;
-    left: 0rpx;
-    top: 0rpx;
+    left: 325rpx;
+    top: 75rpx;
     z-index: 10;
     width: 100rpx;
     height: 100rpx;
@@ -658,8 +670,8 @@
   }
   .me_hd_element1{
     position: absolute;
-    left: 0rpx;
-    top: 0rpx;
+    left: 325rpx;
+    top: 75rpx;
     z-index: 10;
     width: 100rpx;
     height: 100rpx;
@@ -671,8 +683,8 @@
   }
   .me_hd_element2{
     position: absolute;
-    left: 0rpx;
-    top: 0rpx;
+    left: 325rpx;
+    top: 75rpx;
     z-index: 10;
     width: 100rpx;
     height: 100rpx;
@@ -685,8 +697,8 @@
   }
   .me_hd_element3{
     position: absolute;
-    left: 0rpx;
-    top: 0rxp;
+    left: 325rpx;
+    top: 75rpx;
     z-index: 10;
     width: 100rpx;
     height: 100rpx;
@@ -708,14 +720,17 @@
   }
   .me_template_bd{
   }
-
+  .darkMode {
+    background-color: black;
+  }
 </style>
 
 <script  type='application/json'>
   {
     "enablePullDownRefresh": true,
     "usingComponents": {
-      "dialog": "../components/dialog"
+      "dialog": "../components/dialog",
+      "navigationBar": "../components/navigationBar"
     }
   }
 </script>

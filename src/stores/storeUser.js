@@ -1,25 +1,25 @@
 import { createStore } from '@mpxjs/core'
 
-const storeUser = createStore({
+export const storeUser = createStore({
   state: {
     userId: 0,
-    userInfo: {
-      nickname: '未知',
-      headUrl: '',
-      sex: 0
-    }
+    nickname: '未知',
+    headUrl: '',
+    sex: 0,
+    signature: '暂无个签'
   },
   mutations: {
-    updateUserInfo (state, { nickname = '', headUrl = '', sex = 0 }) {
+    updateUserInfo (state, { nickname = '', headUrl = '', sex = 0, signature = '' }) {
       if (nickname) {
-        state.userInfo.nickname = nickname
+        state.nickname = nickname
       }
       if (headUrl) {
-        state.userInfo.headUrl = headUrl
+        state.headUrl = headUrl
       }
       if (sex) {
-        state.userInfo.sex = sex
+        state.sex = sex
       }
+      state.signature = signature
     },
     updateUserId (state, { userId = 0 }) {
       if (userId > 10000) {
@@ -28,5 +28,3 @@ const storeUser = createStore({
     }
   }
 })
-
-export default storeUser

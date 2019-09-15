@@ -1,20 +1,24 @@
 <template>
-  <view class='container'>
-    <textarea wx:if="{{pageType=='report'}}" class="report_area" value="{{contentText}}" bindinput="textInput" maxlength="{{contentTextLength}}" placeholder="告诉我们举报的原因吧，我们将第一时间解决" placeholder-style="color:#aaa;"/>
-    <input wx:elif="{{pageType=='nickname'}}" class="nickname_input" value="{{contentText}}" bindinput="textInput" maxlength="{{contentTextLength}}" placeholder="昵称" placeholder-style="color:#aaa;"/>
+  <navigationBar pageName="点迹"/>
+
+  <view class="container {{darkMode?'darkMode':''}}">
+    <textarea wx:if="{{pageType === 'report' || pageType === 'signature'}}" class="report_area {{darkMode?'fontColorW1':'fontColorB1'}}" value="{{contentText}}" bindinput="textInput" maxlength="{{contentTextLength}}" placeholder="{{placeHolder}}" placeholder-style="{{darkMode?'color:#555;':'color:#aaa;'}}"/>
+    <input wx:elif="{{pageType === 'nickname'}}" class="nickname_input {{darkMode?'fontColorW1':'fontColorB1'}}" value="{{contentText}}" bindinput="textInput" maxlength="{{contentTextLength}}" placeholder="{{placeHolder}}" placeholder-style="{{darkMode?'color:#555;':'color:#aaa;'}}"/>
 
     <view class="sub_text">
       <text class="text_length_count">{{contentTextCount}}/{{contentTextLength}}</text>
     </view>
 
     <button class="bottom_btn" bindtap="clickBtnSend">{{btnName}}</button>
-
   </view>
 </template>
 
 <script>
   import { createPage } from '@mpxjs/core'
   import net from '../utils/net'
+  import { storeMode } from '../stores/storeCommon'
+  import { storeUser } from '../stores/storeUser'
+
   const app = getApp()
 
   createPage({
@@ -23,7 +27,11 @@
       contentTextLength: 140,
       contentTextCount: 0,
       pageType: '',
-      btnName: ''
+      btnName: '',
+      placeHolder: '请输入...'
+    },
+    computed: {
+      ...storeMode.mapState(['darkMode'])
     },
 
     onLoad: function (options) {
@@ -36,7 +44,8 @@
           this.recordId = options.recordId
           this.setData({
             contentTextLength: 140,
-            btnName: '举报'
+            btnName: '举报',
+            placeHolder: '告诉我们举报的原因吧，我们将第一时间解决'
           })
           break
         }
@@ -44,7 +53,17 @@
           this.setData({
             contentTextLength: 15,
             btnName: '确定',
-            contentText: app.globalData.userInfo.nickname || ''
+            contentText: storeUser.state.nickname || '',
+            placeHolder: '昵称(1-15字)'
+          })
+          break
+        }
+        case 'signature': {
+          this.setData({
+            contentTextLength: 50,
+            btnName: '确定',
+            contentText: storeUser.state.signature || '',
+            placeHolder: '简介(1-50字)'
           })
           break
         }
@@ -66,12 +85,19 @@
     },
 
     clickBtnSend: function (e) {
+      if (this.data.contentText.length <= 0 && this.data.pageType !== 'signature') {
+        wx.showToast({
+          title: '不得为空',
+          icon: 'none'
+        })
+        return
+      }
+      if (this.isRequseting) {
+        return
+      }
+      this.isRequseting = true
       switch (this.data.pageType) {
         case 'report': {
-          if (this.isRequseting) {
-            return
-          }
-          this.isRequseting = true
           net.reqPost({
             url: 'report/info',
             body: {
@@ -103,7 +129,6 @@
         }
         case 'nickname': {
           const timestamp = new Date().getTime()
-
           net.reqPut({
             url: 'user/info/nicknameUpdate',
             body: {
@@ -111,18 +136,27 @@
               nickName: this.data.contentText
             }
           }).then(data => {
-            app.globalData.userInfo.nickname = this.data.contentText
-
-            const pages = getCurrentPages()
-            let toSetPage = pages[pages.length - 2]
-            toSetPage.setData({
-              nickname: this.data.contentText
-            })
+            this.isRequseting = false
+            storeUser.commit('updateUserInfo', { nickname: this.data.contentText })
             wx.navigateBack({
               delta: 1
             })
           })
           break
+        }
+        case 'signature': {
+          net.reqPut({
+            url: 'user/info/signatureUpdate',
+            body: {
+              signature: this.data.contentText
+            }
+          }).then(data => {
+            this.isRequseting = false
+            storeUser.commit('updateUserInfo', { signature: this.data.contentText })
+            wx.navigateBack({
+              delta: 1
+            })
+          })
         }
       }
     }
@@ -172,6 +206,8 @@
 
 <script  type='application/json'>
   {
-    "usingComponents": {}
+    "usingComponents": {
+      "navigationBar": "../components/navigationBar"
+    }
   }
 </script>

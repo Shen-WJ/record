@@ -1,62 +1,60 @@
 <template>
-  <view class='container'>
-  <wxs module="common" src="../utils/common.wxs"></wxs>
+  <navigationBar pageName="点迹" showBackIcon="{{false}}"/>
 
-  <view class="release">
-  <view class="top_buttons">
-    <button class="btn_clear" hover-class="touch_btn" bindtap="clickBtnClear">清空</button>
-    <button class="btn_release" hover-class="touch_btn" bindtap="clickBtnRelease">发布</button>
-  </view>
-  <view class="release_content">
-    <view class="location">
-      <input class="location_input" value="{{locationName}}" bindinput="locationInput" maxlength="{{loactionNameLength}}" placeholder="这里，是哪里？(1~{{loactionNameLength}}字)" placeholder-style="color:#aaa;"/>
-      <image class="location_choose" mode="aspectFit" src="../image/icon/toMap.png" catchtap="chooseLocation" />
-      <text class="location_text" catchtap="chooseLocation">地图选点</text>
+  <view class="container {{darkMode?'darkMode':''}}">
+    <wxs module="common" src="../utils/common.wxs"></wxs>
+
+    <view class="top_buttons">
+      <button class="btn_clear" hover-class="touch_btn" bindtap="clickBtnClear">清空</button>
+      <button class="btn_release" hover-class="touch_btn" bindtap="clickBtnRelease">发布</button>
     </view>
-    <view class="sub_text">
-      <text class="location_digit">{{locationGPS}}\t</text>
-      <text class="location_length_count">{{loactionNameCount}}/{{loactionNameLength}}</text>
-    </view>
-    <textarea class="text_area" value="{{contentText}}" bindinput="textInput" maxlength="{{contentTextLength}}" placeholder="在这里，留下属于你的痕迹...(0~{{contentTextLength}}字)" placeholder-style="color:#aaa;"/>
-    <view class="sub_text">
-    <text class="text_length_count">{{contentTextCount}}/{{contentTextLength}}</text>
-    </view>  
-    <view class="img_area">
-    <view class="img_files">
-      <block wx:for="{{imageList}}" wx:for-item="image" wx:key="{{index}}">
-      <view class="img_file">
-        <image class="img" mode="aspectFill" src="{{image}}" data-src="{{image}}" bindtap="previewImage"><image class="img_remove" src="../image/icon/img_remove.png" catchtap="removeImg" data-index="{{index}}"/></image>
+    <view class="release_content">
+      <view class="location">
+        <input class="location_input {{darkMode?'fontColorW1':'fontColorB1'}}" value="{{locationName}}" bindinput="locationInput" maxlength="{{loactionNameLength}}" placeholder="这里，是哪里？(1~{{loactionNameLength}}字)" placeholder-style="{{darkMode?'color:#555;':'color:#aaa;'}}"/>
+        <image class="location_choose" mode="aspectFit" src="../image/icon/toMap.png" catchtap="chooseLocation" />
+        <text class="location_text" catchtap="chooseLocation">地图选点</text>
       </view>
-      </block>
+      <view class="sub_text">
+        <text class="location_digit">{{locationGPS}}\t</text>
+        <text class="location_length_count">{{loactionNameCount}}/{{loactionNameLength}}</text>
+      </view>
+      <textarea class="text_area {{darkMode?'fontColorW1':'fontColorB1'}}" value="{{contentText}}" bindinput="textInput" maxlength="{{contentTextLength}}" placeholder="在这里，留下属于你的痕迹...(0~{{contentTextLength}}字)" placeholder-style="{{darkMode?'color:#555;':'color:#aaa;'}}"/>
+      <view class="sub_text">
+        <text class="text_length_count">{{contentTextCount}}/{{contentTextLength}}</text>
+      </view>  
+      <view class="img_area">
+      <view class="img_files">
+        <block wx:for="{{imageList}}" wx:for-item="image" wx:key="{{index}}">
+        <view class="img_file">
+          <image class="img" mode="aspectFill" src="{{image}}" data-src="{{image}}" bindtap="previewImage"><image class="img_remove" src="../image/icon/img_remove.png" catchtap="removeImg" data-index="{{index}}"/></image>
+        </view>
+        </block>
+      </view>
+      <view class="add_img_box">
+        <view class="add_img" bindtap="chooseImage"></view>
+      </view>
+      </view>
     </view>
-    <view class="add_img_box">
-      <view class="add_img" bindtap="chooseImage"></view>
+    <view class="anonymous_choose {{darkMode?'fontColorW2':'fontColorB2'}}">
+      <text>匿名发布</text>
+      <switch class="switch" checked="{{isAnonymous}}" bindchange="changeAnonymous"></switch>
     </view>
+    <view class="private_choose {{darkMode?'fontColorW2':'fontColorB2'}}">
+      <text>给后来者也看看吧？</text>
+      <picker class="private_choose_picker" mode="multiSelector" range="{{privateType}}" range-key="text" bindchange="changePrivateType" bindcolumnchange="columnchange" bindcancel="cancelChange" bindtap="clickPicker"><text>{{privateType[0][privateTypeIndex].text}}</text><image src="../image/icon/arrow_right.png" /></picker>
     </view>
-  </view>
-  <view class="anonymous_choose">
-    <text>匿名发布</text>
-    <switch class="switch" checked="{{isAnonymous}}" bindchange="changeAnonymous"></switch>
-  </view>
-  <view class="private_choose">
-    <text>给后来者也看看吧？</text>
-    <picker class="private_choose_picker" mode="multiSelector" range="{{privateType}}" range-key="text" bindchange="changePrivateType" bindcolumnchange="columnchange" bindcancel="cancelChange" bindtap="clickPicker"><text>{{privateType[0][privateTypeIndex].text}}</text><image src="../image/icon/arrow_right.png" /></picker>
-  </view>
-  <button class="bottom_btn" bindtap="clickBtnRelease">发布</button>
+    <button class="bottom_btn" bindtap="clickBtnRelease">发布</button>
 
-  </view>
-
-  <dialog isShow="{{isShowDialog}}" title='发布需要头像/昵称' content='在这里，留下你的点滴痕迹。没有头像/昵称可没法发布哦' showCancel="{{false}}" confirmText="去授权" open_type="getUserInfo" bindSuccess='authorizeUserInfo'></dialog>
-
-
+    <dialog isShow="{{isShowDialog}}" title='发布需要头像/昵称' content='在这里，留下你的点滴痕迹。没有头像/昵称可没法发布哦' showCancel="{{false}}" confirmText="去授权" open_type="getUserInfo" bindSuccess='authorizeUserInfo'></dialog>
   </view>
 </template>
 
 <script>
   import { createPage } from '@mpxjs/core'
   import net from '../utils/net'
-  const common = require('../utils/common.js')
+  import { storeMode } from '../stores/storeCommon'
 
+  const common = require('../utils/common.js')
   const app = getApp()
 
   const loactionNameLength = 25
@@ -86,6 +84,9 @@
       contentTextLength: contentTextLength,
 
       isShowDialog: false
+    },
+    computed: {
+      ...storeMode.mapState(['darkMode'])
     },
 
     onLoad: function (options) {
@@ -120,6 +121,12 @@
     },
 
     onShow: function () {
+      if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+        this.getTabBar().setData({
+          selected: 2
+        })
+      }
+
       wx.getSetting({
         success: (res) => {
           console.log(res)
@@ -285,7 +292,7 @@
             filePath: imgs[i],
             name: 'file',
             complete: res => {
-              console.log('uploadFile_complete',res)
+              console.log('uploadFile_complete', res)
               let jsonData = common.strToJson(res.data)
 
               if (jsonData.code === 0) {
@@ -560,16 +567,16 @@
     margin: 5rpx 15rpx 0rpx;
     height: 30rpx;
   }
-  .sub_text text {
+  .sub_text {
     color: #888;
     font-size: 26rpx;
   }
-  .sub_text .location_digit{
+  .location_digit{
     color: #aaa;
     font-size: 24rpx;
     float: left;
   }
-  .sub_text .location_length_count{
+  .location_length_count{
     float: right;
   }
   .release_content .text_area {
@@ -656,18 +663,12 @@
   .anonymous_choose{
     padding: 30rpx 20rpx;
   }
-  .anonymous_choose text{
-    color: #666;
-  }
   .anonymous_choose switch{
     float: right;
   }
 
   .private_choose {
     padding: 30rpx 20rpx;
-  }
-  .private_choose text{
-    color: #666;
   }
   .private_choose_picker{
     width: 120rpx;
@@ -735,7 +736,8 @@
 <script  type='application/json'>
   {
     "usingComponents": {
-      "dialog": "../components/dialog"
+      "dialog": "../components/dialog",
+      "navigationBar": "../components/navigationBar"
     }
   }
 </script>

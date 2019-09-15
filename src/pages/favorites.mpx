@@ -1,19 +1,21 @@
 <template>
+  <navigationBar pageName="点迹"/>
   <import src="../utils/recordItem.wxml"/>
   <import src="../utils/common.wxml"/>
-
-
-  <view class="favorites">
-  <template is="emptyView" data="{{isShow: !recordListRac[0].length, type:0, textArr:['还没有收藏哦！快去','添加','吧～0v0']}}"/>
-  <block wx:for="{{recordListRac[0]}}" wx:key="{{item.recordId}}" wx:for-index="row">
-    <template is="recordItem" data="{{record:item, rcdIndex:{section:0, row:row}, rcdType:2}}"/>
-  </block>
+  <view class="container {{darkMode?'darkMode':''}}">
+    <view class="favorites">
+      <template is="emptyView" data="{{isShow: !recordListRac[0].length, type:0, textArr:['还没有收藏哦！快去','添加','吧～0v0']}}"/>
+      <block wx:for="{{recordListRac[0]}}" wx:key="{{item.recordId}}" wx:for-index="row">
+        <template is="recordItem" data="{{record:item, rcdIndex:{section:0, row:row}, rcdType:2, darkMode:darkMode}}"/>
+      </block>
+    </view>
   </view>
 </template>
 
 <script>
   import { createPage } from '@mpxjs/core'
   import net from '../utils/net'
+  import { storeMode } from '../stores/storeCommon'
 
   const common = require('../utils/common.js')
 
@@ -35,9 +37,6 @@
       records = records.concat(common.getRecordListFrom(data.data.list))
       that.httpsData = data.data
       that.recordList = [records, []]
-      // that.setData({
-      //     'recordList[0]': records,
-      // })
     })
   }
 
@@ -45,11 +44,11 @@
     data: {
       recordList: [[], []]
     },
-
     computed: {
       recordListRac: function () {
         return this.recordList || [[], []]
-      }
+      },
+      ...storeMode.mapState(['darkMode'])
     },
 
     onLoad: function (options) {
@@ -176,12 +175,14 @@
 </script>
 
 <style >
-  .container {} 
+  .container {}
 </style>
 
 <script  type='application/json'>
   {
     "enablePullDownRefresh": true,
-    "usingComponents": {}
+    "usingComponents": {
+      "navigationBar": "../components/navigationBar"
+    }
   }
 </script>
