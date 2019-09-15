@@ -252,8 +252,6 @@
 
 <style >
   .container {
-    padding-bottom: env(safe-area-inset-bottom);
-    margin-bottom: 48px; 
   }
   .locality {
     width: 750rpx;

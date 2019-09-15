@@ -13,8 +13,7 @@
         <image class="me_hd_gender" src="{{genderImg}}"  mode="aspectFit" ></image>
       </navigator>
       </view>
-      <text class="me_hd_describe">{{signature}}</text>
-      <text class="me_hd_describe">{{recordsTotal}}个地点的记忆</text>
+      <text class="me_hd_describe_signature">{{signature}}</text>
       <view class="me_hd_notice_redDot" wx:if="{{isShowNoticeRedDot}}"></view>
       <button class="me_hd_notice me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToNotice">通知 {{noticeCount}}</button>
       <button class="me_hd_favorites me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToFavorites">收藏</button>
@@ -25,10 +24,17 @@
     </image>
     </view>
 
+    <view class="me_bd_memory">
+      <view class="position_icon_line">
+        <image class="me_bd_memory_icon" mode="aspectFit" src="../image/icon/circle.png" />
+        <view class="line2" style="height:10rpx;"></view>
+      </view>
+      <text class="{{darkMode?'fontColorW1':'fontColorB1'}}">{{recordsTotal}}个地点的记忆</text>
+    </view>
 
     <import src="../utils/common.wxml"/>
     <import src="../utils/myRecord.wxml"/>
-    <view id="{{darkMode?'darkMode':''}}" class="me_template" wx:if="{{recordList.length<=0}}">
+    <view class="me_template" wx:if="{{recordList.length<=0}}">
       <template is="emptyView" data="{{isShow: !recordList.length, type:0, textArr:['以下是自定义的一些点迹模版，快','发布','自己的点迹吧～0v0\\n发布后以下内容会消失']}}"/>
       <view class="me_template_bd">
         <template is="myRecord" data="{{recordList:templateList, recordListH:recordListH, darkMode:darkMode}}" />
@@ -43,6 +49,7 @@
 
     <dialog isShow="{{isShowDialog}}" title='获取信息' content='个人页面的展示需要昵称和头像。之后可以点击头像/昵称进行修改。' showCancel="{{false}}" confirmText="去授权" open_type="getUserInfo" bindSuccess='authorizeUserInfo'></dialog>
   </view>
+  <view class="bottomHolder"/>
 </template>
 
 <script>
@@ -108,8 +115,8 @@
           sex: data.data.sex,
           nickname: data.data.nickname,
           headUrl: data.data.headUrl,
-          signature: data.data.signature
         })
+        storeUser.commit('updateSignature', { signature: data.data.signature })
       })
 
       net.reqGet({
@@ -291,7 +298,6 @@
     },
 
     animationOnHead (type) {
-
       let exports = []
       if (type === 0) {
         for (let i = 0; i < elements.length; i++) {
@@ -572,7 +578,10 @@
     background-color: #2ab3f3;
     position: relative;
     width: 100%;
-    height: 360rpx;
+    height: 400rpx;
+  }
+  .darkMode {
+    background-color: black;
   }
   .me_hd_photo {
     position: absolute;
@@ -604,17 +613,16 @@
     width: 30rpx;
     height: 30rpx;
   }
-  .me_hd_describe {
+  .me_hd_describe_signature {
     position: absolute;
-
     left: 0rpx;
-    top: 290rpx;
+    top: 280rpx;
     z-index: 1000;
     width: 750rpx;
 
     color: white;
     text-align: center;
-    font-size: 30rpx;
+    font-size: 26rpx;
   }
   .me_hd_notice_redDot {
     position: absolute;
@@ -708,6 +716,19 @@
     background-color: #eb6106;
   }
 
+  .me_bd_memory {
+    display: flex;
+    padding: 20rpx 0 0 20rpx;
+  }
+  .me_bd_memory text {
+    font-size: 28rpx;
+    margin-left: 20rpx;
+  }
+  .me_bd_memory_icon {
+    width: 40rpx;
+    height: 40rpx;
+  }
+
   .me_template{
     position: relative;
   }
@@ -719,9 +740,6 @@
     background-color: transparent;
   }
   .me_template_bd{
-  }
-  .darkMode {
-    background-color: black;
   }
 </style>
 

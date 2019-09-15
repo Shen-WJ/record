@@ -47,6 +47,7 @@
 
     <dialog isShow="{{isShowDialog}}" title='发布需要头像/昵称' content='在这里，留下你的点滴痕迹。没有头像/昵称可没法发布哦' showCancel="{{false}}" confirmText="去授权" open_type="getUserInfo" bindSuccess='authorizeUserInfo'></dialog>
   </view>
+  <view class="bottomHolder"/>
 </template>
 
 <script>

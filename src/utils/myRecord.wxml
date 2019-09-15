@@ -1,9 +1,9 @@
 <template name="myRecord">
   <block wx:for="{{recordList}}" wx:for-item="record" wx:for-index="row" wx:key="{{record.recordId}}">
     <view class="record_item" bindtap="clickToDetail" data-index="{{row}}">
-      <!-- 位置icon -->
+      <!-- 位置icon和线条 -->
       <view class="position_icon_line">
-        <view wx:if="{{row!=0}}" class="line1"></view>
+        <view class="line1"></view>
         <image class="position_icon" mode="aspectFit" src="../image/icon/me_pin.png" />
         <view class="line2" style="height:{{recordListH[row]}}px;"></view>
       </view>

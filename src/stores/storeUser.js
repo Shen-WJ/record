@@ -9,16 +9,18 @@ export const storeUser = createStore({
     signature: '暂无个签'
   },
   mutations: {
-    updateUserInfo (state, { nickname = '', headUrl = '', sex = 0, signature = '' }) {
+    updateUserInfo (state, { nickname = '', headUrl = '', sex = 0 }) {
       if (nickname) {
         state.nickname = nickname
       }
       if (headUrl) {
         state.headUrl = headUrl
       }
-      if (sex) {
+      if (typeof sex === 'Number') {
         state.sex = sex
       }
+    },
+    updateSignature (state, { signature = 0 }) {
       state.signature = signature
     },
     updateUserId (state, { userId = 0 }) {

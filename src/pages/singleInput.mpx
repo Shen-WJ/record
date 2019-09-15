@@ -152,7 +152,7 @@
             }
           }).then(data => {
             this.isRequseting = false
-            storeUser.commit('updateUserInfo', { signature: this.data.contentText })
+            storeUser.commit('updateSignature', { signature: this.data.contentText })
             wx.navigateBack({
               delta: 1
             })

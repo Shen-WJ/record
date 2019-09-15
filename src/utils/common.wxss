@@ -27,12 +27,6 @@
   line-height: 48rpx;
   border-bottom: 1rpx solid #888;
 }
-.record_main .wxEmoji{
-  vertical-align: middle;
-  width:42rpx;
-  height: 42rpx;
-  margin: 0 3rpx;
-}
 /* rm_header */
 .rm_header{
   display: flex;
@@ -60,7 +54,7 @@
 }
 .rmc_text {
   display: block;
-  margin:10rpx 0 15rpx;
+  margin: 10rpx 0 15rpx;
   padding: 0 5rpx;
 }
 
@@ -303,5 +297,6 @@ display: none;
 
 .bottomHolder {
   width: 100%;
-  height: 1rpx;
+  height: 48px;
+  padding-bottom: env(safe-area-inset-bottom);
 }
