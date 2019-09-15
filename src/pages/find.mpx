@@ -57,7 +57,6 @@
       sortIndex: 0,
       navH: app.globalData.navHeight
     },
-
     computed: {
       recordListRac: function () {
         return this.recordList || [[], []]

@@ -66,7 +66,6 @@
     },
 
     onLoad: function (options) {
-      // wx.hideTabBar()
       net.reqGet({
         url: 'notice/count'
       }).then(data => {
