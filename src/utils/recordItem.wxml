@@ -66,8 +66,8 @@
               <image wx:if="{{record.isFavorited}}" src="../image/icon/favorites1.png"/>
               <image wx:else src="../image/icon/favorites0.png"/>
             </view>
-            <button class="hided" open-type="share" catchtap="clickShare" id="hidedBtn" data-index="{{rcdIndex}}" />
-            <label for="hidedBtn">
+            <button class="hided" open-type="share" catchtap="clickShare" id="hidedBtn{{record.recordId}}" data-index="{{rcdIndex}}" />
+            <label for="hidedBtn{{record.recordId}}">
               <view class="icons3_3">
                 <image src="../image/icon/share.png" />
               </view>

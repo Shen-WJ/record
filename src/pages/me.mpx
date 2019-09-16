@@ -4,11 +4,12 @@
 
 <script>
   import { createPage } from '@mpxjs/core'
+  import { behaviorOnPeople } from '../behavior/behaviorOnPeople'
 
   const app = getApp()
-  const common = require('../utils/common.js')
 
   createPage({
+    behaviors: [behaviorOnPeople],
     data: {
       isShowDialog: false
     },
@@ -41,40 +42,6 @@
         this._getRequest(true)
         app.globalData.isTabbarPageRefresh[2] = false
       }
-    },
-    onReady: function () {
-      this._getRequest(true)
-    },
-    onPullDownRefresh: function () {
-      this._getRequest(true)
-    },
-    onReachBottom: function () {
-      let component = this.selectComponent('#personalPage')
-      if (!common.isEmpty(component.httpsData) && component.httpsData.hasNextPage) {
-        this._getRequest(false)
-      }
-    },
-    onShareAppMessage: function (res) {
-      let component = this.selectComponent('#personalPage')
-      if (res.from === 'button') {
-        const record = component.getRecord(res.target.dataset.index)
-        const title = common.isEmpty(record.content) ? (record.nickname + '在' + record.location + '说') : record.content
-        return {
-          title: title,
-          path: '/pages/recordDetail/recordDetail?recordId=' + record.recordId
-        }
-      } else {
-        return {
-          title: '了解身边的过去，记录过去的身边',
-          path: '/pages/locality/locality'
-        }
-      }
-    },
-    _getRequest: function (isRefresh) {
-      let component = this.selectComponent('#personalPage')
-      component.getRequest({
-        isRefresh: isRefresh
-      })
     }
   })
 </script>

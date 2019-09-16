@@ -17,8 +17,10 @@
 <script>
   import { createPage } from '@mpxjs/core'
   import { storeMode } from '../stores/storeCommon'
+  import { behaviorOnPage } from '../behavior/behaviorOnPage'
 
   createPage({
+    behaviors: [behaviorOnPage],
     data: {
       type: ''
     },

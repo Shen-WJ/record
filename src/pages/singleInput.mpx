@@ -18,10 +18,12 @@
   import net from '../utils/net'
   import { storeMode } from '../stores/storeCommon'
   import { storeUser } from '../stores/storeUser'
+  import { behaviorOnPage } from '../behavior/behaviorOnPage'
 
   const app = getApp()
 
   createPage({
+    behaviors: [behaviorOnPage],
     data: {
       contentText: '',
       contentTextLength: 140,
@@ -67,13 +69,6 @@
           })
           break
         }
-      }
-    },
-
-    onShareAppMessage: function () {
-      return {
-        title: '了解身边的过去，记录过去的身边',
-        path: '/pages/locality/locality'
       }
     },
 

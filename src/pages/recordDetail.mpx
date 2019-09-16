@@ -63,24 +63,8 @@
     onShareAppMessage: function (res) {
       return {
         title: this.data.record.location,
-        path: '/pages/recordDetail/recordDetail?recordId=' + this.data.recordId
+        path: '/pages/recordDetail?recordId=' + this.data.recordId
       }
-    },
-
-    navHome: function () {
-      wx.switchTab({
-        url: './locality'
-      })
-    },
-    navBack: function () {
-      let that = this
-      wx.navigateBack({
-        delta: 1,
-        fail (res) {
-          console.log(res)
-          that.navHome()
-        }
-      })
     },
 
     clickLike: function (e) {

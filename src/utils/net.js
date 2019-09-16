@@ -5,6 +5,7 @@ const hexMD5From = md5.hexMD5From
 
 const baseUrl = 'https://chahuangli.cn/recordAllV2/'
 const signWithStr = 'jilu666'
+let requestingList = {}
 
 function json2UrlEncoded (element, key, list) {
   var list = list || []
@@ -50,6 +51,12 @@ const http = ({ url = '', query = {}, body = {}, method = '', ...other } = {}) =
   }
 
   return new Promise((resolve, reject) => {
+    // 一个请求一次只执行一个
+    if (requestingList[url] === 'requesting') {
+      return
+    }
+    requestingList[url] = 'requesting'
+
     wx.request({
       url: getUrl(url) + queryStr,
       data: body,
@@ -60,8 +67,9 @@ const http = ({ url = '', query = {}, body = {}, method = '', ...other } = {}) =
       },
       ...other,
       complete: (res) => {
-        wx.hideLoading()
+        delete requestingList[url]
 
+        wx.hideLoading()
         console.log(`\n*************************\nRequest of ${method}：${url + queryStr} | 耗时${Date.now() - timeStart}\nbody:`, body, '\nres:', res, '\n*************************\n')
 
         if (res.statusCode >= 200 && res.statusCode < 300) {

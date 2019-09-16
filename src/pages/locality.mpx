@@ -10,8 +10,8 @@
       <block wx:if="{{recordListRac[section].length || section==0}}">
         <view class="section_header {{darkMode?'bgColorB0 fontColorW1':'bgColorW0 fontColorB1'}}">{{sectionName}}</view>
         <template is="emptyView" data="{{isShow: (!recordListRac[0].length && section==0), type:0}}"/>
-        <block wx:for="{{recordListRac[section]}}" wx:key="{{item.recordId}}" wx:for-index="row">
-        <template is="recordItem" data="{{record:item, rcdIndex:{section:section, row:row}, rcdType:1, darkMode:darkMode}}"/>
+        <block wx:for="{{recordListRac[section]}}" wx:key="recordId" wx:for-index="row">
+          <template is="recordItem" data="{{record:item, rcdIndex:{section:section, row:row}, rcdType:1, darkMode:darkMode}}"/>
         </block>
       </block>
     </block>
@@ -27,6 +27,7 @@
   import net from '../utils/net'
   import { storeMode } from '../stores/storeCommon'
   import { behaviorOnRecord } from '../behavior/behaviorOnRecord'
+  import { behaviorOnPage} from '../behavior/behaviorOnPage'
 
   const common = require('../utils/common.js')
   const app = getApp()
@@ -50,7 +51,7 @@
   }
 
   createPage({
-    behaviors: [behaviorOnRecord],
+    behaviors: [behaviorOnRecord, behaviorOnPage],
     data: {
       recordList: [[], []],
       sections: ['附近', '全网热说'],
@@ -144,7 +145,6 @@
     },
 
     clickToSwitch: function (e) {
-      console.log(e)
       let type = parseInt(e.target.dataset.type)
       if (type === 0) {
         wx.switchTab({

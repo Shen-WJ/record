@@ -54,6 +54,7 @@
   import { createPage } from '@mpxjs/core'
   import net from '../utils/net'
   import { storeMode } from '../stores/storeCommon'
+  import { behaviorOnPage } from '../behavior/behaviorOnPage'
 
   const common = require('../utils/common.js')
   const app = getApp()
@@ -68,7 +69,7 @@
   const strReleaseImageList = 'release_ImageList'
 
   createPage({
-
+    behaviors: [behaviorOnPage],
     data: {
       locationName: '',
       contentText: '',
@@ -153,13 +154,6 @@
             this.autoSave(1)
           }
         })
-      }
-    },
-
-    onShareAppMessage: function () {
-      return {
-        title: '了解身边的过去，记录过去的身边',
-        path: '/pages/locality/locality'
       }
     },
 

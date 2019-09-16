@@ -29,6 +29,7 @@
   import net from '../utils/net'
   import { storeMode } from '../stores/storeCommon'
   import { behaviorOnRecord } from '../behavior/behaviorOnRecord'
+  import { behaviorOnPage} from '../behavior/behaviorOnPage'
 
   const common = require('../utils/common.js')
   const app = getApp()
@@ -49,7 +50,7 @@
   ]
 
   createPage({
-    behaviors: [behaviorOnRecord],
+    behaviors: [behaviorOnRecord, behaviorOnPage],
     data: {
       distanceType: distanceType,
       distanceIndex: 0,
@@ -98,22 +99,6 @@
           this.getRequest(true)
         }
       })
-    },
-
-    onShareAppMessage: function (res) {
-      if (res.from === 'button') {
-        const record = this.getRecord(res.target.dataset.index)
-        const title = common.isEmpty(record.content) ? (record.nickname + '在' + record.location + '说') : record.content
-        return {
-          title: title,
-          path: '/pages/recordDetail/recordDetail?recordId=' + record.recordId
-        }
-      } else {
-        return {
-          title: '了解身边的过去，记录过去的身边',
-          path: '/pages/find/find'
-        }
-      }
     },
 
     getRequest: function (isRefresh) {

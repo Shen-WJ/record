@@ -4,12 +4,12 @@
 
 <script>
   import { createPage } from '@mpxjs/core'
-  const common = require('../utils/common.js')
+  import { behaviorOnPeople } from '../behavior/behaviorOnPeople'
 
   createPage({
+    behaviors: [behaviorOnPeople],
     data: {
       otherUserId: 10001,
-      recordListH: []
     },
 
     onLoad: function (option) {
@@ -18,38 +18,6 @@
           otherUserId: parseInt(option.otherUserId)
         })
       }
-    },
-    onReady: function () {
-      this._getRequest(true)
-    },
-    onPullDownRefresh: function () {
-      this._getRequest(true)
-    },
-    onReachBottom: function () {
-      if (!common.isEmpty(this.httpsData) && this.httpsData.hasNextPage) {
-        this._getRequest(false)
-      }
-    },
-    onShareAppMessage: function (res) {
-      if (res.from === 'button') {
-        const record = this.getRecord(res.target.dataset.index)
-        const title = common.isEmpty(record.content) ? (record.nickname + '在' + record.location + '说') : record.content
-        return {
-          title: title,
-          path: '/pages/recordDetail/recordDetail?recordId=' + record.recordId
-        }
-      } else {
-        return {
-          title: '了解身边的过去，记录过去的身边',
-          path: '/pages/locality/locality'
-        }
-      }
-    },
-    _getRequest: function (isRefresh) {
-      let component = this.selectComponent('#personalPage')
-      component.getRequest({
-        isRefresh: isRefresh
-      })
     }
   })
 </script>

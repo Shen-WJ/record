@@ -72,10 +72,12 @@
         sex: 0
       },
       navHeight: 0,
+      navTop: 0,
+      windowHeight: 0,
       likesDic: {},
       favoritesDic: {},
+      requestingList: {},
       location: {},
-      signCode: 'jilu666',
       isTabbarPageRefresh: [false, false, false] // 是否刷新数据，一般在定位移动了1km或者发布了新内容等时需要刷新
     }
   })

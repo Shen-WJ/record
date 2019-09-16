@@ -31,33 +31,12 @@
   import { createPage } from '@mpxjs/core'
   import net from '../utils/net'
   import { storeMode } from '../stores/storeCommon'
+  import { behaviorOnPage } from '../behavior/behaviorOnPage'
 
   const common = require('../utils/common.js')
 
-  const getRequest = function (that, isRefresh) {
-    let pageNum = isRefresh ? 0 : that.httpsData.nextPage
-
-    net.reqGet({
-      url: 'notice/list',
-      query: {
-        pageNum: pageNum
-      }
-    }).then(data => {
-      let list = isRefresh ? [] : that.data.noticeList
-
-      for (let i in data.data.list) {
-        let item = data.data.list[i]
-        item['timeStr'] = common.timeToStr(item.time)
-        list.push(item)
-      }
-      that.httpsData = data.data
-      that.setData({
-        noticeList: list
-      })
-    })
-  }
-
   createPage({
+    behaviors: [behaviorOnPage],
     data: {
       noticeList: [],
       isReadLocalNotice: false
@@ -67,7 +46,7 @@
     },
 
     onLoad: function (options) {
-      getRequest(this, true)
+      this.getRequest(this, true)
       this.setData({
         isReadLocalNotice: wx.getStorageSync('isReadLocalNotice') || false
       })
@@ -80,17 +59,26 @@
       })
     },
 
-    onReachBottom: function () {
-      if (!common.isEmpty(this.httpsData) && this.httpsData.hasNextPage) {
-        getRequest(this, false)
-      }
-    },
+    getRequest: function (that, isRefresh) {
+      let pageNum = isRefresh ? 0 : that.httpsData.nextPage
+      net.reqGet({
+        url: 'notice/list',
+        query: {
+          pageNum: pageNum
+        }
+      }).then(data => {
+        let list = isRefresh ? [] : that.data.noticeList
 
-    onShareAppMessage: function () {
-      return {
-        title: '了解身边的过去，记录过去的身边',
-        path: '/pages/locality/locality'
-      }
+        for (let i in data.data.list) {
+          let item = data.data.list[i]
+          item['timeStr'] = common.timeToStr(item.time)
+          list.push(item)
+        }
+        that.httpsData = data.data
+        that.setData({
+          noticeList: list
+        })
+      })
     }
   })
 </script>

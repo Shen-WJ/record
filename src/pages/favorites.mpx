@@ -17,11 +17,12 @@
   import net from '../utils/net'
   import { storeMode } from '../stores/storeCommon'
   import { behaviorOnRecord } from '../behavior/behaviorOnRecord'
+  import { behaviorOnPage} from '../behavior/behaviorOnPage'
 
   const common = require('../utils/common.js')
 
   createPage({
-    behaviors: [behaviorOnRecord],
+    behaviors: [behaviorOnRecord, behaviorOnPage],
     data: {
     },
     computed: {
@@ -36,7 +37,6 @@
 
     getRequest: function (isRefresh) {
       let pageNum = isRefresh ? 0 : this.data.resData.nextPage
-
       net.reqGet({
         url: 'record/list/byCollection',
         query: {
@@ -57,7 +57,6 @@
 
     clickMore: function (e) {
       const index = e.currentTarget.dataset.index
-
       wx.showActionSheet({
         itemList: ['删除收藏'],
         itemColor: '#ff0000',
@@ -83,7 +82,7 @@
 
     deleteRecord: function (index) {
       this.recordList[index.section].splice(index.row, 1)
-    },
+    }
   })
 </script>
 
