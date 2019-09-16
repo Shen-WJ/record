@@ -1,3 +1,5 @@
+import cover from '../image/launch.jpeg'
+
 const common = require('../utils/common.js')
 
 export const behaviorOnPeople = Behavior({
@@ -34,9 +36,18 @@ export const behaviorOnPeople = Behavior({
         } else {
           const record = component.getRecord(res.target.dataset.index)
           const title = common.isEmpty(record.content) ? (record.nickname + '在' + record.location + '说') : record.content
-          return {
-            title: title,
-            path: '/pages/recordDetail?recordId=' + record.recordId
+          if (record.img1) {
+            return {
+              title: title,
+              path: '/pages/recordDetail?recordId=' + record.recordId,
+              imageUrl: record.img1
+            }
+          } else {
+            return {
+              title: title,
+              path: '/pages/recordDetail?recordId=' + record.recordId,
+              imageUrl: cover
+            }
           }
         }
       } else {
