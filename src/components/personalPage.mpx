@@ -312,7 +312,7 @@
         }
       },
       // 个人信息，通知，收藏，设置，关注/取消关注
-      clickToSome: function () {
+      clickToSome: function (e) {
         const type = parseInt(e.currentTarget.dataset.type)
         switch(type) {
           case 0: {

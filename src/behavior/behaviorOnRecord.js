@@ -36,13 +36,25 @@ export const behaviorOnRecord = Behavior({
     clickLike: function (e) {
       common.clickLike({
         index: e.currentTarget.dataset.index,
-        that: this
+        that: this,
+        success: (res) => {
+          // 详情页向上一页传值
+          if (typeof this.changeFormerPageStatus === 'function') {
+            this.changeFormerPageStatus(0)
+          }
+        }
       })
     },
     clickFavorites: function (e) {
       common.clickFavorites({
         index: e.currentTarget.dataset.index,
-        that: this
+        that: this,
+        success: (res) => {
+          // 详情页向上一页传值
+          if (typeof this.changeFormerPageStatus === 'function') {
+            this.changeFormerPageStatus(1)
+          }
+        }
       })
     },
     clickShare: function (e) {

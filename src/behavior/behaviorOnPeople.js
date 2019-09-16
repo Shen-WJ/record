@@ -3,12 +3,15 @@ const common = require('../utils/common.js')
 export const behaviorOnPeople = Behavior({
   methods: {
     onLoad: function (option) {
-      if (option.otherUserId) {
+      if (option.otherUserId) { // otherPeople
         this.setData({
           otherUserId: parseInt(option.otherUserId)
+        }, res => {
+          this._getRequest(true)
         })
+      } else { // me
+        this._getRequest(true)
       }
-      this._getRequest(true)
     },
     onPullDownRefresh: function () {
       this._getRequest(true)
@@ -22,11 +25,19 @@ export const behaviorOnPeople = Behavior({
     onShareAppMessage: function (res) {
       let component = this.selectComponent('#personalPage')
       if (res.from === 'button') {
-        const record = component.getRecord(res.target.dataset.index)
-        const title = common.isEmpty(record.content) ? (record.nickname + '在' + record.location + '说') : record.content
-        return {
-          title: title,
-          path: '/pages/recordDetail?recordId=' + record.recordId
+        let btnId = res.target.id
+        if (btnId === 'shareOtherPeople') {
+          return {
+            title: '不是诱导分享，讲真，进来看看',
+            path: '/pages/otherPeople?otherUserId=' + this.data.otherUserId
+          } 
+        } else {
+          const record = component.getRecord(res.target.dataset.index)
+          const title = common.isEmpty(record.content) ? (record.nickname + '在' + record.location + '说') : record.content
+          return {
+            title: title,
+            path: '/pages/recordDetail?recordId=' + record.recordId
+          }
         }
       } else {
         return {
