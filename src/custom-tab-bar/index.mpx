@@ -16,9 +16,11 @@
   import find1 from '../image/tabBar/find1.png'
   import add from '../image/tabBar/add.png'
   import add1 from '../image/tabBar/add1.png'
+  import following from '../image/tabBar/following.png'
+  import following1 from '../image/tabBar/following1.png'
   import me from '../image/tabBar/me.png'
   import me1 from '../image/tabBar/me1.png'
-  const iconList = [home, home1, find, find1, add, add1, me, me1]
+  const iconList = [home, home1, find, find1, add, add1, following, following1, me, me1]
   createComponent({
     options: {
       styleIsolation: 'shared'
@@ -40,6 +42,10 @@
         {
           'pagePath': '../pages/release',
           'text': '发布',
+        },
+        {
+          'pagePath': '../pages/following',
+          'text': '关注',
         },
         {
           'pagePath': '../pages/me',

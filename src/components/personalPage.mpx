@@ -4,20 +4,20 @@
   <view class="container {{darkMode?'darkMode':''}}">
     <view class="me_hd" bindtap="clickHead">
     <image class="me_hd_bg_img {{darkMode?'darkMode':''}}" mode="aspectFill">
-      <image class="me_hd_photo" mode="aspectFit" src="{{headUrl}}" catchtap="clickToUserInfo"></image>
-      <view class="me_hd_name" catchtap="clickToUserInfo">
+      <image class="me_hd_photo" mode="aspectFit" src="{{headUrl}}" catchtap="clickToSome" data-type="0"></image>
+      <view class="me_hd_name" catchtap="clickToSome" data-type="0">
         <text class="me_hd_nameStr">{{nickname}}</text>
         <image class="me_hd_gender" src="{{genderImg}}" mode="aspectFit" ></image>
       </view>
-      <text class="me_hd_describe_signature" catchtap="clickToUserInfo">{{signature}}</text>
+      <text class="me_hd_describe_signature" catchtap="clickToSome" data-type="0">{{signature}}</text>
       <block wx:if="{{pageType === 'me'}}">
         <view class="me_hd_notice_redDot" wx:if="{{isShowNoticeRedDot}}"></view>
-        <button class="me_hd_notice me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToNotice">通知 {{noticeCount}}</button>
-        <button class="me_hd_favorites me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToFavorites">收藏</button>
-        <button class="me_hd_settings me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSettings">设置</button>
+        <button class="me_hd_notice me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="1">通知 {{noticeCount}}</button>
+        <button class="me_hd_favorites me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="2">收藏</button>
+        <button class="me_hd_settings me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="3">设置</button>
       </block>
       <block wx:if="{{pageType === 'others'}}">
-        <button class="me_hd_follow me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToFollow">关注 {{followedCount}}</button>
+        <button class="me_hd_follow me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="4">关注 {{followedCount}}</button>
       </block>
       <block wx:for="{{animations}}" wx:key="{{index}}">
         <view class="me_hd_element{{index}}" animation="{{animations[index]}}">{{animationsText[index]}}</view>
@@ -58,6 +58,7 @@
   import net from '../utils/net'
   import { storeMode } from '../stores/storeCommon'
   import { storeUser } from '../stores/storeUser'
+  import { behaviorOnRecord } from '../behavior/behaviorOnRecord'
 
   const common = require('../utils/common.js')
 
@@ -219,6 +220,7 @@
   }
 
   createComponent({
+    behaviors: [behaviorOnRecord],
     options: {
       styleIsolation: 'shared'
     },
@@ -226,10 +228,6 @@
       pageType: {
         type: String,
         value: ''
-      },
-      isShowDialog: {
-        type: Boolean,
-        value: false
       },
       otherUserId: {
         type: Number,
@@ -250,6 +248,7 @@
       templateListH: 0,
       recordListH: [],
       isShowNoticeRedDot: false,
+      isShowDialog: false,
 
       otherNickname: '',
       otherSex: 0,
@@ -286,9 +285,22 @@
     },
     pageLifetimes: {
       show: function () {
-        common.getLocation()
         this.clickHead()
-        console.log('show function')
+
+        // 查看是否有权限，有则消失或从不显示
+        wx.getSetting({
+          success: (res) => {
+            if (!res.authSetting['scope.userInfo']) {
+              this.setData({
+                isShowDialog: true
+              })
+            } else {
+              this.setData({
+                isShowDialog: false
+              })
+            }
+          }
+        })
       }
     },
     methods: {
@@ -299,49 +311,53 @@
           getRequestOnOthers(this, isRefresh)
         }
       },
-
-      clickToUserInfo: function () {
-        if (this.data.pageType === 'me') {
-          wx.navigateTo({
-            url: './userInfo'
-          })
-        }
-      },
-
-      clickToFavorites: function () {
-        wx.navigateTo({
-          url: './favorites'
-        })
-      },
-
-      clickToSettings: function () {
-        wx.navigateTo({
-          url: './settings'
-        })
-      },
-
-      clickToNotice: function () {
-        this.setData({
-          noticeCount: '',
-          isShowNoticeRedDot: false
-        })
-        wx.hideTabBarRedDot({
-          index: 3
-        })
-
-        wx.navigateTo({
-          url: './notice'
-        })
-      },
-
-      clickToFollow: function () {
-        if (storeUser.state.userId === this.data.otherUserId) return
-        net.reqPost({
-          url: 'user/follow',
-          body: {
-            followUserId: this.data.otherUserId
+      // 个人信息，通知，收藏，设置，关注/取消关注
+      clickToSome: function () {
+        const type = parseInt(e.currentTarget.dataset.type)
+        switch(type) {
+          case 0: {
+            if (this.data.pageType === 'me') {
+              wx.navigateTo({
+                url: './userInfo'
+              })
+            }
+            break
           }
-        })
+          case 1: { // 通知
+            this.setData({
+              noticeCount: '',
+              isShowNoticeRedDot: false
+            })
+
+            wx.navigateTo({
+              url: './notice'
+            })
+            break
+          }
+          case 2: { // 收藏
+            wx.navigateTo({
+              url: './favorites'
+            })
+            break
+          }
+          case 3: { // 设置
+            wx.navigateTo({
+              url: './settings'
+            })
+            break
+          }
+          case 4: { // 点击关注
+            if (storeUser.state.userId === this.data.otherUserId) return
+            net.reqPost({
+              url: 'user/follow',
+              body: {
+                followUserId: this.data.otherUserId
+              }
+            })
+            break
+          }
+        }
+
       },
 
       clickHead (e) {
@@ -394,6 +410,7 @@
         })
       },
 
+      // 点击是否授权后触发
       authorizeUserInfo (e) {
         wx.getSetting({
           success: (res) => {
@@ -414,40 +431,6 @@
             }
           }
         })
-      },
-
-      clickToDetail: function (e) {
-        const index = e.currentTarget.dataset.index
-        const record = this.getRecord(index)
-
-        wx.navigateTo({
-          url: './recordDetail?recordId=' + record.recordId + '&row=' + index
-        })
-      },
-
-      clickLike: function (e) {
-        common.clickLike({
-          index: e.currentTarget.dataset.index,
-          that: this
-        })
-      },
-
-      clickFavorites: function (e) {
-        common.clickFavorites({
-          index: e.currentTarget.dataset.index,
-          that: this
-        })
-      },
-
-      clickShare: function (e) {
-        console.log('clickShare')
-        if (!((typeof wx.canIUse === 'function') && wx.canIUse('button.open-type.share'))) {
-          wx.showModal({
-            title: '当前版本不支持转发按钮',
-            content: '请升级至最新版本微信客户端',
-            showCancel: false
-          })
-        }
       },
 
       clickMore: function (e) {
@@ -479,7 +462,7 @@
                         status: status
                       }
                     }).then(data => {
-                      this.changeStatus(2, isAnonymous, index)
+                      this.changeStatus(2, index)
                     })
                   }
                 }
@@ -505,26 +488,6 @@
               })
             }
           }
-        })
-      },
-
-      previewImage: function (e) {
-        const current = e.target.dataset.src
-        const record = this.getRecord(e.target.dataset.index)
-        console.log(e)
-        wx.previewImage({
-          current,
-          urls: record.imageList
-        })
-      },
-
-      clickToMap: function (e) {
-        const index = e.currentTarget.dataset.index
-        let record = this.getRecord(index)
-
-        wx.openLocation({
-          latitude: record.lat,
-          longitude: record.lng
         })
       },
 

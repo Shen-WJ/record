@@ -49,7 +49,7 @@
       })
     })
   }
-
+  var count = 0
   createPage({
     behaviors: [behaviorOnRecord, behaviorOnPage],
     data: {
@@ -76,6 +76,18 @@
           })
         }
       })
+      var timer = setInterval(() => {
+        common.getLocation()
+        console.log('timer fire!!!', ++count)
+      }, 30000)
+    },
+
+    onLoad: function () {
+      common.getLocation({
+        success: (res) => {
+          this.getRequest(true)
+        }
+      })
     },
 
     onShow: function () {
@@ -85,38 +97,29 @@
         })
       }
 
-      common.getLocation({
-        success: (res) => {
-          if (!common.isEmpty(app.globalData.location)) {
-            if (common.getKilometerDistance(res.latitude, res.longitude, app.globalData.location.latitude, app.globalData.location.longitude) > 1) {
-              // 定位离开了1km才强制刷新
-              app.globalData.isTabbarPageRefresh[0] = true
-            }
-          }
-
-          if (app.globalData.isTabbarPageRefresh[0]) {
-            wx.pageScrollTo({
-              scrollTop: 0,
-              duration: 0
-            })
-            this.getRequest(true)
-            app.globalData.isTabbarPageRefresh[0] = false
-          }
+      // 非第一次请求才需要做比较
+      if (!common.isEmpty(this.data.location)) {
+        if (common.getDistanceToMe(this.data.pageLocation.latitude, this.data.pageLocation.longitude) > 1) {
+          // 定位离开了1km才强制刷新
+          app.globalData.isTabbarPageRefresh['locality'] = true
         }
-      })
-    },
-
-    onReady: function () {
-      common.getLocation({
-        success: (res) => {
-          this.getRequest(true)
-        }
-      })
+      }
+      // 查询有没有在其他页面的事件要求本页面更新
+      if (app.globalData.isTabbarPageRefresh['locality']) {
+        wx.pageScrollTo({
+          scrollTop: 0,
+          duration: 0
+        })
+        this.getRequest(true)
+        app.globalData.isTabbarPageRefresh['locality'] = false
+      }
     },
 
     getRequest: function (isRefresh) {
       let pageNum = isRefresh ? 0 : this.httpsData.nextPage
       let distance = isRefresh ? -1 : this.distance
+      // 用于记录“上一次”请求时的定位点
+      this.data.pageLocation = { longitude: app.globalData.longitude, latitude: app.globalData.latitude }
       net.reqGet({
         url: 'record/list/byLocation',
         query: {

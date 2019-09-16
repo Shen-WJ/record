@@ -10,14 +10,6 @@
     behaviors: [behaviorOnPeople],
     data: {
       otherUserId: 10001,
-    },
-
-    onLoad: function (option) {
-      if (option.otherUserId) {
-        this.setData({
-          otherUserId: parseInt(option.otherUserId)
-        })
-      }
     }
   })
 </script>

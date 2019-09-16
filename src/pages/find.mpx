@@ -65,6 +65,14 @@
       ...storeMode.mapState(['darkMode'])
     },
 
+    onLoad: function () {
+      common.getLocation({
+        success: (res) => {
+          this.getRequest(true)
+        }
+      })
+    },
+
     onShow: function () {
       if (typeof this.getTabBar === 'function' && this.getTabBar()) {
         this.getTabBar().setData({
@@ -72,33 +80,22 @@
         })
       }
 
-      common.getLocation({
-        success: (res) => {
-          if (!common.isEmpty(app.globalData.location)) {
-            if (common.getKilometerDistance(res.latitude, res.longitude, app.globalData.location.latitude, app.globalData.location.longitude) > 1) {
-              // 定位离开了1km才强制刷新
-              app.globalData.isTabbarPageRefresh[1] = true
-            }
-          }
-
-          if (app.globalData.isTabbarPageRefresh[1]) {
-            wx.pageScrollTo({
-              scrollTop: 0,
-              duration: 0
-            })
-            this.getRequest(true)
-            app.globalData.isTabbarPageRefresh[1] = false
-          }
+      // 非第一次请求才需要做比较
+      if (!common.isEmpty(this.data.location)) {
+        if (common.getDistanceToMe(this.data.pageLocation.latitude, this.data.pageLocation.longitude) > 1) {
+          // 定位离开了1km才强制刷新
+          app.globalData.isTabbarPageRefresh['find'] = true
         }
-      })
-    },
-
-    onReady: function () {
-      common.getLocation({
-        success: (res) => {
-          this.getRequest(true)
-        }
-      })
+      }
+      // 查询有没有在其他页面的事件要求本页面更新
+      if (app.globalData.isTabbarPageRefresh['find']) {
+        wx.pageScrollTo({
+          scrollTop: 0,
+          duration: 0
+        })
+        this.getRequest(true)
+        app.globalData.isTabbarPageRefresh['find'] = false
+      }
     },
 
     getRequest: function (isRefresh) {

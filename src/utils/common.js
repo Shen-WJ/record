@@ -13,6 +13,10 @@ function _getKilometerDistance (lat1, lng1, lat2, lng2) {
   return s
 }
 
+function _getDistanceToMe (lat, lng) {
+  return _getKilometerDistance(lat, lng, app.globalData.location.latitude, app.globalData.location.longitude)
+}
+
 function _isEmpty (v) {
   switch (typeof v) {
     case 'undefined':
@@ -216,6 +220,7 @@ function _changeStatus ({ type, index, that } = {}) {
 }
 
 export const getKilometerDistance = _getKilometerDistance
+export const getDistanceToMe = _getDistanceToMe
 export const isEmpty = _isEmpty
 export const strToJson = _strToJson
 export const timeToStr = _timeToStr

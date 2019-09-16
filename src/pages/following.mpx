@@ -1,0 +1,78 @@
+<template>
+  <navigationBar pageName="点迹" showBackIcon="{{false}}"/>
+  <import src="../utils/recordItem.wxml"/>
+  <import src="../utils/common.wxml"/>
+  <view class="container {{darkMode?'darkMode':''}}">
+    <view class="favorites">
+      <template is="emptyView" data="{{isShow: !recordListRac[0].length, type:0, textArr:['还没有关注哦！快去','添加','吧～0v0']}}"/>
+      <block wx:for="{{recordListRac[0]}}" wx:key="{{item.recordId}}" wx:for-index="row">
+        <template is="recordItem" data="{{record:item, rcdIndex:{section:0, row:row}, rcdType:1, darkMode:darkMode}}"/>
+      </block>
+    </view>
+  </view>
+</template>
+
+<script>
+  import { createPage } from '@mpxjs/core'
+  import net from '../utils/net'
+  import { storeMode } from '../stores/storeCommon'
+  import { behaviorOnRecord } from '../behavior/behaviorOnRecord'
+  import { behaviorOnPage} from '../behavior/behaviorOnPage'
+
+  createPage({
+    behaviors: [behaviorOnRecord, behaviorOnPage],
+    computed: {
+      recordListRac: function () {
+        return this.recordList || [[], []]
+      },
+      ...storeMode.mapState(['darkMode'])
+    },
+    onLoad: function () {
+      this.getRequest(true)
+    },
+    onShow: function () {
+      if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+        this.getTabBar().setData({
+          selected: 3
+        })
+      }
+    },
+    getRequest: function (isRefresh) {
+      let pageNum = isRefresh ? 0 : this.data.resData.nextPage
+      net.reqGet({
+        url: 'record/list/byFollow',
+        query: {
+          pageNum: pageNum
+        }
+      }).then(data => {
+        if (isRefresh) {
+          wx.stopPullDownRefresh()
+        }
+
+        let records = isRefresh ? [] : this.recordList[0]
+        records = records.concat(common.getRecordListFrom(data.data.list))
+        this.httpsData = data.data
+        this.recordList = [records, []]
+      })
+    },
+    clickToSwitch: function () {
+      wx.switchTab({
+        url: './find'
+      })
+    }
+  })
+</script>
+
+<style>
+  .container {} 
+</style>
+
+<script  type='application/json' lang='json'>
+  {
+    "enablePullDownRefresh": true,
+    "usingComponents": {
+      "navigationBar": "../components/navigationBar"
+    }
+  }
+</script>
+

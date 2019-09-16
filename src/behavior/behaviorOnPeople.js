@@ -2,7 +2,12 @@ const common = require('../utils/common.js')
 
 export const behaviorOnPeople = Behavior({
   methods: {
-    onReady: function () {
+    onLoad: function (option) {
+      if (option.otherUserId) {
+        this.setData({
+          otherUserId: parseInt(option.otherUserId)
+        })
+      }
       this._getRequest(true)
     },
     onPullDownRefresh: function () {

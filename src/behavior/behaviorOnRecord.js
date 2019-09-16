@@ -75,7 +75,6 @@ export const behaviorOnRecord = Behavior({
         index,
         that: this
       })
-    },
-
+    }
   }
 })

@@ -78,7 +78,12 @@
       favoritesDic: {},
       requestingList: {},
       location: {},
-      isTabbarPageRefresh: [false, false, false] // 是否刷新数据，一般在定位移动了1km或者发布了新内容等时需要刷新
+      isTabbarPageRefresh: {
+        'locality': false,
+        'find': false,
+        'following': false,
+        'me': false
+      } // 是否刷新数据，一般在定位移动了1km或者发布了新内容等时需要刷新
     }
   })
 </script>
@@ -101,13 +106,14 @@
     "pages": [
       "./pages/launch",
       "./pages/locality",
+      "./pages/find",
       "./pages/release",
+      "./pages/following",
       "./pages/me",
       "./pages/recordDetail",
       "./pages/favorites",
       "./pages/notice",
       "./pages/singleInput",
-      "./pages/find",
       "./pages/userInfo",
       "./pages/singleText",
       "./pages/settings",
@@ -144,6 +150,12 @@
           "text": "发布",
           "iconPath": "image/tabBar/add.png",
           "selectedIconPath": "image/tabBar/add1.png"
+        },
+        {
+          "pagePath": "pages/following",
+          "text": "关注",
+          "iconPath": "image/tabBar/following.png",
+          "selectedIconPath": "image/tabBar/following.png"
         },
         {
           "pagePath": "pages/me",

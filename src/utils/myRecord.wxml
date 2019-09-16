@@ -1,17 +1,17 @@
 <template name="myRecord">
-  <block wx:for="{{recordList}}" wx:for-item="record" wx:for-index="row" wx:key="{{record.recordId}}">
-    <view class="record_item" bindtap="clickToDetail" data-index="{{row}}">
+  <block wx:for="{{recordList}}" wx:for-item="record" wx:for-index="rcdIndex" wx:key="{{record.recordId}}">
+    <view class="record_item" bindtap="clickToDetail" data-index="{{rcdIndex}}">
       <!-- 位置icon和线条 -->
       <view class="position_icon_line">
         <view class="line1"></view>
         <image class="position_icon" mode="aspectFit" src="../image/icon/me_pin.png" />
-        <view class="line2" style="height:{{recordListH[row]}}px;"></view>
+        <view class="line2" style="height:{{recordListH[rcdIndex]}}px;"></view>
       </view>
       <!-- record主体 -->
       <view class="record_main">
         <!-- 头部，包括地点、时间等 -->
         <view class="rm_header">
-          <view catchtap="clickToMap" data-index="{{row}}">
+          <view catchtap="clickToMap" data-index="{{rcdIndex}}">
             <text class="rmh_location">{{record.location}}</text><text class="rmc_jin_wei">{{record.distance}}</text>
           </view>
           <text class="rmh_time">{{record.timeStr}}</text>
@@ -27,7 +27,7 @@
           </view>        
           <view class="rmc_image">
             <block wx:for-items="{{record.imageList}}" wx:key="">
-              <image lazy-load="true" mode="aspectFill" src="{{item}}" data-src="{{item}}" data-index="{{row}}" catchtap="previewImage" />
+              <image lazy-load="true" mode="aspectFill" src="{{item}}" data-src="{{item}}" data-index="{{rcdIndex}}" catchtap="previewImage" />
             </block>
           </view>
           <!-- icon's color is #777 and #d81e06 -->
@@ -42,8 +42,8 @@
                 <image wx:if="{{record.isFavorited}}" src="../image/icon/favorites1.png"/>
                 <image wx:else src="../image/icon/favorites0.png"/>
               </view>
-              <button class="hided" open-type="share" catchtap="clickShare" id="hidedBtn" data-index="{{rcdIndex}}" />
-              <label for="hidedBtn">
+              <button class="hided" open-type="share" catchtap="clickShare" id="hidedBtn{{record.recordId}}" data-index="{{rcdIndex}}" />
+              <label for="hidedBtn{{record.recordId}}">
                 <view class="icons4_3">
                   <image src="../image/icon/share.png" />
                 </view>
@@ -61,8 +61,8 @@
                 <image wx:if="{{record.isFavorited}}" src="../image/icon/favorites1.png"/>
                 <image wx:else src="../image/icon/favorites0.png"/>
               </view>
-              <button class="hided" open-type="share" catchtap="clickShare" id="hidedBtn" data-index="{{rcdIndex}}" />
-              <label for="hidedBtn">
+              <button class="hided" open-type="share" catchtap="clickShare" id="hidedBtn{{record.recordId}}" data-index="{{rcdIndex}}" />
+              <label for="hidedBtn{{record.recordId}}">
                 <view class="icons3_3">
                   <image src="../image/icon/share.png" />
                 </view>
