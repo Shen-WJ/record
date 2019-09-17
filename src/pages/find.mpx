@@ -35,11 +35,11 @@
   const app = getApp()
 
   const distanceType = [
-    { text: '20km内', distance: 20 },
     { text: '1km内', distance: 1 },
     { text: '5km内', distance: 5 },
     { text: '10km内', distance: 10 },
-    { text: '15km内', distance: 15 },
+    { text: '20km内', distance: 20 },
+    { text: '40km内', distance: 40 },
     { text: '全网', distance: -1 }
   ]
   const sortType = [
@@ -53,7 +53,7 @@
     behaviors: [behaviorOnRecord, behaviorOnPage],
     data: {
       distanceType: distanceType,
-      distanceIndex: 0,
+      distanceIndex: 3,
       sortType: sortType,
       sortIndex: 0,
       navH: app.globalData.navHeight

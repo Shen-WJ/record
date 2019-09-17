@@ -60,6 +60,7 @@
               navHeight = statusBarHeight + menuButtonObject.height + (menuButtonObject.top - statusBarHeight)*2
           this.globalData.navHeight = navHeight
           this.globalData.navTop = navTop
+          this.globalData.statusBarHeight = statusBarHeight
           this.globalData.windowHeight = res.windowHeight
         }
       })
@@ -74,6 +75,7 @@
       navHeight: 0,
       navTop: 0,
       windowHeight: 0,
+      statusBarHeight: 0,
       likesDic: {},
       favoritesDic: {},
       requestingList: {},

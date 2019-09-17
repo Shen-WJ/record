@@ -6,7 +6,9 @@ export const storeUser = createStore({
     nickname: '未知',
     headUrl: '',
     sex: 0,
-    signature: '暂无个签'
+    signature: '暂无简介',
+    followedCount: 0,
+    followingCount: 0
   },
   mutations: {
     updateUserInfo (state, { nickname = '', headUrl = '', sex = 0 }) {
@@ -21,7 +23,15 @@ export const storeUser = createStore({
       }
     },
     updateSignature (state, { signature = 0 }) {
-      state.signature = signature
+      if (signature) {
+        state.signature = signature
+      } else {
+        state.signature = '暂无简介'
+      }
+    },
+    updateFollowCount (state, { followingCount = 0, followedCount = 0 }) {
+      state.followingCount = followingCount || 0
+      state.followedCount = followedCount || 0
     },
     updateUserId (state, { userId = 0 }) {
       if (userId > 10000) {

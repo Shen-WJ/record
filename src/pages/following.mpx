@@ -19,6 +19,8 @@
   import { behaviorOnRecord } from '../behavior/behaviorOnRecord'
   import { behaviorOnPage} from '../behavior/behaviorOnPage'
 
+  const common = require('../utils/common.js')
+
   createPage({
     behaviors: [behaviorOnRecord, behaviorOnPage],
     computed: {

@@ -61,7 +61,7 @@
 .rmc_text_break {
   text-overflow: -o-ellipsis-lastline;
   overflow: hidden;
-  text-overflow: '...more';
+  text-overflow: ellipsis;
   word-break: break-all; 
   display: -webkit-box;
   -webkit-line-clamp: 5;
@@ -247,6 +247,9 @@ display: none;
 }
 .dayMode {
   background-color: white;
+}
+.themeMode {
+  background-color: #2ab3f3;
 }
 .coverPage {
   top: 0rpx;

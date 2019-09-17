@@ -1,28 +1,37 @@
 <template>
-  <navigationBar pageName="点迹" showBackIcon="{{showBackIcon}}" showThemeBgColor="{{true}}"/>
+  <navigationBar showBackIcon="{{showBackIcon}}" showThemeBgColor="{{true}}"/>
 
   <view class="container {{darkMode?'darkMode':''}}">
     <view class="me_hd" bindtap="clickHead">
-    <image class="me_hd_bg_img {{darkMode?'darkMode':''}}" mode="aspectFill">
-      <image class="me_hd_photo" mode="aspectFit" src="{{headUrl}}" catchtap="clickToSome" data-type="0"></image>
-      <view class="me_hd_name" catchtap="clickToSome" data-type="0">
-        <text class="me_hd_nameStr">{{nickname}}</text>
-        <image class="me_hd_gender" src="{{genderImg}}" mode="aspectFit" ></image>
-      </view>
-      <text class="me_hd_describe_signature" catchtap="clickToSome" data-type="0">{{signature}}</text>
-      <block wx:if="{{pageType === 'me'}}">
-        <view class="me_hd_notice_redDot" wx:if="{{isShowNoticeRedDot}}"></view>
-        <button class="me_hd_notice me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="1">通知 {{noticeCount}}</button>
-        <button class="me_hd_favorites me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="2">收藏</button>
-        <button class="me_hd_settings me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="3">设置</button>
-      </block>
-      <block wx:if="{{pageType === 'others'}}">
-        <button class="me_hd_follow me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="4">关注 {{followedCount}}</button>
-      </block>
-      <block wx:for="{{animations}}" wx:key="{{index}}">
-        <view class="me_hd_element{{index}}" animation="{{animations[index]}}">{{animationsText[index]}}</view>
-      </block>
-    </image>
+      <image class="me_hd_bg_img {{darkMode?'darkMode':'themeMode'}}" mode="aspectFill">
+        <image class="me_hd_photo" mode="aspectFit" src="{{headUrl}}" catchtap="clickToSome" data-type="0"></image>
+        <view class="me_hd_name me_hd_flex_group">
+          <text class="me_hd_nameStr" catchtap="clickToSome" data-type="0">{{nickname}}</text>
+          <image class="me_hd_gender" src="{{genderImg}}" mode="aspectFit" catchtap="clickToSome" data-type="0"></image>
+        </view>
+        <view class="me_hd_desc_follow me_hd_flex_group">
+          <text class="me_hd_desc_following">关注：{{followedCount}}</text>
+          <view class="me_hd_desc_separate"/>
+          <text class="me_hd_desc_followed">粉丝：{{followingCount}}</text>
+        </view>
+        <view class="me_hd_signature me_hd_flex_group">
+          <text class="me_hd_desc_signature {{pageType === 'me'?'me_hd_desc_signature_gap':''}}" catchtap="clickToSome" data-type="0">{{signature}}</text>
+          <image wx:if="{{pageType === 'me'}}" class="me_hd_edit" src="../image/icon/edit.png" mode="aspectFit" catchtap="clickToSome" data-type="0"></image>
+        </view>
+        <block wx:if="{{pageType === 'me'}}">
+          <view class="me_hd_notice_redDot" wx:if="{{isShowNoticeRedDot}}"></view>
+          <button class="me_hd_notice me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="1">通知 {{noticeCount}}</button>
+          <button class="me_hd_favorites me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="2">收藏</button>
+          <button class="me_hd_settings me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="3">设置</button>
+        </block>
+        <block wx:if="{{pageType === 'others'}}">
+          <button wx:if="{{isShowFollowBtn}}" class="me_hd_follow me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="4">{{isFollowed?'取消关注':'关注'}}</button>
+          <button class="me_hd_share me_hd_btn" hover-class="me_hd_touch_btn" open-type="share" id="shareOtherPeople">分享</button>
+        </block>
+        <block wx:for="{{animations}}" wx:key="{{index}}">
+          <view class="me_hd_element{{index}}" animation="{{animations[index]}}">{{animationsText[index]}}</view>
+        </block>
+      </image>
     </view>
 
     <view class="me_bd_memory">
@@ -61,6 +70,7 @@
   import { behaviorOnRecord } from '../behavior/behaviorOnRecord'
 
   const common = require('../utils/common.js')
+  const app = getApp()
 
   let elements = [
     wx.createAnimation({ timingFunction: 'ease', duration: 1000 }),
@@ -115,9 +125,13 @@
         storeUser.commit('updateUserInfo', {
           sex: data.data.sex,
           nickname: data.data.nickname,
-          headUrl: data.data.headUrl,
+          headUrl: data.data.headUrl
         })
         storeUser.commit('updateSignature', { signature: data.data.signature })
+        storeUser.commit('updateFollowCount', {
+          followingCount: data.data.followingCount,
+          followedCount: data.data.followedCount,
+        })
       })
 
       net.reqGet({
@@ -179,8 +193,10 @@
         that.otherSex = data.data.sex
         that.otherNickname = data.data.nickname
         that.otherHeadUrl = data.data.headUrl
-        that.otherSignature = data.data.signature
+        that.otherSignature = data.data.signature || '暂无简介'
         that.otherFollowedCount = data.data.followedCount
+        that.otherFollowingCount = data.data.followingCount || 0
+        that.otherIsFollowed = data.data.follow
       })
     }
 
@@ -250,11 +266,15 @@
       isShowNoticeRedDot: false,
       isShowDialog: false,
 
+      headGapHeight: app.globalData.statusBarHeight + 10,
+
       otherNickname: '',
       otherSex: 0,
       otherHeadUrl: '',
       otherSignature: '',
-      otherFollowedCount: 0
+      otherFollowedCount: 0,
+      otherFollowingCount: 0,
+      otherIsFollowed: false
     },
     computed: {
       genderImg: function () {
@@ -274,7 +294,16 @@
         return this.pageType === 'me' ? storeUser.state.signature : this.otherSignature
       },
       followedCount () {
-        return this.otherFollowedCount
+        return this.pageType === 'me' ? storeUser.state.followedCount : this.otherFollowedCount
+      },
+      followingCount () {
+        return this.pageType === 'me' ? storeUser.state.followingCount : this.otherFollowedCount
+      },
+      isFollowed () {
+        return this.otherIsFollowed
+      },
+      isShowFollowBtn () {
+        return storeUser.state.userId != this.otherUserId
       }
     },
     lifetimes: {
@@ -315,7 +344,7 @@
       clickToSome: function (e) {
         const type = parseInt(e.currentTarget.dataset.type)
         switch(type) {
-          case 0: {
+          case 0: { //个人信息
             if (this.data.pageType === 'me') {
               wx.navigateTo({
                 url: './userInfo'
@@ -346,14 +375,23 @@
             })
             break
           }
-          case 4: { // 点击关注
+          case 4: { // 点击关注/取消关注
             if (storeUser.state.userId === this.data.otherUserId) return
-            net.reqPost({
-              url: 'user/follow',
-              body: {
-                followUserId: this.data.otherUserId
-              }
-            })
+            if (this.data.isFollowed) {
+              net.reqPost({
+                url: 'user/unfollow',
+                body: {
+                  followUserId: this.data.otherUserId
+                }
+              })
+            } else {
+              net.reqPost({
+                url: 'user/follow',
+                body: {
+                  followUserId: this.data.otherUserId
+                }
+              })
+            }
             break
           }
         }
@@ -598,33 +636,32 @@
   .container {
   }
   .me_hd_bg_img {
-    background-color: #2ab3f3;
     position: relative;
     width: 100%;
-    height: 400rpx;
-  }
-  .darkMode {
-    background-color: black;
+    height: 410rpx;
+    z-index: 100;
   }
   .me_hd_photo {
     position: absolute;
     left: 300rpx;
-    top: 50rpx;
+    top: 40rpx;
     z-index: 1000;
     height: 150rpx;
     width: 150rpx;
     border-radius: 50%;
   }
 
-  .me_hd_name{
+  .me_hd_flex_group {
     position: absolute;
     display: flex;
     justify-content: center;
     align-items: center;
     left: 0rpx;
-    top: 220rpx;
     z-index: 1000;
     width: 750rpx;
+  }
+  .me_hd_name{
+    top: 200rpx;
   }
   .me_hd_nameStr{
     padding-left: 40rpx;
@@ -632,20 +669,50 @@
     color: white;
     font-size: 38rpx;
   }
-  .me_hd_gender{
+  .me_hd_gender, .me_hd_edit {
     width: 30rpx;
     height: 30rpx;
+    flex-shrink: 0;
   }
-  .me_hd_describe_signature {
-    position: absolute;
-    left: 0rpx;
-    top: 280rpx;
-    z-index: 1000;
-    width: 750rpx;
-
+  .me_hd_desc_follow {
+    top: 260rpx;
+  }
+  .me_hd_desc_following {
     color: white;
-    text-align: center;
     font-size: 26rpx;
+    text-align: right;
+  }
+  .me_hd_desc_separate {
+    width: 2rpx;
+    height: 30rpx;
+    margin: 0 15rpx;
+    background-color: white;
+  }
+  .me_hd_desc_followed {
+    color: white;
+    font-size: 26rpx;
+    text-align: left;
+  }
+  .me_hd_signature {
+    top: 300rpx;
+  }
+  .me_hd_desc_signature {
+    color: white;
+    font-size: 26rpx;
+    text-align: center;
+
+    text-overflow: -o-ellipsis-lastline;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-all; 
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    align-content: center;
+  }
+  .me_hd_desc_signature_gap {
+    padding-left: 40rpx;
+    padding-right: 10rpx;
   }
   .me_hd_notice_redDot {
     position: absolute;
@@ -667,7 +734,7 @@
     border:3rpx solid white;
 
     position: absolute;
-    top: 50rpx;
+    top: 40rpx;
     z-index: 1000;
   }
   .me_hd_touch_btn {
@@ -680,17 +747,22 @@
   }
   .me_hd_favorites {
     width: 180rpx;
-    top: 140rpx;
+    top: 130rpx;
     right: -30rpx;
   }
   .me_hd_settings {
     width: 210rpx;
-    top: 230rpx;
+    top: 220rpx;
     right: -30rpx;
   }
   .me_hd_follow {
     width: 240rpx;
-    top: 50rpx;
+    top: 40rpx;
+    left: -30rpx;
+  }
+  .me_hd_share {
+    width: 140rpx;
+    top: 130rpx;
     left: -30rpx;
   }
   .me_hd_element0{
