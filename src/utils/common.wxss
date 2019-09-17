@@ -56,6 +56,7 @@
   display: block;
   margin: 10rpx 0 15rpx;
   padding: 0 5rpx;
+  opacity: 0.6;
 }
 
 .rmc_text_break {

@@ -1,7 +1,7 @@
 <template>
   <navigationBar pageName="点迹"/>
 
-  <view class="container {{darkMode?'darkMode':''}}">
+  <view class="container">
     <view class="table">
       <view class="cell notice_cell">
         <view wx:if="{{!isReadLocalNotice}}" class="notice_cell_redDot"></view>

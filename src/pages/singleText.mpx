@@ -1,7 +1,7 @@
 <template>
   <navigationBar pageName="点迹"/>
 
-  <view class="container {{darkMode?'darkMode':''}}">
+  <view class="container">
     <block wx:if="{{type == 'userAgreement'}}">
       <import src="../utils/userAgreement.wxml"/>
       <template is="userAgreement" />

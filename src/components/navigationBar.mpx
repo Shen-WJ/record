@@ -10,7 +10,7 @@
     </view>
   </view>
   <view wx:if="{{showHolder}}" class="navbar_holder" style="height:{{navH}}px"></view>
-  <view class="coverPage {{darkMode?'darkMode':''}}"/>
+  <image class="coverPage {{darkMode?'darkMode':''}}" mode='aspectFill' src="{{coverImg}}"/>
 </template>
 
 <script>
@@ -44,7 +44,7 @@
       navH: app.globalData.navHeight
     },
     computed: {
-      ...storeMode.mapState(['darkMode']),
+      ...storeMode.mapState(['darkMode', 'coverImg']),
       navBackIcon () {
         return require('../image/icon/nav_back' + (storeMode.state.darkMode ? 1 : 0) + '.png')
       },
@@ -121,9 +121,9 @@
   }
   
   .navbar-icon view {
-    height: 18px;
+    height: 36rpx;
     border-left: 1px solid #ffffff;
-    margin-top: 6px;
+    margin-top: 16rpx;
   }
 </style>
 

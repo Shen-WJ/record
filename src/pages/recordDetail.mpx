@@ -1,7 +1,7 @@
 <template>
   <navigationBar pageName="点迹"/>
 
-  <view class="container {{darkMode?'darkMode':''}}">
+  <view class="container">
     <import src="../utils/recordItem.wxml"/>
 
     <view class="detail_container">

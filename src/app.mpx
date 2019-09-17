@@ -29,6 +29,7 @@
     onLaunch: function (option) {
       storeUser.commit('updateUserId', { userId: (wx.getStorageSync('userId') || 0) })
       storeMode.commit('openDarkMode', { isOpen: (wx.getStorageSync('darkMode') || false) })
+      storeMode.commit('updateCoverImg', { imgUrl: (wx.getStorageSync('coverImg') || '') })
       // 用户静默登录
       if (storeUser.state.userId < 10000) {
         wx.login({

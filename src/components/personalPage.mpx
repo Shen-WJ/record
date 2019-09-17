@@ -1,7 +1,7 @@
 <template>
   <navigationBar showBackIcon="{{showBackIcon}}" showThemeBgColor="{{true}}"/>
 
-  <view class="container {{darkMode?'darkMode':''}}">
+  <view class="container">
     <view class="me_hd" bindtap="clickHead">
       <image class="me_hd_bg_img {{darkMode?'darkMode':'themeMode'}}" mode="aspectFill">
         <image class="me_hd_photo" mode="aspectFit" src="{{headUrl}}" catchtap="clickToSome" data-type="0"></image>
@@ -297,7 +297,7 @@
         return this.pageType === 'me' ? storeUser.state.followedCount : this.otherFollowedCount
       },
       followingCount () {
-        return this.pageType === 'me' ? storeUser.state.followingCount : this.otherFollowedCount
+        return this.pageType === 'me' ? storeUser.state.followingCount : this.otherFollowingCount
       },
       isFollowed () {
         return this.otherIsFollowed

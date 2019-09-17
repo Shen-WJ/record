@@ -1,7 +1,7 @@
 <template>
   <navigationBar pageName="点迹"/>
 
-  <view class="container {{darkMode?'darkMode':''}}">
+  <view class="container">
     <view class="table user_table">
       <view class="cell1 user_cell {{darkMode?'bgColorB0':'bgColorW0'}}" bindtap="clickCell" data-index="0">
           <text class="title {{darkMode?'fontColorW1':'fontColorB1'}}">头像</text>

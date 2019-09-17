@@ -1,19 +1,22 @@
 <template>
   <navigationBar pageName="点迹"/>
 
-  <view class="container {{darkMode?'darkMode':''}}">
+  <view class="container">
     <view class="table">
-      <view class="cell {{darkMode?'fontColorW0':'fontColorB0'}}" catchtap="clickToPage" data-type="userInfo">
+      <view class="cell {{darkMode?'fontColorW0':'fontColorB0'}}" bindtap="clickToSome" data-type="userInfo">
         修改个人信息
       </view>
       <view class="cell dark_mode_cell {{darkMode?'fontColorW1':'fontColorB1'}}">
         开启夜间模式
-        <switch class="switch" checked="{{darkMode}}" bindchange="openDarkMode"></switch>
+        <switch class="switch" checked="{{darkMode}}" bindchange="clickToSome" data-type="mode"></switch>
       </view>
-      <view class="cell {{darkMode?'fontColorW2':'fontColorB2'}}" catchtap="clickToPage" data-type="about">
+      <view class="cell {{darkMode?'fontColorW2':'fontColorB2'}}" bindtap="clickToSome" data-type="chooseImg">
+        更改背景图
+      </view>
+      <view class="cell {{darkMode?'fontColorW2':'fontColorB2'}}" bindtap="clickToSome" data-type="about">
         关于
       </view>
-      <view class="cell {{darkMode?'fontColorC bgColorB0':'fontColorC bgColorW0'}}" catchtap="clickToPage" data-type="userAgreement">
+      <view class="cell {{darkMode?'fontColorC bgColorB0':'fontColorC bgColorW0'}}" bindtap="clickToSome" data-type="userAgreement">
         用户协议
       </view>
     </view>
@@ -36,32 +39,47 @@
       storeMode.commit('openDarkMode',{
         isOpen: res.detail.value
       })
-      if (res.detail.value) { // dark
-        wx.setNavigationBarColor({
-          frontColor:"#ffffff",
-          backgroundColor:'#000000'
-        })
-        wx.setTabBarStyle({
-          backgroundColor: '#000000'
-        })
-      } else {
-        wx.setNavigationBarColor({
-          frontColor:"#ffffff",
-          backgroundColor:'#2ab3f3'
-        })
-        wx.setTabBarStyle({
-          backgroundColor: '#000000'
-        })
-      }
-      console.log(storeMode.state)
     },
-    clickToPage: function (res) {
+    clickToSome: function (res) {
       let type = res.currentTarget.dataset.type
       switch (type) {
         case 'userInfo': {
           wx.navigateTo({
             url: './userInfo'
           })
+          break
+        }
+        case 'mode': {
+          storeMode.commit('openDarkMode',{
+            isOpen: res.detail.value
+          })
+          break
+        }
+        case 'chooseImg': {
+          wx.showActionSheet({
+            itemList: ['从相册选择', '清除背景图'],
+            success: res => {
+              if (res.tapIndex === 0) {
+                wx.chooseImage({
+                  sourceType: ['camera', 'album'],
+                  sizeType: ['compressed'],
+                  count: 1,
+                  success (res) {
+                    console.log(res)
+                    storeMode.commit('updateCoverImg',{
+                      imgUrl: res.tempFilePaths[0]
+                    })
+                  }
+                })
+              } else {
+                storeMode.commit('updateCoverImg',{
+                  imgUrl: ''
+                })
+              }
+
+            }
+          })
+
           break
         }
         case 'about':

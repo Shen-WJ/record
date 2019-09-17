@@ -1,7 +1,7 @@
 <template>
   <navigationBar pageName="点迹" showBackIcon="{{false}}"/>
 
-  <view class="container {{darkMode?'darkMode':''}}">
+  <view class="container">
     <wxs module="common" src="../utils/common.wxs"></wxs>
 
     <view class="top_buttons">
@@ -287,12 +287,10 @@
             filePath: imgs[i],
             name: 'file',
             complete: res => {
-              console.log('uploadFile_complete', res)
               let jsonData = common.strToJson(res.data)
 
               if (jsonData.code === 0) {
                 let url = jsonData.data
-                console.log(url)
 
                 if (!common.isEmpty(url)) {
                   imgUrls[i] = url
@@ -302,7 +300,6 @@
 
                 waitingCount--
                 console.log('i:' + i + '\twait:' + waitingCount)
-                console.log(imgUrls)
                 // 最后一个返回的图片url
                 if (waitingCount === 0) {
                   console.log('the last one---i:' + i + '\twait:' + waitingCount)
@@ -333,7 +330,6 @@
         imgUrls.push('')
         count--
       }
-      console.log(imgUrls)
 
       const param = {
         location: this.data.locationName,

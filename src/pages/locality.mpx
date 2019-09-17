@@ -1,6 +1,6 @@
 <template>
   <navigationBar pageName="点迹" showBackIcon="{{false}}"/>
-  <view class="container {{darkMode?'darkMode':''}}">
+  <view class="container">
   
     <import src="../utils/recordItem.wxml"/>
     <import src="../utils/common.wxml"/>

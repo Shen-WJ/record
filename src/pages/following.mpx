@@ -2,7 +2,7 @@
   <navigationBar pageName="点迹" showBackIcon="{{false}}"/>
   <import src="../utils/recordItem.wxml"/>
   <import src="../utils/common.wxml"/>
-  <view class="container {{darkMode?'darkMode':''}}">
+  <view class="container">
     <view class="favorites">
       <template is="emptyView" data="{{isShow: !recordListRac[0].length, type:0, textArr:['还没有关注哦！快去','添加','吧～0v0']}}"/>
       <block wx:for="{{recordListRac[0]}}" wx:key="{{item.recordId}}" wx:for-index="row">
