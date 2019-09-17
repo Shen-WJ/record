@@ -10,9 +10,9 @@
           <image class="me_hd_gender" src="{{genderImg}}" mode="aspectFit" catchtap="clickToSome" data-type="0"></image>
         </view>
         <view class="me_hd_desc_follow me_hd_flex_group">
-          <text class="me_hd_desc_following">关注：{{followedCount}}</text>
+          <text class="me_hd_desc_following">关注：{{followingCount}}</text>
           <view class="me_hd_desc_separate"/>
-          <text class="me_hd_desc_followed">粉丝：{{followingCount}}</text>
+          <text class="me_hd_desc_followed">粉丝：{{followedCount}}</text>
         </view>
         <view class="me_hd_signature me_hd_flex_group">
           <text class="me_hd_desc_signature {{pageType === 'me'?'me_hd_desc_signature_gap':''}}" catchtap="clickToSome" data-type="0">{{signature}}</text>
@@ -57,7 +57,7 @@
       <template is="myRecord" data="{{recordList:recordList, recordListH:recordListH, darkMode:darkMode, rcdType:pageType==='me'?0:1}}" />
     </view>
 
-    <dialog isShow="{{isShowDialog}}" title='获取信息' content='个人页面的展示需要昵称和头像。之后可以点击头像/昵称进行修改。' showCancel="{{false}}" confirmText="去授权" open_type="getUserInfo" bindSuccess='authorizeUserInfo'></dialog>
+    <dialog isShow="{{isShowDialog}}" title="{{pageType==='me'?'获取信息':'关注需要昵称/头像'}}" content="{{pageType==='me'?'个人页面的展示需要昵称和头像。之后可以点击头像/昵称进行修改。':'你还没有昵称头像，关注不了哦OvO～快去授权吧！'}}" showCancel="{{false}}" confirmText="去授权" open_type="getUserInfo" bindSuccess='authorizeUserInfo'></dialog>
   </view>
   <view class="bottomHolder"/>
 </template>
@@ -316,20 +316,23 @@
       show: function () {
         this.clickHead()
 
-        // 查看是否有权限，有则消失或从不显示
-        wx.getSetting({
-          success: (res) => {
-            if (!res.authSetting['scope.userInfo']) {
-              this.setData({
-                isShowDialog: true
-              })
-            } else {
-              this.setData({
-                isShowDialog: false
-              })
-            }
+        if (this.pageType === 'me') {
+          if (!app.globalData.hasHadUserInfo) {
+            wx.getSetting({
+              success: (res) => {
+                if (!res.authSetting['scope.userInfo']) {
+                  this.setData({
+                    isShowDialog: true
+                  })
+                } else {
+                  this.setData({
+                    isShowDialog: false
+                  })
+                }
+              }
+            })
           }
-        })
+        }
       }
     },
     methods: {
@@ -378,18 +381,28 @@
           case 4: { // 点击关注/取消关注
             if (storeUser.state.userId === this.data.otherUserId) return
             if (this.data.isFollowed) {
-              net.reqPost({
+              net.reqPut({
                 url: 'user/unfollow',
                 body: {
                   followUserId: this.data.otherUserId
                 }
+              }).then(data => {
+                this.otherIsFollowed = false
               })
             } else {
+              if (!app.globalData.hasHadUserInfo) {
+                this.setData({
+                  isShowDialog: true
+                })
+                return
+              }
               net.reqPost({
                 url: 'user/follow',
                 body: {
                   followUserId: this.data.otherUserId
                 }
+              }).then(data => {
+                this.otherIsFollowed = true
               })
             }
             break
@@ -453,18 +466,21 @@
         wx.getSetting({
           success: (res) => {
             if (!res.authSetting['scope.userInfo']) {
-              this.setData({
-                isShowDialog: true
-              })
+              if (this.pageType === 'me') {
+                this.setData({
+                  isShowDialog: true
+                })
+              } else {
+                this.setData({
+                  isShowDialog: false
+                })
+              }
             } else {
               this.setData({
                 isShowDialog: false
               })
               common.updateUserInfo({
-                userInfo: e.detail.detail.userInfo,
-                success: (res) => {
-                  getRequestOnMe(this, true)
-                }
+                userInfo: e.detail.detail.userInfo
               })
             }
           }

@@ -24,7 +24,7 @@
         <!-- 定位与地点 -->
         <text class="rmc_location" catchtap="clickToMap" data-index="{{rcdIndex}}">{{record.location}}<text class="rmc_jin_wei">{{record.distance}}</text></text>
 
-        <view class="rmc_text {{rcdType == 0 ? '' : 'rmc_text_break'}} {{darkMode?'fontColorW1 bgColorB0':'fontColorB1 bgColorW0'}}">
+        <view class="rmc_text {{rcdType == 0 ? '' : 'rmc_text_break'}} {{darkMode?'fontColorW0 bgColorB1':'fontColorB0 bgColorW1'}}">
           <text>{{record.content}}</text>
           <!-- <text wx:if="{{record.hasMoreText}}" class="rmc_text_hasMore"> ...更多</text> -->
         </view>

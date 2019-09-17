@@ -8,7 +8,7 @@
     <block wx:for="{{sections}}" wx:for-item="sectionName" wx:for-index="section" wx:key="{{sectionName}}">
       <!-- section0即使为空也要显示 -->
       <block wx:if="{{recordListRac[section].length || section==0}}">
-        <view class="section_header {{darkMode?'bgColorB0 fontColorW1':'bgColorW0 fontColorB1'}}">{{sectionName}}</view>
+        <view class="section_header {{darkMode?'bgColorB1 fontColorW1':'bgColorW1 fontColorB1'}}">{{sectionName}}</view>
         <template is="emptyView" data="{{isShow: (!recordListRac[0].length && section==0), type:0}}"/>
         <block wx:for="{{recordListRac[section]}}" wx:key="recordId" wx:for-index="row">
           <template is="recordItem" data="{{record:item, rcdIndex:{section:section, row:row}, rcdType:1, darkMode:darkMode}}"/>

@@ -56,7 +56,7 @@
   display: block;
   margin: 10rpx 0 15rpx;
   padding: 0 5rpx;
-  opacity: 0.6;
+  opacity: 0.7;
 }
 
 .rmc_text_break {
@@ -252,14 +252,6 @@ display: none;
 .themeMode {
   background-color: #2ab3f3;
 }
-.coverPage {
-  top: 0rpx;
-  left: 0rpx;
-  width: 100%;
-  height: 100%;
-  z-index: -1000;
-  position: fixed;
-}
 .fontColorW0 {
   color: #fff;
 }
@@ -285,15 +277,21 @@ display: none;
   color: #999;
 }
 .bgColorB0 {
-  background-color: #222;
+  background-color: #000000;
 }
 .bgColorB1 {
+  background-color: #222;
+}
+.bgColorB2 {
   background-color: #565656;
 }
 .bgColorW0 {
-  background-color: #f6f6f6;
+  background-color: #ffffff;
 }
 .bgColorW1 {
+  background-color: #f6f6f6;
+}
+.bgColorW2 {
   background-color: #bbb;
 }
 

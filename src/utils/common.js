@@ -1,4 +1,5 @@
 import net from './net'
+import { storeUser } from '../stores/storeUser'
 let app = getApp()
 
 function _getKilometerDistance (lat1, lng1, lat2, lng2) {
@@ -110,6 +111,13 @@ function _getRecordListFrom (list, type = 0) {
 }
 
 function _updateUserInfo ({ userInfo, success = function () { } }) {
+  storeUser.commit('updateUserInfo', {
+    sex: userInfo.gender,
+    nickname: userInfo.nickName,
+    headUrl: userInfo.avatarUrl
+  })
+  app.globalData.hasHadUserInfo = true
+  wx.setStorageSync('hasHadUserInfo', true)
   net.reqPut({
     url: 'user/info',
     body: {

@@ -3,24 +3,27 @@
 
   <view class="container">
     <view class="table user_table">
-      <view class="cell1 user_cell {{darkMode?'bgColorB0':'bgColorW0'}}" bindtap="clickCell" data-index="0">
+      <view class="cell1 user_cell {{darkMode?'bgColorB1':'bgColorW1'}}" bindtap="clickCell" data-index="0">
           <text class="title {{darkMode?'fontColorW1':'fontColorB1'}}">头像</text>
           <image class="headPhoto" src="{{headUrl}}" mode="aspectFit"></image>
       </view>
-      <view class="cell1 user_cell {{darkMode?'bgColorB0':'bgColorW0'}}" bindtap="clickCell" data-index="1">
+      <view class="cell1 user_cell {{darkMode?'bgColorB1':'bgColorW1'}}" bindtap="clickCell" data-index="1">
           <text class="title {{darkMode?'fontColorW1':'fontColorB1'}}">昵称</text>
           <text class="description">{{nickname}}</text>
       </view>
-      <view class="cell1 user_cell {{darkMode?'bgColorB0':'bgColorW0'}}" bindtap="clickCell" data-index="2">
+      <view class="cell1 user_cell {{darkMode?'bgColorB1':'bgColorW1'}}" bindtap="clickCell" data-index="2">
           <text class="title {{darkMode?'fontColorW1':'fontColorB1'}}">性别</text>
           <text class="description">{{genders[sex]}}</text>
       </view>
-      <view class="cell1 user_cell {{darkMode?'bgColorB0':'bgColorW0'}}" bindtap="clickCell" data-index="3">
+      <view class="cell1 user_cell {{darkMode?'bgColorB1':'bgColorW1'}}" bindtap="clickCell" data-index="3">
           <text class="title {{darkMode?'fontColorW1':'fontColorB1'}}">个性签名</text>
           <text class="description">{{signature}}</text>
       </view>
     </view>
+
+    <dialog isShow="{{isShowDialog}}" title='需要授权' content='需要获得头像的授权才能获取最新的微信头像' showCancel="{{false}}" confirmText="去授权" open_type="getUserInfo" bindSuccess='authorizeUserInfo'></dialog>
   </view>
+
 </template>
 
 <script>
@@ -35,7 +38,8 @@
   createPage({
     behaviors: [behaviorOnPage],
     data: {
-      genders: ['未知', '男', '女']
+      genders: ['未知', '男', '女'],
+      isShowDialog: false
     },
     computed: {
       ...storeMode.mapState(['darkMode']),
@@ -49,22 +53,32 @@
       const index = parseInt(e.currentTarget.dataset.index)
       switch (index) {
         case 0: {
-          wx.showModal({
-            title: '确定更新头像？',
-            content: '点击“确定”以使用当前微信头像。(由于微信后台的延迟，新头像可能无法及时获取。如此，请过几小时再试。)',
-            confirmColor: '#2ab3f3',
+          wx.getSetting({
             success: (res) => {
-              if (res.confirm) {
-                wx.getUserInfo({
-                  success: res => {
-                    net.reqPut({
-                      url: 'user/headUrl',
-                      body: {
-                        headUrl: res.userInfo.avatarUrl
-                      }
-                    }).then(data => {
-                      storeUser.commit('updateUserInfo', { headUrl: res.userInfo.avatarUrl })
-                    })
+              if (!res.authSetting['scope.userInfo']) {
+                this.setData({
+                  isShowDialog: true
+                })
+              } else {
+                wx.showModal({
+                  title: '确定更新头像？',
+                  content: '点击“确定”以使用当前微信头像。(由于微信后台的延迟，新头像可能无法及时获取。如此，请过几小时再试。)',
+                  confirmColor: '#2ab3f3',
+                  success: (res) => {
+                    if (res.confirm) {
+                      wx.getUserInfo({
+                        success: res => {
+                          net.reqPut({
+                            url: 'user/headUrl',
+                            body: {
+                              headUrl: res.userInfo.avatarUrl
+                            }
+                          }).then(data => {
+                            storeUser.commit('updateUserInfo', { headUrl: res.userInfo.avatarUrl })
+                          })
+                        }
+                      })
+                    }
                   }
                 })
               }
@@ -102,6 +116,11 @@
           break
         }
       }
+    },
+    authorizeUserInfo (e) {
+      this.setData({
+        isShowDialog: false
+      })
     }
   })
 </script>
@@ -139,6 +158,7 @@
 <script  type='application/json'>
   {
     "usingComponents": {
+      "dialog": "../components/dialog",
       "navigationBar": "../components/navigationBar"
     }
   }

@@ -2,12 +2,12 @@
   <navigationBar pageName="点迹" showBackIcon="{{false}}"/>
 
   <view class="container">
-    <view class="header {{darkMode?'bgColorB0':'bgColorW0'}}" style="top:{{navH}}px">
+    <view class="header {{darkMode?'bgColorB1':'bgColorW1'}}" style="top:{{navH}}px">
       <picker class="picker_distance" range="{{distanceType}}" range-key="text" value="{{distanceIndex}}" bindchange="changeFilter" data-type="0">
-        <button class="picker_btn {{darkMode ? 'fontColorW2':'fontColorB2'}}" hover-class="{{darkMode?'bgColorB1':'bgColorW1'}}">{{distanceType[distanceIndex].text}}</button>
+        <button class="picker_btn {{darkMode ? 'fontColorW2':'fontColorB2'}}" hover-class="{{darkMode?'bgColorB2':'bgColorW2'}}">{{distanceType[distanceIndex].text}}</button>
       </picker>
       <picker class="picker_sort" range="{{sortType}}" range-key="text" value="{{sortIndex}}" bindchange="changeFilter" data-type="1">
-        <button class="picker_btn {{darkMode ? 'fontColorW2':'fontColorB2'}}" hover-class="{{darkMode?'bgColorB1':'bgColorW1'}}">{{sortType[sortIndex].text}}</button>
+        <button class="picker_btn {{darkMode ? 'fontColorW2':'fontColorB2'}}" hover-class="{{darkMode?'bgColorB2':'bgColorW2'}}">{{sortType[sortIndex].text}}</button>
       </picker>
     </view>
     <view class="header_holder"></view>

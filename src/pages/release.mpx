@@ -129,20 +129,22 @@
         })
       }
 
-      wx.getSetting({
-        success: (res) => {
-          console.log(res)
-          if (!res.authSetting['scope.userInfo']) {
-            this.setData({
-              isShowDialog: true
-            })
-          } else {
-            this.setData({
-              isShowDialog: false
-            })
+      if (!app.globalData.hasHadUserInfo) {
+        wx.getSetting({
+          success: (res) => {
+            console.log(res)
+            if (!res.authSetting['scope.userInfo']) {
+              this.setData({
+                isShowDialog: true
+              })
+            } else {
+              this.setData({
+                isShowDialog: false
+              })
+            }
           }
-        }
-      })
+        })
+      }
 
       if (common.isEmpty(this.data.locationName) && common.isEmpty(this.data.contentText) && common.isEmpty(this.data.imageList)) {
         common.getLocation({

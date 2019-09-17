@@ -16,7 +16,7 @@
       <view class="cell {{darkMode?'fontColorW2':'fontColorB2'}}" bindtap="clickToSome" data-type="about">
         关于
       </view>
-      <view class="cell {{darkMode?'fontColorC bgColorB0':'fontColorC bgColorW0'}}" bindtap="clickToSome" data-type="userAgreement">
+      <view class="cell {{darkMode?'fontColorC bgColorB1':'fontColorC bgColorW1'}}" bindtap="clickToSome" data-type="userAgreement">
         用户协议
       </view>
     </view>
@@ -57,7 +57,7 @@
         }
         case 'chooseImg': {
           wx.showActionSheet({
-            itemList: ['从相册选择', '清除背景图'],
+            itemList: ['选择（将重新加载小程序）', '清除背景图'],
             success: res => {
               if (res.tapIndex === 0) {
                 wx.chooseImage({
@@ -65,9 +65,12 @@
                   sizeType: ['compressed'],
                   count: 1,
                   success (res) {
-                    console.log(res)
+                    console.log(res.tempFilePaths[0])
                     storeMode.commit('updateCoverImg',{
                       imgUrl: res.tempFilePaths[0]
+                    })
+                    wx.reLaunch({
+                      url: './launch'
                     })
                   }
                 })
@@ -79,7 +82,6 @@
 
             }
           })
-
           break
         }
         case 'about':

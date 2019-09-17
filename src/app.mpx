@@ -23,6 +23,29 @@
       }
       that.globalData.favoritesDic = dic
     })
+
+    // 缓存中无‘曾经授权’记录则去询问服务器
+    if (!that.globalData.hasHadUserInfo) {
+      net.reqGet({
+        url: 'user/info'
+      }).then(data => {
+        if (typeof data.data.headUrl === 'string' && data.data.headUrl.length > 0) {
+          // 有授权则缓存记录下来，减少打开小程序时的网络请求次数
+          wx.setStorageSync('hasHadUserInfo', true)
+          that.globalData.hasHadUserInfo = true
+          storeUser.commit('updateUserInfo', {
+            sex: data.data.sex,
+            nickname: data.data.nickname,
+            headUrl: data.data.headUrl
+          })
+          storeUser.commit('updateSignature', { signature: data.data.signature })
+          storeUser.commit('updateFollowCount', {
+            followingCount: data.data.followingCount,
+            followedCount: data.data.followedCount,
+          })
+        }
+      })
+    }
   }
 
   App({
@@ -30,6 +53,8 @@
       storeUser.commit('updateUserId', { userId: (wx.getStorageSync('userId') || 0) })
       storeMode.commit('openDarkMode', { isOpen: (wx.getStorageSync('darkMode') || false) })
       storeMode.commit('updateCoverImg', { imgUrl: (wx.getStorageSync('coverImg') || '') })
+      // hasHadUserInfo是指服务器是否已经有此用户的昵称头像性别三个基本信息，如果有则个人页永远不要再请求微信授权，无论当前是否授权，减少打扰用户
+      this.globalData.hasHadUserInfo = wx.getStorageSync('hasHadUserInfo') || false
       // 用户静默登录
       if (storeUser.state.userId < 10000) {
         wx.login({
@@ -68,11 +93,7 @@
     },
 
     globalData: {
-      userInfo: {
-        nickname: '未知',
-        headUrl: '',
-        sex: 0
-      },
+      hasHadUserInfo: false,
       navHeight: 0,
       navTop: 0,
       windowHeight: 0,
