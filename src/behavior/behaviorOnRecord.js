@@ -17,6 +17,7 @@ export const behaviorOnRecord = Behavior({
       })
     },
     clickToDetail: function (e) {
+      if (e.currentTarget.dataset.type === 0) return
       const index = e.currentTarget.dataset.index
       const record = this.getRecord(index)
 

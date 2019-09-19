@@ -1,6 +1,7 @@
 <!-- 
-@param textArr
-@param isShow
+@param textArr  自定义三段式的填充文字
+@param isShow   是否显示
+@param type     用以区分同一页多个emptyView
  -->
 <template name="emptyView">
   <block wx:if="{{isShow}}">

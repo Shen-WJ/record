@@ -15,7 +15,7 @@
     <import src="../utils/recordItem.wxml"/>
     <import src="../utils/common.wxml"/>
     <view class="find">
-      <template is="emptyView" data="{{isShow: !recordListRac[0].length, type:0}}"/>
+      <template is="emptyView" data="{{isShow: !recordListRac[0].length, type:0, textArr:['要不点击上方⬆换个筛选条件试试？或者','去发布','分享给你的附近吧～0v0']}}"/>
       <block wx:for="{{recordListRac[0]}}" wx:key="{{item.recordId}}" wx:for-index="row">
       <template is="recordItem" data="{{record:item, rcdIndex:{section:0, row:row}, rcdType:1, darkMode:darkMode}}"/>
       </block>
@@ -53,9 +53,9 @@
     behaviors: [behaviorOnRecord, behaviorOnPage],
     data: {
       distanceType: distanceType,
-      distanceIndex: 3,
+      distanceIndex: wx.getStorageSync('find_distanceIndex') || 3,
       sortType: sortType,
-      sortIndex: 0,
+      sortIndex: wx.getStorageSync('find_sortIndex') || 2,
       navH: app.globalData.navHeight
     },
     computed: {
@@ -131,6 +131,7 @@
           this.setData({
             distanceIndex: e.detail.value
           }, (res) => {
+            wx.setStorageSync('find_distanceIndex', e.detail.value)
             wx.pageScrollTo({
               scrollTop: 0,
               duration: 0
@@ -143,6 +144,7 @@
           this.setData({
             sortIndex: e.detail.value
           }, (res) => {
+            wx.setStorageSync('find_sortIndex', e.detail.value)
             wx.pageScrollTo({
               scrollTop: 0,
               duration: 0

@@ -75,19 +75,25 @@ const http = ({ url = '', query = {}, body = {}, method = '', ...other } = {}) =
         if (res.statusCode >= 200 && res.statusCode < 300) {
           if (res.data.code === 0) {
             resolve(res.data)
-          } else {
-            reject(res)
-            console.log('!!! Request error, data code: ', res.data.code || 'none', 'message: ', res.data.message || 'none')
+          } else if (res.data.code === 300) {
+            wx.showToast({
+              title: res.data.message || 'none',
+              icon: 'none'
+            })
+          } else if (res.data.code === 500) {
             wx.showToast({
               title: '网络出错，请重试',
               icon: 'none'
             })
+          } else {
+            reject(res)
+            console.log('!!! Request error, data code: ', res.data.code || 'none', 'message: ', res.data.message || 'none')
           }
         } else {
           console.log('!!! Request error, res statusCode: ', res.statusCode || 'none')
           reject(res)
           wx.showToast({
-            title: '网络出错，请重试',
+            title: '网络出错：' + (res.statusCode || 'none'),
             icon: 'none'
           })
         }

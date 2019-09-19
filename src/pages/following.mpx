@@ -41,7 +41,7 @@
       }
     },
     getRequest: function (isRefresh) {
-      let pageNum = isRefresh ? 0 : this.data.resData.nextPage
+      let pageNum = isRefresh ? 0 : this.httpsData.nextPage
       net.reqGet({
         url: 'record/list/byFollow',
         query: {

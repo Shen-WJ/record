@@ -6,7 +6,7 @@
       } 
       -->
 <template name="recordItem">
-  <view class="record_item" bindtap="clickToDetail" data-index="{{rcdIndex}}">
+  <view class="record_item" bindtap="clickToDetail" data-index="{{rcdIndex}}" data-type="{{rcdType}}">
     <!-- 头像 -->
     <view class="record_avatar" catchtap="clickToOtherPeople" data-index="{{rcdIndex}}">
       <image wx:if="{{!record.isAnonymous}}"  class="user_avator" mode="aspectFill" src="{{record.headUrl}}"/>

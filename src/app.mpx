@@ -100,7 +100,6 @@
       statusBarHeight: 0,
       likesDic: {},
       favoritesDic: {},
-      requestingList: {},
       location: {},
       isTabbarPageRefresh: {
         'locality': false,
