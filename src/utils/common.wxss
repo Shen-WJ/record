@@ -240,6 +240,9 @@ display: none;
   margin: 20rpx;
   padding: 20rpx;
   border-radius: 10rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 /* darkMode */

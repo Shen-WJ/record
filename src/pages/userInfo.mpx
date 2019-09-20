@@ -2,20 +2,20 @@
   <navigationBar pageName="点迹"/>
 
   <view class="container">
-    <view class="table user_table">
-      <view class="cell1 user_cell {{darkMode?'bgColorB1':'bgColorW1'}}" bindtap="clickCell" data-index="0">
+    <view class="table userInfo_table">
+      <view class="cell1 {{darkMode?'bgColorB1':'bgColorW1'}}" bindtap="clickCell" data-index="0">
           <text class="title {{darkMode?'fontColorW1':'fontColorB1'}}">头像</text>
           <image class="headPhoto" src="{{headUrl}}" mode="aspectFit"></image>
       </view>
-      <view class="cell1 user_cell {{darkMode?'bgColorB1':'bgColorW1'}}" bindtap="clickCell" data-index="1">
+      <view class="cell1 {{darkMode?'bgColorB1':'bgColorW1'}}" bindtap="clickCell" data-index="1">
           <text class="title {{darkMode?'fontColorW1':'fontColorB1'}}">昵称</text>
           <text class="description">{{nickname}}</text>
       </view>
-      <view class="cell1 user_cell {{darkMode?'bgColorB1':'bgColorW1'}}" bindtap="clickCell" data-index="2">
+      <view class="cell1 {{darkMode?'bgColorB1':'bgColorW1'}}" bindtap="clickCell" data-index="2">
           <text class="title {{darkMode?'fontColorW1':'fontColorB1'}}">性别</text>
           <text class="description">{{genders[sex]}}</text>
       </view>
-      <view class="cell1 user_cell {{darkMode?'bgColorB1':'bgColorW1'}}" bindtap="clickCell" data-index="3">
+      <view class="cell1 {{darkMode?'bgColorB1':'bgColorW1'}}" bindtap="clickCell" data-index="3">
           <text class="title {{darkMode?'fontColorW1':'fontColorB1'}}">个性签名</text>
           <text class="description">{{signature}}</text>
       </view>
@@ -126,11 +126,7 @@
 </script>
 
 <style >
-  .user_table {
-  }
-  .user_cell {
-    display: flex;
-    justify-content: space-between;
+  .userInfo_table {
   }
 
   .headPhoto {

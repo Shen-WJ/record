@@ -2,23 +2,30 @@
   <navigationBar pageName="点迹"/>
 
   <view class="container">
-    <view class="table">
-      <view class="cell {{darkMode?'fontColorW0':'fontColorB0'}}" bindtap="clickToSome" data-type="userInfo">
-        修改个人信息
+    <view class="table1">
+      <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToSome" data-type="userInfo">
+        <text>修改个人信息</text>
+        <image src="../image/icon/arrow_right.png" />
       </view>
-      <view class="cell dark_mode_cell {{darkMode?'fontColorW1':'fontColorB1'}}">
-        开启夜间模式
+      <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
+        <text>开启夜间模式</text>
         <switch class="switch" checked="{{darkMode}}" bindchange="clickToSome" data-type="mode"></switch>
       </view>
-      <view class="cell {{darkMode?'fontColorW2':'fontColorB2'}}" bindtap="clickToSome" data-type="chooseImg">
-        更改背景图
+      <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToSome" data-type="chooseImg">
+        <text>更改背景图</text>
+        <image src="../image/icon/arrow_right.png" />
       </view>
-      <view class="cell {{darkMode?'fontColorW2':'fontColorB2'}}" bindtap="clickToSome" data-type="about">
-        关于
+      <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToSome" data-type="about">
+        <text>关于</text>
+        <image src="../image/icon/arrow_right.png" />
       </view>
-      <view class="cell {{darkMode?'fontColorC bgColorB1':'fontColorC bgColorW1'}}" bindtap="clickToSome" data-type="userAgreement">
-        用户协议
-      </view>
+      <button class="hided" open-type="feedback" id="feedbackBtn"/>
+      <label for="feedbackBtn">
+        <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
+          <text>反馈/建议</text>
+          <image src="../image/icon/arrow_right.png" />
+        </view>
+      </label>
     </view>
   </view>
 </template>
@@ -57,7 +64,7 @@
         }
         case 'chooseImg': {
           wx.showActionSheet({
-            itemList: ['选择（将重新加载小程序）', '清除背景图'],
+            itemList: ['选择（将重启小程序）', '清除背景图'],
             success: res => {
               if (res.tapIndex === 0) {
                 wx.chooseImage({
@@ -84,8 +91,7 @@
           })
           break
         }
-        case 'about':
-        case 'userAgreement': {
+        case 'about': {
           wx.navigateTo({
             url: './singleText?type=' + type
           })
@@ -98,10 +104,14 @@
 
 <style>
   .container {}
-  .dark_mode_cell {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .settings_cell {
+  }
+  .settings_cell image{
+    position: relative;
+    top: 50%;
+    width: 40rpx;
+    height: 40rpx;
+    float: right;
   }
   .switch {
     float: right;

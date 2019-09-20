@@ -85,7 +85,7 @@
               <view class="icons3_2">
                 <image src="../image/icon/share.png" />
               </view>
-            </label> 
+            </label>
             <image class="icons3_3" catchtap="clickMore" data-index="{{rcdIndex}}" src="../image/icon/more.png" />
           </block>        
         </view>

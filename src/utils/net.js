@@ -86,7 +86,7 @@ const http = ({ url = '', query = {}, body = {}, method = '', ...other } = {}) =
               icon: 'none'
             })
           } else {
-            reject(res)
+            reject(res.data)
             console.log('!!! Request error, data code: ', res.data.code || 'none', 'message: ', res.data.message || 'none')
           }
         } else {

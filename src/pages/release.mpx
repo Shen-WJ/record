@@ -41,7 +41,10 @@
     </view>
     <view class="private_choose {{darkMode?'fontColorW2':'fontColorB2'}}">
       <text>给后来者也看看吧？</text>
-      <picker class="private_choose_picker" mode="multiSelector" range="{{privateType}}" range-key="text" bindchange="changePrivateType" bindcolumnchange="columnchange" bindcancel="cancelChange" bindtap="clickPicker"><text>{{privateType[0][privateTypeIndex].text}}</text><image src="../image/icon/arrow_right.png" /></picker>
+      <picker class="private_choose_picker" mode="multiSelector" range="{{privateType}}" range-key="text" bindchange="changePrivateType" bindcolumnchange="columnchange" bindcancel="cancelChange" bindtap="clickPicker">
+        <text>{{privateType[0][privateTypeIndex].text}}</text>
+        <image src="../image/icon/arrow_right.png" />
+      </picker>
     </view>
     <button class="bottom_btn" bindtap="clickBtnRelease">发布</button>
 
