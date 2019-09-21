@@ -15,8 +15,8 @@
     <import src="../utils/recordItem.wxml"/>
     <import src="../utils/common.wxml"/>
     <view class="find">
-      <template is="emptyView" data="{{isShow: !recordListRac[0].length, type:0, textArr:['要不点击上方⬆换个筛选条件试试？或者','去发布','分享给你的附近吧～0v0']}}"/>
-      <block wx:for="{{recordListRac[0]}}" wx:key="{{item.recordId}}" wx:for-index="row">
+      <template is="emptyView" data="{{isShow: !recordList[0].length, type:0, textArr:['要不点击上方⬆换个筛选条件试试？或者','去发布','分享给你的附近吧～0v0']}}"/>
+      <block wx:for="{{recordList[0]}}" wx:key="{{item.recordId}}" wx:for-index="row">
       <template is="recordItem" data="{{record:item, rcdIndex:{section:0, row:row}, rcdType:1, darkMode:darkMode}}"/>
       </block>
     </view>
@@ -29,7 +29,7 @@
   import net from '../utils/net'
   import { storeMode } from '../stores/storeCommon'
   import { behaviorOnRecord } from '../behavior/behaviorOnRecord'
-  import { behaviorOnPage} from '../behavior/behaviorOnPage'
+  import { behaviorOnPage } from '../behavior/behaviorOnPage'
 
   const common = require('../utils/common.js')
   const app = getApp()
@@ -52,16 +52,15 @@
   createPage({
     behaviors: [behaviorOnRecord, behaviorOnPage],
     data: {
+      recordList: [[], []],
       distanceType: distanceType,
       distanceIndex: wx.getStorageSync('find_distanceIndex') || 3,
       sortType: sortType,
       sortIndex: wx.getStorageSync('find_sortIndex') || 2,
-      navH: app.globalData.navHeight
+      navH: app.globalData.navHeight,
+      pageLocation: {}
     },
     computed: {
-      recordListRac: function () {
-        return this.recordList || [[], []]
-      },
       ...storeMode.mapState(['darkMode'])
     },
 
@@ -81,8 +80,8 @@
       }
 
       // 非第一次请求才需要做比较
-      if (!common.isEmpty(this.data.location)) {
-        if (common.getDistanceToMe(this.data.pageLocation.latitude, this.data.pageLocation.longitude) > 1) {
+      if (!common.isEmpty(this.pageLocation)) {
+        if (common.getDistanceToMe(this.pageLocation.latitude, this.pageLocation.longitude) > 1) {
           // 定位离开了1km才强制刷新
           app.globalData.isTabbarPageRefresh['find'] = true
         }
@@ -100,14 +99,15 @@
 
     getRequest: function (isRefresh) {
       let pageNum = isRefresh ? 0 : this.httpsData.nextPage
+      this.pageLocation = { longitude: app.globalData.longitude, latitude: app.globalData.latitude }
       net.reqGet({
         url: 'record/list/filter',
         query: {
           pageNum: pageNum,
           lng: app.globalData.location.longitude,
           lat: app.globalData.location.latitude,
-          distance: distanceType[this.data.distanceIndex].distance,
-          type: sortType[this.data.sortIndex].type
+          distance: distanceType[this.distanceIndex].distance,
+          type: sortType[this.sortIndex].type
         }
       }).then(data => {
         if (isRefresh) {
@@ -120,7 +120,7 @@
           records = records.concat(common.getRecordListFrom(data.data.list))
           this.httpsData = data.data
         }
-        this.recordList = [records, []]
+        this.recordList.splice(0, 1, records)
       })
     },
 
@@ -128,29 +128,23 @@
       const type = parseInt(e.target.dataset.type)
       switch (type) {
         case 0: {
-          this.setData({
-            distanceIndex: e.detail.value
-          }, (res) => {
-            wx.setStorageSync('find_distanceIndex', e.detail.value)
-            wx.pageScrollTo({
-              scrollTop: 0,
-              duration: 0
-            })
-            this.getRequest(true)
+          this.distanceIndex = e.detail.value
+          wx.setStorageSync('find_distanceIndex', e.detail.value)
+          wx.pageScrollTo({
+            scrollTop: 0,
+            duration: 0
           })
+          this.getRequest(true)
           break
         }
         case 1: {
-          this.setData({
-            sortIndex: e.detail.value
-          }, (res) => {
-            wx.setStorageSync('find_sortIndex', e.detail.value)
-            wx.pageScrollTo({
-              scrollTop: 0,
-              duration: 0
-            })
-            this.getRequest(true)
+          this.sortIndex = e.detail.value
+          wx.setStorageSync('find_sortIndex', e.detail.value)
+          wx.pageScrollTo({
+            scrollTop: 0,
+            duration: 0
           })
+          this.getRequest(true)
           break
         }
       }
@@ -160,7 +154,7 @@
       wx.switchTab({
         url: './release'
       })
-    },
+    }
   })
 </script>
 

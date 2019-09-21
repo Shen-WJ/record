@@ -74,8 +74,8 @@
 
   let elements = [
     wx.createAnimation({ timingFunction: 'ease', duration: 1000 }),
-    wx.createAnimation({ timingFunction: 'ease-in', duration: 1000  }),
-    wx.createAnimation({ timingFunction: 'ease-in-out', duration: 1000  }),
+    wx.createAnimation({ timingFunction: 'ease-in', duration: 1000 }),
+    wx.createAnimation({ timingFunction: 'ease-in-out', duration: 1000 }),
     wx.createAnimation({ timingFunction: 'ease-out', duration: 1000 })
   ]
   let isAnimating = false
@@ -130,7 +130,7 @@
         storeUser.commit('updateSignature', { signature: data.data.signature })
         storeUser.commit('updateFollowCount', {
           followingCount: data.data.followingCount,
-          followedCount: data.data.followedCount,
+          followedCount: data.data.followedCount
         })
       })
 
@@ -303,7 +303,7 @@
         return this.otherIsFollowed
       },
       isShowFollowBtn () {
-        return storeUser.state.userId != this.otherUserId
+        return storeUser.state.userId !== this.otherUserId
       }
     },
     lifetimes: {
@@ -346,8 +346,8 @@
       // 个人信息，通知，收藏，设置，关注/取消关注
       clickToSome: function (e) {
         const type = parseInt(e.currentTarget.dataset.type)
-        switch(type) {
-          case 0: { //个人信息
+        switch (type) {
+          case 0: { // 个人信息
             if (this.data.pageType === 'me') {
               wx.navigateTo({
                 url: './userInfo'
@@ -408,7 +408,6 @@
             break
           }
         }
-
       },
 
       clickHead (e) {

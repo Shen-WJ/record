@@ -5,29 +5,21 @@
 
 <script>
   import { createPage } from '@mpxjs/core'
+
   let stop = false
+  let count = 3
   createPage({
     data: {
-      counter: 3
+      counter: count
     },
     onLoad () {
-      let timer = setTimeout(() => {
-        clearTimeout(timer)
-        this.direct()
-      }, 3000)
-
-      let timer1 = setTimeout(() => {
-        clearTimeout(timer1)
-        this.setData({
-          counter: 2
-        })
+      let timer = setInterval(() => {
+        this.counter = --count
+        if (count === 0) {
+          clearTimeout(timer)
+          this.direct()
+        }
       }, 1000)
-      let timer2 = setTimeout(() => {
-        clearTimeout(timer2)
-        this.setData({
-          counter: 1
-        })
-      }, 2000)
     },
 
     direct () {

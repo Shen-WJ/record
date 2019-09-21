@@ -7,11 +7,11 @@ export const storeMode = createStore({
   },
   mutations: {
     openDarkMode (state, { isOpen = false }) {
-      wx.setStorageSync("darkMode", isOpen)
+      wx.setStorageSync('darkMode', isOpen)
       state.darkMode = isOpen
     },
     updateCoverImg (state, { imgUrl = '' }) {
-      wx.setStorageSync('coverImg', imgUrl||'')
+      wx.setStorageSync('coverImg', imgUrl || '')
       state.coverImg = imgUrl || ''
     }
   }

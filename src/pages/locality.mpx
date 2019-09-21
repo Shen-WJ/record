@@ -7,10 +7,10 @@
     <view class="locality">
     <block wx:for="{{sections}}" wx:for-item="sectionName" wx:for-index="section" wx:key="{{sectionName}}">
       <!-- section0即使为空也要显示 -->
-      <block wx:if="{{recordListRac[section].length || section==0}}">
+      <block wx:if="{{recordList[section].length || section==0}}">
         <view class="section_header {{darkMode?'bgColorB1 fontColorW1':'bgColorW1 fontColorB1'}}">{{sectionName}}</view>
-        <template is="emptyView" data="{{isShow: (!recordListRac[0].length && section==0), type:0}}"/>
-        <block wx:for="{{recordListRac[section]}}" wx:key="recordId" wx:for-index="row">
+        <template is="emptyView" data="{{isShow: (!recordList[0].length && section==0), type:0}}"/>
+        <block wx:for="{{recordList[section]}}" wx:key="recordId" wx:for-index="row">
           <template is="recordItem" data="{{record:item, rcdIndex:{section:section, row:row}, rcdType:1, darkMode:darkMode}}"/>
         </block>
       </block>
@@ -27,28 +27,11 @@
   import net from '../utils/net'
   import { storeMode } from '../stores/storeCommon'
   import { behaviorOnRecord } from '../behavior/behaviorOnRecord'
-  import { behaviorOnPage} from '../behavior/behaviorOnPage'
+  import { behaviorOnPage } from '../behavior/behaviorOnPage'
 
   const common = require('../utils/common.js')
   const app = getApp()
 
-
-  const getHotList = function (that) {
-    net.reqGet({
-      url: 'record/list/hot',
-      query: {
-        size: 5
-      }
-    }).then(data => {
-      let hotList = []
-      hotList = hotList.concat(common.getRecordListFrom(data.data))
-      that.recordList.splice(1, 1, hotList)
-
-      that.setData({
-        isReachBottom: true
-      })
-    })
-  }
   var count = 0
   createPage({
     behaviors: [behaviorOnRecord, behaviorOnPage],
@@ -56,17 +39,21 @@
       recordList: [[], []],
       sections: ['附近', '全网热说'],
       scrollTop: 0,
-      isReachBottom: false
+      isReachBottom: false,
+      pageLocation: {} // 这是对应页面“上一次”做数据请求的定位记录，不做任何其他用途
     },
 
     computed: {
-      recordListRac: function () {
-        return this.recordList || [[], []]
-      },
       ...storeMode.mapState(['darkMode'])
     },
 
     onLoad: function (options) {
+      common.getLocation({
+        success: (res) => {
+          this.getRequest(true)
+        }
+      })
+
       net.reqGet({
         url: 'notice/count'
       }).then(data => {
@@ -76,18 +63,11 @@
           })
         }
       })
+
       var timer = setInterval(() => {
         common.getLocation()
         console.log('timer fire!!!', ++count)
       }, 30000)
-    },
-
-    onLoad: function () {
-      common.getLocation({
-        success: (res) => {
-          this.getRequest(true)
-        }
-      })
     },
 
     onShow: function () {
@@ -98,8 +78,8 @@
       }
 
       // 非第一次请求才需要做比较
-      if (!common.isEmpty(this.data.location)) {
-        if (common.getDistanceToMe(this.data.pageLocation.latitude, this.data.pageLocation.longitude) > 1) {
+      if (!common.isEmpty(this.pageLocation)) {
+        if (common.getDistanceToMe(this.pageLocation.latitude, this.pageLocation.longitude) > 1) {
           // 定位离开了1km才强制刷新
           app.globalData.isTabbarPageRefresh['locality'] = true
         }
@@ -119,7 +99,7 @@
       let pageNum = isRefresh ? 0 : this.httpsData.nextPage
       let distance = isRefresh ? -1 : this.distance
       // 用于记录“上一次”请求时的定位点
-      this.data.pageLocation = { longitude: app.globalData.longitude, latitude: app.globalData.latitude }
+      this.pageLocation = { longitude: app.globalData.longitude, latitude: app.globalData.latitude }
       net.reqGet({
         url: 'record/list/byLocation',
         query: {
@@ -137,13 +117,27 @@
         let records = isRefresh ? [] : this.recordList[0]
 
         if (!data.data.hasNextPage) {
-          getHotList(this)
+          this.getHotList()
         }
         if (data.data.total > 0) {
           records = records.concat(common.getRecordListFrom(data.data.list))
           this.httpsData = data.data
         }
-        this.recordList = [records, []]
+        this.recordList.splice(0, 1, records)
+      })
+    },
+    getHotList: function () {
+      net.reqGet({
+        url: 'record/list/hot',
+        query: {
+          size: 5
+        }
+      }).then(data => {
+        let hotList = []
+        hotList = hotList.concat(common.getRecordListFrom(data.data))
+        this.recordList.splice(1, 1, hotList)
+
+        this.isReachBottom = true
       })
     },
 

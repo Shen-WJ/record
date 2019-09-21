@@ -37,50 +37,40 @@
     },
 
     onLoad: function (options) {
-      this.setData({
-        pageType: options.pageType
-      })
+      this.pageType = options.pageType
       switch (options.pageType) {
         case 'report': {
           this.reportType = options.reportType
           this.recordId = options.recordId
-          this.setData({
-            contentTextLength: 140,
-            btnName: '举报',
-            placeHolder: '告诉我们举报的原因吧，我们将第一时间解决'
-          })
+          this.contentTextLength = 140,
+          this.btnName = '举报',
+          this.placeHolder = '告诉我们举报的原因吧，我们将第一时间解决'
           break
         }
         case 'nickname': {
-          this.setData({
-            contentTextLength: 15,
-            btnName: '确定',
-            contentText: storeUser.state.nickname || '',
-            placeHolder: '昵称(1-15字)'
-          })
+          this.contentTextLength = 15,
+          this.btnName = '确定',
+          this.contentText = storeUser.state.nickname || '',
+          this.placeHolder = '昵称(1-15字)'
           break
         }
         case 'signature': {
-          this.setData({
-            contentTextLength: 50,
-            btnName: '确定',
-            contentText: storeUser.state.signature || '',
-            placeHolder: '简介(1-50字)'
-          })
+          this.contentTextLength = 50,
+          this.btnName = '确定',
+          this.contentText = storeUser.state.signature || '',
+          this.placeHolder = '简介(1-50字)'
           break
         }
       }
     },
 
     textInput: function (e) {
-      this.setData({
-        contentText: e.detail.value,
-        contentTextCount: e.detail.value.length
-      })
+      this.contentText = e.detail.value,
+      this.contentTextCount = e.detail.value.length
     },
 
     clickBtnSend: function (e) {
-      if (this.data.contentText.length <= 0 && this.data.pageType !== 'signature') {
+      if (this.contentText.length <= 0 && this.pageType !== 'signature') {
         wx.showToast({
           title: '不得为空',
           icon: 'none'
@@ -91,12 +81,12 @@
         return
       }
       this.isRequseting = true
-      switch (this.data.pageType) {
+      switch (this.pageType) {
         case 'report': {
           net.reqPost({
             url: 'report/info',
             body: {
-              message: this.data.contentText,
+              message: this.contentText,
               recordId: this.recordId,
               reportType: this.reportType
             }
@@ -106,9 +96,7 @@
             wx.setStorageSync('reportList', list)
 
             this.isRequseting = false
-            this.setData({
-              contentText: ''
-            })
+            this.contentText = ''
             wx.showToast({
               title: '已举报',
               duration: 1000
@@ -128,11 +116,11 @@
             url: 'user/info/nicknameUpdate',
             body: {
               timestamp: timestamp,
-              nickName: this.data.contentText
+              nickName: this.contentText
             }
           }).then(data => {
             this.isRequseting = false
-            storeUser.commit('updateUserInfo', { nickname: this.data.contentText })
+            storeUser.commit('updateUserInfo', { nickname: this.contentText })
             wx.navigateBack({
               delta: 1
             })
@@ -143,11 +131,11 @@
           net.reqPut({
             url: 'user/info/signatureUpdate',
             body: {
-              signature: this.data.contentText
+              signature: this.contentText
             }
           }).then(data => {
             this.isRequseting = false
-            storeUser.commit('updateSignature', { signature: this.data.contentText })
+            storeUser.commit('updateSignature', { signature: this.contentText })
             wx.navigateBack({
               delta: 1
             })

@@ -4,7 +4,6 @@ const common = require('../utils/common.js')
 
 export const behaviorOnPage = Behavior({
   data: {
-    pageLocation: {}, // 这是对应页面“上一次”做数据请求的定位记录，不做任何其他用途
   },
   methods: {
     onPullDownRefresh: function () {

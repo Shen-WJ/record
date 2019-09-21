@@ -56,9 +56,7 @@
           wx.getSetting({
             success: (res) => {
               if (!res.authSetting['scope.userInfo']) {
-                this.setData({
-                  isShowDialog: true
-                })
+                this.isShowDialog = true
               } else {
                 wx.showModal({
                   title: '确定更新头像？',
@@ -118,9 +116,7 @@
       }
     },
     authorizeUserInfo (e) {
-      this.setData({
-        isShowDialog: false
-      })
+      this.isShowDialog = false
     }
   })
 </script>

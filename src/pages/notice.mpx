@@ -47,9 +47,7 @@
 
     onLoad: function (options) {
       this.getRequest(this, true)
-      this.setData({
-        isReadLocalNotice: wx.getStorageSync('isReadLocalNotice') || false
-      })
+      this.isReadLocalNotice = wx.getStorageSync('isReadLocalNotice') || false
       wx.setStorageSync('isReadLocalNotice', true)
     },
 
@@ -59,25 +57,23 @@
       })
     },
 
-    getRequest: function (that, isRefresh) {
-      let pageNum = isRefresh ? 0 : that.httpsData.nextPage
+    getRequest: function (isRefresh) {
+      let pageNum = isRefresh ? 0 : this.httpsData.nextPage
       net.reqGet({
         url: 'notice/list',
         query: {
           pageNum: pageNum
         }
       }).then(data => {
-        let list = isRefresh ? [] : that.data.noticeList
+        let list = isRefresh ? [] : this.noticeList
 
         for (let i in data.data.list) {
           let item = data.data.list[i]
           item['timeStr'] = common.timeToStr(item.time)
           list.push(item)
         }
-        that.httpsData = data.data
-        that.setData({
-          noticeList: list
-        })
+        this.httpsData = data.data
+        this.noticeList = list
       })
     }
   })

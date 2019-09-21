@@ -15,24 +15,24 @@
   import net from '../utils/net'
   import { storeMode } from '../stores/storeCommon'
   import { behaviorOnRecord } from '../behavior/behaviorOnRecord'
-  import { behaviorOnPage} from '../behavior/behaviorOnPage'
+  import { behaviorOnPage } from '../behavior/behaviorOnPage'
 
   const common = require('../utils/common.js')
   const app = getApp()
-
 
   createPage({
     behaviors: [behaviorOnRecord, behaviorOnPage],
     data: {
       navH: app.globalData.navHeight,
       record: {},
-      locDigit: {}
+      locDigit: {},
+      recordId: 0
     },
     computed: {
       ...storeMode.mapState(['darkMode'])
     },
     onLoad: function (options) {
-      this.data.recordId = options.recordId
+      this.recordId = options.recordId
       if (!common.isEmpty(options.row)) {
         this.oldIndex = {
           section: parseInt(options.section),
@@ -47,13 +47,11 @@
       net.reqGet({
         url: 'record/detail',
         query: {
-          recordId: this.data.recordId
+          recordId: this.recordId
         }
       }).then(data => {
         wx.stopPullDownRefresh()
-        this.setData({
-          record: common.getRecordListFrom([data.data], 1)[0]
-        })
+        this.record = common.getRecordListFrom([data.data], 1)[0]
       })
     },
     clickMore: function (e) {
@@ -62,12 +60,12 @@
         success: res => {
           if (res.tapIndex === 0) {
             let list = wx.getStorageSync('reportList')
-            if (common.isEmpty(list[this.data.recordId])) {
+            if (common.isEmpty(list[this.recordId])) {
               wx.showActionSheet({
                 itemList: ['黄赌毒暴骗', '侵犯隐私/人身攻击', '政治', '广告/垃圾信息', '其他'],
                 success: res => {
                   wx.navigateTo({
-                    url: './singleInput?pageType=report&recordId=' + this.data.recordId + '&reportType=' + res.tapIndex
+                    url: './singleInput?pageType=report&recordId=' + this.recordId + '&reportType=' + res.tapIndex
                   })
                 }
               })
@@ -83,12 +81,10 @@
     },
 
     getRecord: function (index) {
-      return this.data.record
+      return this.record
     },
     changeRecord: function (index, record) {
-      this.setData({
-        record: record
-      })
+      this.record = record
     },
     // 0点赞，1收藏
     changeFormerPageStatus: function (type) {

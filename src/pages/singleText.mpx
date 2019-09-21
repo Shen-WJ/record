@@ -34,9 +34,7 @@
     },
 
     onLoad: function (option) {
-      this.setData({
-        type: option.type
-      })
+      this.type - option.type
     },
     clickToUserAgreement () {
       wx.navigateTo({
