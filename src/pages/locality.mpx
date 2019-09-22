@@ -19,6 +19,7 @@
     <template is="emptyView" data="{{isShow: isReachBottom, type: 1, textArr:['已经到底啦！去','发现','查看更多内容吧～0v0']}}"/>
     </view>
   </view>
+  <view class="point themeMode" catchtap="clickToMap">地图</view>
   <view class="bottomHolder"/>
 </template>
 
@@ -152,6 +153,11 @@
           url: './find'
         })
       }
+    },
+    clickToMap: function () {
+      wx.navigateTo({
+        url: './mapPage'
+      })
     }
   })
 </script>
@@ -170,6 +176,20 @@
     line-height: 70rpx;
     height: 70rpx;
     width: 710rpx;
+  }
+  .point {
+    position: fixed;
+    z-index: 1000;
+    right: 60rpx;
+    bottom: 58px;
+    margin-bottom: env(safe-area-inset-bottom);
+
+    width: 100rpx;
+    height: 100rpx;
+    color: white;
+    line-height: 100rpx;
+    border-radius: 50%;
+    text-align: center;
   }
 </style>
 

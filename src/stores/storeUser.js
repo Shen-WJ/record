@@ -3,6 +3,7 @@ import { createStore } from '@mpxjs/core'
 export const storeUser = createStore({
   state: {
     userId: 0,
+    userCode: '',
     nickname: '未知',
     headUrl: '',
     sex: 0,
@@ -36,7 +37,12 @@ export const storeUser = createStore({
     updateUserId (state, { userId = 0 }) {
       if (userId > 10000) {
         state.userId = userId
+        wx.setStorageSync('userId', userId)
       }
+    },
+    updateUserCode (state, { userCode = '' }) {
+      state.userCode = userCode
+      wx.setStorageSync('userCode', userCode)
     }
   }
 })

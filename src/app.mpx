@@ -51,12 +51,13 @@
   App({
     onLaunch: function (option) {
       storeUser.commit('updateUserId', { userId: (wx.getStorageSync('userId') || 0) })
+      storeUser.commit('updateUserCode', { userCode: (wx.getStorageSync('userCode') || '') })
       storeMode.commit('openDarkMode', { isOpen: (wx.getStorageSync('darkMode') || false) })
       storeMode.commit('updateCoverImg', { imgUrl: (wx.getStorageSync('coverImg') || '') })
       // hasHadUserInfo是指服务器是否已经有此用户的昵称头像性别三个基本信息，如果有则个人页永远不要再请求微信授权，无论当前是否授权，减少打扰用户
       this.globalData.hasHadUserInfo = wx.getStorageSync('hasHadUserInfo') || false
       // 用户静默登录
-      if (storeUser.state.userId < 10000) {
+      if (storeUser.state.userId < 10000 || storeUser.state.userCode === '') {
         wx.login({
           success: res => {
             // 发送 res.code 到后台换取 openId, sessionKey, unionId
@@ -67,8 +68,8 @@
                 code: res.code
               }
             }).then(data => {
-              storeUser.commit('updateUserId', { userId: data.data })
-              wx.setStorageSync('userId', data.data)
+              storeUser.commit('updateUserId', { userId: data.data.userId })
+              storeUser.commit('updateUserCode', { userCode: data.data.code })
               getData(this)
             })
           }
@@ -127,6 +128,7 @@
 <script type="application/json">
   {
     "pages": [
+      "./pages/mapPage",
       "./pages/launch",
       "./pages/locality",
       "./pages/find",

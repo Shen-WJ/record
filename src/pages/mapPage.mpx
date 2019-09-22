@@ -1,0 +1,26 @@
+<template>
+  <navigationBar pageName="点迹"/>
+  <view class='container'>
+    <customMap></customMap>
+  </view>
+</template>
+
+<script>
+  import { createPage } from '@mpxjs/core'
+  createPage({
+  })
+</script>
+
+<style>
+  .container {} 
+</style>
+
+<script  type='application/json' lang='json'>
+  {
+    "usingComponents": {
+      "navigationBar": "../components/navigationBar",
+      "customMap": "../components/customMap"
+    }
+  }
+</script>
+

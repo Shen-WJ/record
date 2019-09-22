@@ -63,7 +63,8 @@ const http = ({ url = '', query = {}, body = {}, method = '', ...other } = {}) =
       method: method,
       header: {
         'content-type': 'application/json', // 默认值 ,另一种是 "content-type": "application/x-www-form-urlencoded"
-        'sign': sign
+        'sign': sign,
+        'code': storeUser.state.userCode
       },
       ...other,
       complete: (res) => {

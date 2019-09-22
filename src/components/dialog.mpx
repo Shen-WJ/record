@@ -19,9 +19,6 @@
 <script>
   import { createComponent } from '@mpxjs/core'
   createComponent({
-    /**
-    * 组件的属性列表
-    */
     properties: {
       // 是否显示
       isShow: {
@@ -56,15 +53,8 @@
       // bindSuccess 在HTML使用该属性可将 使用页面 的函数绑定到确认按钮的事件当中去
       // bindCancel 在HTML使用该属性可将 使用页面 的函数绑定到取消按钮的事件当中去
     },
-
-    /**
-    * 组件的初始数据
-    */
     data: {
     },
-    /**
-    * 组件的方法列表
-    */
     methods: {
       close: function () {
         this.setData({

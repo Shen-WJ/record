@@ -8,13 +8,6 @@
       <button class="btn_clear" hover-class="touch_btn" bindtap="clickBtnClear">清空</button>
       <button class="btn_release" hover-class="touch_btn" bindtap="clickBtnRelease">发布</button>
     </view>
-    <map catchtap="chooseLocation"
-      id="myMap"
-      style="width: 100%; height: 100rpx;"
-      latitude="{{locationDigit.latitude}}"
-      longitude="{{locationDigit.longitude}}"
-      show-location
-    ></map>
     <view class="release_content">
       <view class="location">
         <input class="location_input {{darkMode?'fontColorW1':'fontColorB1'}}" value="{{locationName}}" bindinput="locationInput" maxlength="{{loactionNameLength}}" placeholder="这里，是哪里？(1~{{loactionNameLength}}字)" placeholder-style="{{darkMode?'color:#555;':'color:#aaa;'}}"/>
@@ -390,10 +383,11 @@
         success: choose => {
           common.getLocation({
             success: (res) => {
+              console.log(choose)
               let distance = common.getKilometerDistance(choose.latitude, choose.longitude, res.latitude, res.longitude)
-              if (distance > 1) {
+              if (distance > 10) {
                 wx.showToast({
-                  title: '可不能选超过1km远的地方哦',
+                  title: '可不能选超过10km远的地方哦',
                   icon: 'none',
                   duration: 5000
                 })
