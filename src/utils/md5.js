@@ -17,7 +17,7 @@
  * See http://pajhome.org.uk/crypt/md5 for more info.
  */
 
-/* global define */
+// global define
 
 /* eslint-disable strict */
 

@@ -41,7 +41,7 @@
           storeUser.commit('updateSignature', { signature: data.data.signature })
           storeUser.commit('updateFollowCount', {
             followingCount: data.data.followingCount,
-            followedCount: data.data.followedCount,
+            followedCount: data.data.followedCount
           })
         }
       })
@@ -77,13 +77,13 @@
         getData(this)
       }
 
-      let menuButtonObject = wx.getMenuButtonBoundingClientRect();
+      let menuButtonObject = wx.getMenuButtonBoundingClientRect()
       wx.getSystemInfo({
         success: (res) => {
           console.log(res)
-          let statusBarHeight = res.statusBarHeight,
-              navTop = menuButtonObject.top,
-              navHeight = statusBarHeight + menuButtonObject.height + (menuButtonObject.top - statusBarHeight)*2
+          let statusBarHeight = res.statusBarHeight
+          let navTop = menuButtonObject.top
+          let navHeight = statusBarHeight + menuButtonObject.height + (menuButtonObject.top - statusBarHeight) * 2
           this.globalData.navHeight = navHeight
           this.globalData.navTop = navTop
           this.globalData.statusBarHeight = statusBarHeight

@@ -31,26 +31,28 @@
       selected: 0,
       color: '#7A7E83',
       selectedColor: '#2ab3f3',
-      list: [{
+      list: [
+        {
           'pagePath': '../pages/locality',
-          'text': '周围',
+          'text': '周围'
         },
         {
           'pagePath': '../pages/find',
-          'text': '发现',
+          'text': '发现'
         },
         {
           'pagePath': '../pages/release',
-          'text': '发布',
+          'text': '发布'
         },
         {
           'pagePath': '../pages/following',
-          'text': '关注',
+          'text': '关注'
         },
         {
           'pagePath': '../pages/me',
-          'text': '我',
-        }]
+          'text': '我'
+        }
+      ]
     },
     computed: {
       icons: function () {
@@ -62,21 +64,11 @@
       },
       ...storeMode.mapState(['darkMode'])
     },
-    pageShow() {
-      // 所在页面显示之后就会执行一次
-      console.log('page show')
-
-    },
-    pageHide() {
-      // 页面切入后台执行
-      console.log('page hide')
-
-    },
     methods: {
-      switchTab(e) {
+      switchTab (e) {
         const data = e.currentTarget.dataset
         const url = data.path
-        wx.switchTab({url})
+        wx.switchTab({ url })
         this.setData({
           selected: data.index
         })

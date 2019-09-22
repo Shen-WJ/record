@@ -9,7 +9,7 @@
   createPage({
     behaviors: [behaviorOnPeople],
     data: {
-      otherUserId: 0,
+      otherUserId: 0
     }
   })
 </script>

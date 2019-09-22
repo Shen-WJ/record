@@ -34,7 +34,7 @@
     },
 
     onLoad: function (option) {
-      this.type - option.type
+      this.type = option.type
     },
     clickToUserAgreement () {
       wx.navigateTo({

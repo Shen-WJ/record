@@ -7,8 +7,8 @@ const baseUrl = 'https://chahuangli.cn/recordAllV2/'
 const signWithStr = 'jilu666'
 let requestingList = {}
 
-function json2UrlEncoded (element, key, list) {
-  var list = list || []
+function json2UrlEncoded (element, key, paramList) {
+  var list = paramList || []
   if (typeof (element) === 'object') {
     for (let idx in element) {
       json2UrlEncoded(element[idx], key ? key + '[' + idx + ']' : idx, list)

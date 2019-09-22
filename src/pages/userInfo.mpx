@@ -33,8 +33,6 @@
   import { storeUser } from '../stores/storeUser'
   import { behaviorOnPage } from '../behavior/behaviorOnPage'
 
-  const app = getApp()
-
   createPage({
     behaviors: [behaviorOnPage],
     data: {

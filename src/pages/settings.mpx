@@ -43,7 +43,7 @@
       ...storeMode.mapState(['darkMode'])
     },
     openDarkMode: function (res) {
-      storeMode.commit('openDarkMode',{
+      storeMode.commit('openDarkMode', {
         isOpen: res.detail.value
       })
     },
@@ -57,7 +57,7 @@
           break
         }
         case 'mode': {
-          storeMode.commit('openDarkMode',{
+          storeMode.commit('openDarkMode', {
             isOpen: res.detail.value
           })
           break
@@ -73,7 +73,7 @@
                   count: 1,
                   success (res) {
                     console.log(res.tempFilePaths[0])
-                    storeMode.commit('updateCoverImg',{
+                    storeMode.commit('updateCoverImg', {
                       imgUrl: res.tempFilePaths[0]
                     })
                     wx.reLaunch({
@@ -82,11 +82,10 @@
                   }
                 })
               } else {
-                storeMode.commit('updateCoverImg',{
+                storeMode.commit('updateCoverImg', {
                   imgUrl: ''
                 })
               }
-
             }
           })
           break

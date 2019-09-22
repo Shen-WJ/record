@@ -16,7 +16,7 @@
       let timer = setInterval(() => {
         this.counter = --count
         if (count === 0) {
-          clearTimeout(timer)
+          clearInterval(timer)
           this.direct()
         }
       }, 1000)

@@ -32,7 +32,7 @@ export const behaviorOnPeople = Behavior({
           return {
             title: '不是诱导分享，讲真，进来看看',
             path: '/pages/otherPeople?otherUserId=' + this.data.otherUserId
-          } 
+          }
         } else {
           const record = component.getRecord(res.target.dataset.index)
           const title = common.isEmpty(record.content) ? (record.nickname + '在' + record.location + '说') : record.content

@@ -20,8 +20,6 @@
   import { storeUser } from '../stores/storeUser'
   import { behaviorOnPage } from '../behavior/behaviorOnPage'
 
-  const app = getApp()
-
   createPage({
     behaviors: [behaviorOnPage],
     data: {
@@ -42,22 +40,22 @@
         case 'report': {
           this.reportType = options.reportType
           this.recordId = options.recordId
-          this.contentTextLength = 140,
-          this.btnName = '举报',
+          this.contentTextLength = 140
+          this.btnName = '举报'
           this.placeHolder = '告诉我们举报的原因吧，我们将第一时间解决'
           break
         }
         case 'nickname': {
-          this.contentTextLength = 15,
-          this.btnName = '确定',
-          this.contentText = storeUser.state.nickname || '',
+          this.contentTextLength = 15
+          this.btnName = '确定'
+          this.contentText = storeUser.state.nickname || ''
           this.placeHolder = '昵称(1-15字)'
           break
         }
         case 'signature': {
-          this.contentTextLength = 50,
-          this.btnName = '确定',
-          this.contentText = storeUser.state.signature || '',
+          this.contentTextLength = 50
+          this.btnName = '确定'
+          this.contentText = storeUser.state.signature || ''
           this.placeHolder = '简介(1-50字)'
           break
         }
@@ -65,7 +63,7 @@
     },
 
     textInput: function (e) {
-      this.contentText = e.detail.value,
+      this.contentText = e.detail.value
       this.contentTextCount = e.detail.value.length
     },
 

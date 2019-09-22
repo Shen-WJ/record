@@ -211,11 +211,10 @@
 
       this.clearSave()
 
-      let that = this
       common.getLocation({
         success: (res) => {
-          that.locationDigit = { latitude: res.latitude, longitude: res.longitude }
-          that.setData({
+          this.locationDigit = { latitude: res.latitude, longitude: res.longitude }
+          this.setData({
             locationGPS: common.formatLocation(res.longitude, res.latitude)
           })
         }
@@ -249,7 +248,6 @@
         return
       }
       // 检查定位
-      let that = this
       let digitLoc = this.locationDigit
       common.getLocation({
         success: (res) => {
@@ -293,7 +291,6 @@
         let imgUrls = []
         let imgs = this.data.imageList
         let waitingCount = imgs.length
-        var that = this
         for (let i = 0; i < imgs.length; i++) {
           wx.uploadFile({
             url: net.baseUrl + 'upload',
@@ -317,7 +314,7 @@
                 if (waitingCount === 0) {
                   console.log('the last one---i:' + i + '\twait:' + waitingCount)
                   // 发布
-                  that.requestRelease(imgUrls)
+                  this.requestRelease(imgUrls)
                 }
               } else {
                 this.isRequesting = false
@@ -375,6 +372,7 @@
           title: '成功'
         })
       }).catch(err => {
+        console.log('Catch error: ', err)
         this.isRequesting = false
       })
     },
@@ -421,23 +419,22 @@
     },
 
     chooseImage () {
-      const that = this
       var imgs = this.data.imageList
       if (imgListLength - imgs.length > 0) {
         wx.chooseImage({
           sourceType: ['camera', 'album'],
           sizeType: ['compressed'],
           count: (imgListLength - imgs.length),
-          success (res) {
+          success: (res) => {
             console.log(res)
             for (let i = 0; i < res.tempFilePaths.length; i++) {
               imgs.push(res.tempFilePaths[i])
             }
-            that.setData({
+            this.setData({
               imageList: imgs
             })
 
-            that.autoSave(3)
+            this.autoSave(3)
           }
         })
       } else {

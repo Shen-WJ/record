@@ -5,7 +5,6 @@ export const behaviorOnRecord = Behavior({
   properties: {
   },
   data: {
-    recordList: [[], []],
   },
   methods: {
     clickToOtherPeople (e) {
