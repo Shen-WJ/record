@@ -65,7 +65,7 @@
 <script>
   import { createComponent } from '@mpxjs/core'
   import net from '../utils/net'
-  import { storeMode } from '../stores/storeCommon'
+  import { storeMode, storeNotice } from '../stores/storeCommon'
   import { storeUser } from '../stores/storeUser'
   import { behaviorOnRecord } from '../behavior/behaviorOnRecord'
 
@@ -137,9 +137,16 @@
       net.reqGet({
         url: 'notice/count'
       }).then(data => {
+        let count = data.data
+        count += (!wx.getStorageSync('isReadLocalNotice') ? 1 : 0)
+        if (count > 0) {
+          storeNotice.commit('updateRedDots', {
+            redDots: [0, 0, 0, 0, count]
+          })
+        }
         that.setData({
-          noticeCount: (data.data === 0 ? '' : data.data.toString()),
-          isShowNoticeRedDot: (data.data > 0 || !wx.getStorageSync('isReadLocalNotice'))
+          noticeCount: (count === 0 ? '' : count.toString()),
+          isShowNoticeRedDot: count > 0
         })
       })
     }
@@ -364,7 +371,9 @@
               noticeCount: '',
               isShowNoticeRedDot: false
             })
-
+            storeNotice.commit('updateRedDots', {
+              redDots: [0, 0, 0, 0, 0]
+            })
             wx.navigateTo({
               url: './notice'
             })

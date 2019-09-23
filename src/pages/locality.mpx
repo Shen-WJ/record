@@ -55,16 +55,6 @@
         }
       })
 
-      net.reqGet({
-        url: 'notice/count'
-      }).then(data => {
-        if (data.data > 0 || !wx.getStorageSync('isReadLocalNotice')) {
-          wx.showTabBarRedDot({
-            index: 3
-          })
-        }
-      })
-
       var timer = setInterval(() => {
         common.getLocation()
         console.log('timer(', timer, ') fire!!!', ++count)

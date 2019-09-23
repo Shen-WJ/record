@@ -43,3 +43,14 @@ export const storeMode = createStore({
     }
   }
 })
+
+export const storeNotice = createStore({
+  state: {
+    redDots: [0, 0, 0, 0, 0] // 做了预留，将来可扩展成-1时不显示数字，只显示红点。目前，只有>0时，显示数字
+  },
+  mutations: {
+    updateRedDots (state, { redDots = [0, 0, 0, 0, 0] }) {
+      state.redDots = redDots
+    }
+  }
+})

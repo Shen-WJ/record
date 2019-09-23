@@ -4,6 +4,7 @@
       <view wx:for="{{list}}" wx:key="index" class="tab-bar-item" data-path="{{item.pagePath}}" data-index="{{index}}" bindtap="switchTab">
         <image class="tab-bar-item-image" src="{{icons[index]}}"></image>
         <view class="tab-bar-item-view" style="color: {{selected === index ? selectedColor : color}}">{{item.text}}</view>
+        <view wx:if="{{redDots[index] !== 0}}" class="tab-bar-item-redDot">{{redDots[index]}}</view>
       </view>
     </view>
   </block>
@@ -12,6 +13,7 @@
       <cover-view wx:for="{{list}}" wx:key="index" class="tab-bar-item" data-path="{{item.pagePath}}" data-index="{{index}}" bindtap="switchTab">
         <cover-image class="tab-bar-item-image" src="{{icons[index]}}"></cover-image>
         <cover-view class="tab-bar-item-view" style="color: {{selected === index ? selectedColor : color}}">{{item.text}}</cover-view>
+        <cover-view wx:if="{{redDots[index] !== 0}}" class="tab-bar-item-redDot">{{redDots[index]}}</cover-view>
       </cover-view>
     </cover-view>
   </block>
@@ -19,7 +21,7 @@
 
 <script>
   import { createComponent } from '@mpxjs/core'
-  import { storeMode } from '../stores/storeCommon'
+  import { storeMode, storeNotice } from '../stores/storeCommon'
   import home from '../image/tabBar/home.png'
   import home1 from '../image/tabBar/home1.png'
   import find from '../image/tabBar/find.png'
@@ -73,7 +75,8 @@
         }
         return icons
       },
-      ...storeMode.mapState(['darkMode'])
+      ...storeMode.mapState(['darkMode']),
+      ...storeNotice.mapState(['redDots'])
     },
     methods: {
       switchTab (e) {
@@ -92,16 +95,16 @@
   .tab-bar {
     position: fixed;
     bottom: env(safe-area-inset-bottom);
-    left: 50rpx;
-    right: 50rpx;
+    left: 30rpx;
+    right: 30rpx;
     height: 48px;
-    width: 650rpx;
     display: flex;
     border-radius: 24px;
     border: 2rpx solid #888;
   }
 
   .tab-bar-item {
+    position: relative;
     flex: 1;
     text-align: center;
     display: flex;
@@ -110,6 +113,18 @@
     flex-direction: column;
   }
 
+  .tab-bar-item-redDot {
+    position: absolute;
+    top: 5rpx;
+    right: 20rpx;
+    width: 36rpx;
+    height: 36rpx;
+    line-height: 36rpx;
+    border-radius: 50%;
+    background-color: red;
+    color: white;
+    font-size: 18rpx;
+  }
   .tab-bar-item-image {
     width: 27px;
     height: 27px;
