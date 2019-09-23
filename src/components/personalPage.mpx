@@ -317,7 +317,7 @@
         this.clickHead()
 
         if (this.pageType === 'me') {
-          if (!app.globalData.hasHadUserInfo) { // 无则判断授权
+          if (!storeUser.state.hasHadUserInfo) { // 无则判断授权
             wx.getSetting({
               success: (res) => {
                 if (!res.authSetting['scope.userInfo']) { // 依旧没授权
@@ -394,7 +394,7 @@
                 this.otherIsFollowed = false
               })
             } else {
-              if (!app.globalData.hasHadUserInfo) {
+              if (!storeUser.state.hasHadUserInfo) {
                 this.setData({
                   isShowDialog: true
                 })

@@ -140,7 +140,7 @@
         })
       }
 
-      if (!app.globalData.hasHadUserInfo) {
+      if (!storeUser.state.hasHadUserInfo) {
         wx.getSetting({
           success: (res) => {
             console.log(res)

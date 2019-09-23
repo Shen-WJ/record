@@ -5,6 +5,7 @@
 <script>
   import { createPage } from '@mpxjs/core'
   import { behaviorOnPeople } from '../behavior/behaviorOnPeople'
+  import { storeUser } from '../stores/storeUser'
 
   const app = getApp()
 
@@ -16,7 +17,7 @@
       if (typeof this.getTabBar === 'function' && this.getTabBar()) {
         this.getTabBar().setData({
           selected: 4,
-          isShowNative: !app.globalData.hasHadUserInfo // 没有userInfo即false，则展示原生
+          isShowNative: !storeUser.state.hasHadUserInfo // 没有userInfo即false，则展示原生
         })
       }
 

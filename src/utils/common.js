@@ -122,8 +122,7 @@ function _updateUserInfo ({ userInfo, success = function () { } }) {
     nickname: userInfo.nickName,
     headUrl: userInfo.avatarUrl
   })
-  app.globalData.hasHadUserInfo = true
-  wx.setStorageSync('hasHadUserInfo', true)
+  storeUser.commit('updateHasHadUserInfo', { hasHadUserInfo: true })
   net.reqPut({
     url: 'user/info',
     body: {

@@ -5,6 +5,7 @@ export const storeUser = createStore({
     userId: 0,
     userCode: '',
     userAuth: {}, // 1001-发布，1002-评论
+    hasHadUserInfo: false,
     nickname: '未知',
     headUrl: '',
     sex: 0,
@@ -47,6 +48,10 @@ export const storeUser = createStore({
     },
     updateUserAuth (state, { userAuth = {} }) {
       state.userAuth = { ...state.userAuth, ...userAuth }
+    },
+    updateHasHadUserInfo (state, { hasHadUserInfo = false }) {
+      wx.setStorageSync('hasHadUserInfo', hasHadUserInfo)
+      state.hasHadUserInfo = hasHadUserInfo
     }
   },
   getters: {
