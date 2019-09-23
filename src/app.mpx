@@ -24,6 +24,15 @@
       that.globalData.favoritesDic = dic
     })
 
+    net.reqGet({
+      url: 'user/auth'
+    }).then(data => {
+      let auth = data.data
+      delete (auth['userId'])
+      storeUser.commit('updateUserAuth', { userAuth: auth })
+      console.log('authRelease? ', storeUser.getters.authRelease)
+    })
+
     // 缓存中无‘曾经授权’记录则去询问服务器
     if (!that.globalData.hasHadUserInfo) {
       net.reqGet({
@@ -128,7 +137,6 @@
 <script type="application/json">
   {
     "pages": [
-      "./pages/mapPage",
       "./pages/launch",
       "./pages/locality",
       "./pages/find",
@@ -142,6 +150,7 @@
       "./pages/userInfo",
       "./pages/singleText",
       "./pages/settings",
+      "./pages/mapPage",
       "./pages/otherPeople"
     ],
     "window": {

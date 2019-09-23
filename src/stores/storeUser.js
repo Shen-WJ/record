@@ -4,6 +4,7 @@ export const storeUser = createStore({
   state: {
     userId: 0,
     userCode: '',
+    userAuth: {}, // 1001-发布，1002-评论
     nickname: '未知',
     headUrl: '',
     sex: 0,
@@ -43,6 +44,19 @@ export const storeUser = createStore({
     updateUserCode (state, { userCode = '' }) {
       state.userCode = userCode
       wx.setStorageSync('userCode', userCode)
+    },
+    updateUserAuth (state, { userAuth = {} }) {
+      state.userAuth = { ...state.userAuth, ...userAuth }
+    }
+  },
+  getters: {
+    authRelease (state) {
+      let time = state.userAuth['1001'] - (new Date()).getTime()
+      let leftTime = time > 3600 ? (time/3600).toFixed(1) + '小时' : (time/60).toFixed(1) + '分钟'
+      return {
+        canRelease: time <= 0,
+        leftTime: leftTime
+      }
     }
   }
 })

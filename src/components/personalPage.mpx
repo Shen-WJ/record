@@ -317,19 +317,23 @@
         this.clickHead()
 
         if (this.pageType === 'me') {
-          if (!app.globalData.hasHadUserInfo) {
+          if (!app.globalData.hasHadUserInfo) { // 无则判断授权
             wx.getSetting({
               success: (res) => {
-                if (!res.authSetting['scope.userInfo']) {
+                if (!res.authSetting['scope.userInfo']) { // 依旧没授权
                   this.setData({
                     isShowDialog: true
                   })
-                } else {
+                } else { // 已经授权
                   this.setData({
                     isShowDialog: false
                   })
                 }
               }
+            })
+          } else { // 在其他页面授权获得了信息，则消失
+            this.setData({
+              isShowDialog: false
             })
           }
         }

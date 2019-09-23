@@ -15,7 +15,8 @@
     onShow: function () {
       if (typeof this.getTabBar === 'function' && this.getTabBar()) {
         this.getTabBar().setData({
-          selected: 4
+          selected: 4,
+          isShowNative: !app.globalData.hasHadUserInfo // 没有userInfo即false，则展示原生
         })
       }
 

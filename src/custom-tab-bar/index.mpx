@@ -1,10 +1,20 @@
 <template>
-  <view class="tab-bar {{darkMode?'darkMode':'dayMode'}}">
-    <view wx:for="{{list}}" wx:key="index" class="tab-bar-item" data-path="{{item.pagePath}}" data-index="{{index}}" bindtap="switchTab">
-      <image src="{{icons[index]}}"></image>
-      <view style="color: {{selected === index ? selectedColor : color}}">{{item.text}}</view>
+  <block wx:if="{{!isShowNative}}">
+    <view class="tab-bar {{darkMode?'darkMode':'dayMode'}}">
+      <view wx:for="{{list}}" wx:key="index" class="tab-bar-item" data-path="{{item.pagePath}}" data-index="{{index}}" bindtap="switchTab">
+        <image class="tab-bar-item-image" src="{{icons[index]}}"></image>
+        <view class="tab-bar-item-view" style="color: {{selected === index ? selectedColor : color}}">{{item.text}}</view>
+      </view>
     </view>
-  </view>
+  </block>
+  <block wx:else>
+    <cover-view class="tab-bar {{darkMode?'darkMode':'dayMode'}}">
+      <cover-view wx:for="{{list}}" wx:key="index" class="tab-bar-item" data-path="{{item.pagePath}}" data-index="{{index}}" bindtap="switchTab">
+        <cover-image class="tab-bar-item-image" src="{{icons[index]}}"></cover-image>
+        <cover-view class="tab-bar-item-view" style="color: {{selected === index ? selectedColor : color}}">{{item.text}}</cover-view>
+      </cover-view>
+    </cover-view>
+  </block>
 </template>
 
 <script>
@@ -25,9 +35,10 @@
     options: {
       styleIsolation: 'shared'
     },
-    properties: {
+    properties: { // 自定义tabbar目前不支持外界直接控制传值
     },
     data: {
+      isShowNative: false,
       selected: 0,
       color: '#7A7E83',
       selectedColor: '#2ab3f3',
@@ -99,12 +110,11 @@
     flex-direction: column;
   }
 
-  .tab-bar-item image {
+  .tab-bar-item-image {
     width: 27px;
     height: 27px;
   }
-
-  .tab-bar-item view {
+  .tab-bar-item-view {
     font-size: 10px;
   }
 </style>
