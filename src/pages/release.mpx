@@ -72,6 +72,7 @@
   const strReleaseLocationGPS = 'release_locationGPS'
   const strReleaseContentText = 'release_contentText'
   const strReleaseImageList = 'release_ImageList'
+  const allowedDistance = 20 // 单位km
 
   createPage({
     behaviors: [behaviorOnPage],
@@ -159,7 +160,7 @@
         this.setData({
           isShowDialog: false
         })
-        this.authRelease = storeUser.getters.authRelease
+        this.authRelease = { ...storeUser.getters.authRelease }
       }
 
       if (common.isEmpty(this.data.locationName) && common.isEmpty(this.data.contentText) && common.isEmpty(this.data.imageList)) {
@@ -258,12 +259,12 @@
         success: (res) => {
           let resLoc = { latitude: res.latitude, longitude: res.longitude }
           let distance = common.getKilometerDistance(digitLoc.latitude, digitLoc.longitude, resLoc.latitude, resLoc.longitude)
-          if (distance > 1) {
+          if (distance > allowedDistance) {
             wx.showModal({
               title: '初始定位与当前定位不符',
-              content: '你最初编辑时使用的定位与此刻的定位相差' + distance + 'km，是否使用当前定位？',
-              cancelText: '旧定位',
-              confirmText: '新定位',
+              content: '你最初编辑文字/图片时暂存的定位与此刻所在的位置相差' + distance + 'km，是否使用此刻的定位？',
+              cancelText: '最初定位',
+              confirmText: '此刻定位',
               showCancel: true,
               success: (res) => {
                 if (res.confirm) { // 新定位为小程序获取的最新定位
@@ -397,9 +398,9 @@
             success: (res) => {
               console.log(choose)
               let distance = common.getKilometerDistance(choose.latitude, choose.longitude, res.latitude, res.longitude)
-              if (distance > 10) {
+              if (distance > allowedDistance) {
                 wx.showToast({
-                  title: '可不能选超过10km远的地方哦',
+                  title: '可不能选超过' + allowedDistance + 'km远的地方哦',
                   icon: 'none',
                   duration: 5000
                 })

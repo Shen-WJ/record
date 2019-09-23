@@ -84,7 +84,7 @@
       return this.record
     },
     changeRecord: function (index, record) {
-      this.record = record
+      this.record = {...record}
     },
     // 0点赞，1收藏
     changeFormerPageStatus: function (type) {

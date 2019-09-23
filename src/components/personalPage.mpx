@@ -378,7 +378,7 @@
           }
           case 3: { // 设置
             wx.navigateTo({
-              url: './settings'
+              url: './settings?pageType=settings'
             })
             break
           }

@@ -6,31 +6,20 @@
 <script>
   import { createPage } from '@mpxjs/core'
 
-  let stop = false
-  let count = 3
   createPage({
     data: {
-      counter: count
+      counter: 2
     },
     onLoad () {
-      let timer = setInterval(() => {
-        this.counter = --count
-        if (count === 0) {
-          clearInterval(timer)
-          this.direct()
+      this.timer = setInterval(() => {
+        this.counter--
+        if (this.counter === 0) {
+          this.skipLaunch()
         }
       }, 1000)
     },
-
-    direct () {
-      if (!stop) {
-        wx.switchTab({
-          url: './locality'
-        })
-      }
-    },
     skipLaunch () {
-      stop = true
+      clearInterval(this.timer)
       wx.switchTab({
         url: './locality'
       })

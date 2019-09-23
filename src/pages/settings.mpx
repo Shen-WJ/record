@@ -2,13 +2,13 @@
   <navigationBar pageName="点迹"/>
 
   <view class="container">
-    <view class="table1">
+    <view wx:if="{{pageType === 'settings'}}" class="table1">
       <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToSome" data-type="userInfo">
         <text>修改个人信息</text>
         <image src="../image/icon/arrow_right.png" />
       </view>
       <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
-        <text>开启夜间模式</text>
+        <text>开启夜间模式<text class="sub_desc">  将重置透明度</text></text>
         <switch class="switch" checked="{{darkMode}}" bindchange="clickToSome" data-type="mode"></switch>
       </view>
       <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToSome" data-type="chooseImg">
@@ -27,6 +27,24 @@
         </view>
       </label>
     </view>
+    <view wx:elif="{{pageType === 'bgImg'}}" class="table1">
+      <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
+        <text>黑色/白色<text class="sub_desc">  开-黑色，关-白色</text></text>
+        <switch class="switch" checked="{{darkMode}}" bindchange="clickBgImgOf" data-type="theme"></switch>
+      </view>
+      <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickBgImgOf" data-type="choose">
+        <text>选择图片<text class="sub_desc">  将重启小程序</text></text>
+        <image src="../image/icon/arrow_right.png" />
+      </view>
+      <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickBgImgOf" data-type="clear">
+        <text>清空背景图</text>
+        <image src="../image/icon/arrow_right.png" />
+      </view>
+      <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickBgImgOf" data-type="choose">
+        <text>更改透明度</text>
+      </view>
+      <slider min="0" max="10" step="1" value="{{opacity*10}}" backgroundColor="{{darkMode?'#222':'#f6f6f6'}}" activeColor="#2ab3f3" block-color="{{darkMode?'#565656':'#fff'}}" show-value="{{true}}" bindchange="sliderChange"/>
+    </view>
   </view>
 </template>
 
@@ -38,17 +56,19 @@
   createPage({
     behaviors: [behaviorOnPage],
     data: {
+      pageType: 'settings'
     },
     computed: {
-      ...storeMode.mapState(['darkMode'])
+      ...storeMode.mapState(['darkMode', 'opacity'])
     },
-    openDarkMode: function (res) {
-      storeMode.commit('openDarkMode', {
-        isOpen: res.detail.value
-      })
+    onLoad: function (option) {
+      if (option.pageType) {
+        this.pageType = option.pageType
+      }
     },
-    clickToSome: function (res) {
-      let type = res.currentTarget.dataset.type
+
+    clickToSome: function (e) {
+      let type = e.currentTarget.dataset.type
       switch (type) {
         case 'userInfo': {
           wx.navigateTo({
@@ -58,35 +78,13 @@
         }
         case 'mode': {
           storeMode.commit('openDarkMode', {
-            isOpen: res.detail.value
+            isOpen: e.detail.value
           })
           break
         }
         case 'chooseImg': {
-          wx.showActionSheet({
-            itemList: ['选择（将重启小程序）', '清除背景图'],
-            success: res => {
-              if (res.tapIndex === 0) {
-                wx.chooseImage({
-                  sourceType: ['camera', 'album'],
-                  sizeType: ['compressed'],
-                  count: 1,
-                  success (res) {
-                    console.log(res.tempFilePaths[0])
-                    storeMode.commit('updateCoverImg', {
-                      imgUrl: res.tempFilePaths[0]
-                    })
-                    wx.reLaunch({
-                      url: './launch'
-                    })
-                  }
-                })
-              } else {
-                storeMode.commit('updateCoverImg', {
-                  imgUrl: ''
-                })
-              }
-            }
+          wx.navigateTo({
+            url: './settings?pageType=bgImg'
           })
           break
         }
@@ -97,6 +95,44 @@
           break
         }
       }
+    },
+    clickBgImgOf: function (e) {
+      let type = e.currentTarget.dataset.type
+      switch (type) {
+        case 'choose': {
+          wx.chooseImage({
+            sourceType: ['camera', 'album'],
+            sizeType: ['compressed'],
+            count: 1,
+            success: (res) => {
+              console.log(res.tempFilePaths[0])
+              storeMode.commit('updateCoverImg', {
+                imgUrl: res.tempFilePaths[0]
+              })
+              wx.reLaunch({
+                url: './locality'
+              })
+            }
+          })
+          break
+        }
+        case 'clear': {
+          storeMode.commit('updateCoverImg', {
+            imgUrl: ''
+          })
+          break
+        }
+        case 'theme': {
+          storeMode.commit('chooseBlackTheme', {
+            isOpen: e.detail.value
+          })
+        }
+      }
+    },
+    sliderChange: function (e) {
+      storeMode.commit('updateOpacity', {
+        opacity: e.detail.value * 0.1
+      })
     }
   })
 </script>
@@ -111,6 +147,10 @@
     width: 40rpx;
     height: 40rpx;
     float: right;
+  }
+  .sub_desc {
+    font-size: 22rpx;
+    color: #888;
   }
   .switch {
     float: right;
