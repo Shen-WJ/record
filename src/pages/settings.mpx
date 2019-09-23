@@ -40,10 +40,10 @@
         <text>清空背景图</text>
         <image src="../image/icon/arrow_right.png" />
       </view>
-      <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickBgImgOf" data-type="choose">
+      <view class="slider_cell settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
         <text>更改透明度</text>
+        <slider class="slider_opacity" min="0" max="10" step="1" value="{{opacity*10}}" backgroundColor="{{darkMode?'#222':'#f6f6f6'}}" activeColor="#2ab3f3" block-color="{{darkMode?'#565656':'#fff'}}" show-value="{{true}}" bindchange="sliderChange"/>
       </view>
-      <slider min="0" max="10" step="1" value="{{opacity*10}}" backgroundColor="{{darkMode?'#222':'#f6f6f6'}}" activeColor="#2ab3f3" block-color="{{darkMode?'#565656':'#fff'}}" show-value="{{true}}" bindchange="sliderChange"/>
     </view>
   </view>
 </template>
@@ -154,6 +154,13 @@
   }
   .switch {
     float: right;
+  }
+  .slider_cell {
+    margin: 20rpx;
+    padding: 20rpx;
+    border-radius: 10rpx;
+  }
+  .slider_opacity {
   }
 </style>
 

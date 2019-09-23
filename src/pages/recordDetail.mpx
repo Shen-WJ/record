@@ -84,13 +84,15 @@
       return this.record
     },
     changeRecord: function (index, record) {
-      this.record = {...record}
+      this.record = { ...record }
     },
     // 0点赞，1收藏
     changeFormerPageStatus: function (type) {
       const pages = getCurrentPages()
       let toSetPage = pages[pages.length - 2]
-      toSetPage.changeStatus(type, this.oldIndex)
+      if (typeof (toSetPage.changeStatus) === 'function') {
+        toSetPage.changeStatus(type, this.oldIndex)
+      }
     }
   })
 </script>

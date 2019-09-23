@@ -60,7 +60,7 @@
           })
           storeUser.commit('updateSignature', { signature: data.data.signature })
           storeUser.commit('updateFollowCount', {
-            followingCount: data.data.followingCount,
+            followCount: data.data.followCount,
             followedCount: data.data.followedCount
           })
         }
@@ -112,6 +112,7 @@
           this.globalData.navTop = navTop
           this.globalData.statusBarHeight = statusBarHeight
           this.globalData.windowHeight = res.windowHeight
+          console.log('windowHeight: ', res.windowHeight)
         }
       })
     },

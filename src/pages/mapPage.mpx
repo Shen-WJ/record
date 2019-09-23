@@ -1,18 +1,113 @@
 <template>
-  <navigationBar pageName="点迹"/>
+  <navigationBar onlyShowIcon="{{true}}" showHolder="{{false}}"/>
   <view class='container'>
-    <customMap></customMap>
+    <customMap mapH="{{mapH}}" markers="{{markers}}" polyline="{{polyline}}" includePoints="{{includePoints}}"></customMap>
   </view>
 </template>
 
 <script>
   import { createPage } from '@mpxjs/core'
+  import net from '../utils/net'
+
+  const app = getApp()
+  const common = require('../utils/common.js')
+  // 请求在这一层做，下一层只做数据展示和点击响应
   createPage({
+    data: {
+      mapH: app.globalData.windowHeight,
+      markers: [], // 标记点
+      polyline: [
+        {
+          points: [],
+          color: "#2ab3f3",
+          width: 2,
+          arrowLine: true,
+          borderColor: "#000"
+        }
+      ],
+      includePoints: [] // 缩放视野以包含所有给定的坐标点
+    },
+    computed: {
+    },
+    onLoad (option) {
+      this.otherUserId = option.otherUserId || 0
+      option.personType === 'others'? this.getRequset2(true) : this.getRequset(true)
+    },
+    getRequset (isRefresh) {
+      let pageNum = isRefresh ? 0 : this.httpsData.nextPage
+      net.reqGet({
+        url: 'record/list/person',
+        query: {
+          pageNum: pageNum
+        }
+      }).then(data => {
+        this.originalRecords = isRefresh ? [] : this.originalRecords
+        this.originalRecords = this.originalRecords.concat(data.data.list)
+        this.httpsData = data.data
+        if (!this.httpsData.isLastPage) {
+          this.getRequset(false)
+        } else {
+          let recordsOnMap = common.formatRecordsOnMap({
+            list: this.originalRecords,
+            isNeedLine: true,
+            isNeedInclude: true
+          })
+          this.markers = recordsOnMap.markers
+          this.polyline = [
+            {
+              points: recordsOnMap.points,
+              color: "#2ab3f3",
+              width: 2,
+              arrowLine: true,
+              borderColor: "#000"
+            }
+          ]
+          this.includePoints = recordsOnMap.points
+        }
+      })
+    },
+    getRequset2 (isRefresh) {
+    let pageNum = isRefresh ? 0 : this.httpsData.nextPage
+      net.reqGet({
+        url: 'record/list/other',
+        query: {
+          otherUserId: this.otherUserId,
+          pageNum: pageNum
+        }
+      }).then(data => {
+        this.originalRecords = isRefresh ? [] : this.originalRecords
+        this.originalRecords = this.originalRecords.concat(data.data.list)
+        this.httpsData = data.data
+        if (!this.httpsData.isLastPage) {
+          this.getRequset2(false)
+        } else {
+          let recordsOnMap = common.formatRecordsOnMap({
+            list: this.originalRecords,
+            isNeedLine: true,
+            isNeedInclude: true
+          })
+          this.markers = recordsOnMap.markers
+          this.polyline = [
+            {
+              points: recordsOnMap.points,
+              color: "#2ab3f3",
+              width: 2,
+              arrowLine: true,
+              borderColor: "#000"
+            }
+          ]
+          this.includePoints = recordsOnMap.points
+        }
+      })
+    }
   })
 </script>
 
 <style>
-  .container {} 
+  .container {}
+  .custom_map {
+    width: 750rpx;
+  }
 </style>
 
 <script  type='application/json' lang='json'>

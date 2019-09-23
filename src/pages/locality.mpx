@@ -167,20 +167,7 @@
     height: 70rpx;
     width: 710rpx;
   }
-  .point {
-    position: fixed;
-    z-index: 1000;
-    right: 60rpx;
-    bottom: 58px;
-    margin-bottom: env(safe-area-inset-bottom);
 
-    width: 100rpx;
-    height: 100rpx;
-    color: white;
-    line-height: 100rpx;
-    border-radius: 50%;
-    text-align: center;
-  }
 </style>
 
 <script  type='application/json'>

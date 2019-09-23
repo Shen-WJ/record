@@ -19,9 +19,14 @@ export const behaviorOnRecord = Behavior({
       if (e.currentTarget.dataset.type === 0) return
       const index = e.currentTarget.dataset.index
       const record = this.getRecord(index)
-
+      let indexStr = ''
+      if (typeof index === 'number') {
+        indexStr = '&row=' + index
+      } else {
+        indexStr = '&section=' + index.section + '&row=' + index.row
+      }
       wx.navigateTo({
-        url: './recordDetail?recordId=' + record.recordId + '&section=' + index.section + '&row=' + index.row
+        url: './recordDetail?recordId=' + record.recordId + indexStr
       })
     },
     clickToMap: function (e) {
@@ -80,7 +85,7 @@ export const behaviorOnRecord = Behavior({
     changeRecord: function (index, record) {
       this.recordList[index.section].splice(index.row, 1, record)
     },
-    // 0点赞，1收藏
+    // 0点赞，1收藏，供子页面向上（本页面）调用，当前页面自己不用
     changeStatus: function (type, index) {
       common.changeStatus({
         type,

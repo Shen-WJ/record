@@ -62,6 +62,10 @@ export const behaviorOnPeople = Behavior({
       component.getRequest({
         isRefresh: isRefresh
       })
+    },
+    changeStatus: function (type, index) {
+      let component = this.selectComponent('#personalPage')
+      component.changeStatus(type, index)
     }
   }
 })

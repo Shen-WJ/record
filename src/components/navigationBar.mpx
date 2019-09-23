@@ -1,11 +1,11 @@
 <template>
-  <view class="navbar {{darkMode?'darkMode borderB':(showThemeBgColor?'themeMode ':'dayMode borderW')}}" style='height:{{navH}}px'>
+  <view class="navbar {{navBarClass}}" style='height:{{navH}}px'>
     <view wx:if="{{showBackIcon}}" class='navbar-icon'>
       <image src='{{navBackIcon}}' mode='aspectFit' bindtap='navBack'></image>
       <view class="{{darkMode?'bgColorW0':'bgColorB0'}}"></view>
       <image src='{{navHomeIcon}}' mode='aspectFit' bindtap='navHome'></image>
     </view>
-    <view class="navbar-title {{darkMode?'fontColorW0':'fontColorB0'}}">
+    <view wx:if="{{!onlyShowIcon}}" class="navbar-title {{darkMode?'fontColorW0':'fontColorB0'}}">
       {{pageName}}
     </view>
   </view>
@@ -39,6 +39,10 @@
       showHolder: {
         type: Boolean,
         value: true
+      },
+      onlyShowIcon: {
+        type: Boolean,
+        value: false
       }
     },
     data: {
@@ -51,6 +55,17 @@
       },
       navHomeIcon () {
         return require('../image/icon/nav_home' + (storeMode.state.darkMode ? 1 : 0) + '.png')
+      },
+      navBarClass () {
+        if (this.onlyShowIcon) {
+          return ''
+        } else if (storeMode.state.darkMode) {
+          return 'darkMode borderB'
+        } else if (this.showThemeBgColor) {
+          return 'themeMode'
+        } else {
+          return 'dayMode borderW'
+        }
       }
     },
     methods: {

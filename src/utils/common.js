@@ -116,6 +116,40 @@ function _getRecordListFrom (list, type = 0) {
   return arr
 }
 
+function _formatRecordsOnMap ({ list = [], isNeedLine = false, isNeedInclude = false }) {
+  // list.reverse()
+  let markers = []
+  let points = []
+  for (let i in list) {
+    let item = list[i]
+    markers.push({
+      id: item.recordId,
+      latitude: item.lat,
+      longitude: item.lng,
+      iconPath: item.headUrl,
+      width: '40rpx',
+      height: '40rpx',
+      label: {
+        content: item.location
+      },
+      callout: {
+        content: item.content || '[图片](点击查看)'
+      }
+    })
+    if (isNeedLine || isNeedInclude) {
+      points.push({
+        latitude: item.lat,
+        longitude: item.lng
+      })
+    }
+  }
+  return {
+    markers: markers,
+    points: points
+  }
+}
+
+
 function _updateUserInfo ({ userInfo, success = function () { } }) {
   storeUser.commit('updateUserInfo', {
     sex: userInfo.gender,
@@ -240,6 +274,7 @@ export const strToJson = _strToJson
 export const timeToStr = _timeToStr
 export const formatLocation = _formatLocation
 export const getRecordListFrom = _getRecordListFrom
+export const formatRecordsOnMap = _formatRecordsOnMap
 export const updateUserInfo = _updateUserInfo
 export const getLocation = _getLocation
 export const clickLike = _clickLike

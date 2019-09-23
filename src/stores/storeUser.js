@@ -11,7 +11,7 @@ export const storeUser = createStore({
     sex: 0,
     signature: '暂无简介',
     followedCount: 0,
-    followingCount: 0
+    followCount: 0
   },
   mutations: {
     updateUserInfo (state, { nickname = '', headUrl = '', sex = 0 }) {
@@ -32,8 +32,8 @@ export const storeUser = createStore({
         state.signature = '暂无简介'
       }
     },
-    updateFollowCount (state, { followingCount = 0, followedCount = 0 }) {
-      state.followingCount = followingCount || 0
+    updateFollowCount (state, { followCount = 0, followedCount = 0 }) {
+      state.followCount = followCount || 0
       state.followedCount = followedCount || 0
     },
     updateUserId (state, { userId = 0 }) {
@@ -57,7 +57,7 @@ export const storeUser = createStore({
   getters: {
     authRelease (state) {
       let time = (state.userAuth['1001'] - (new Date()).getTime()) / 1000
-      let leftTime = time > 3600 ? (time/3600).toFixed(1) + '小时' : (time/60).toFixed(1) + '分钟'
+      let leftTime = time > 3600 ? (time / 3600).toFixed(1) + '小时' : (time / 60).toFixed(1) + '分钟'
       return {
         canRelease: time <= 0,
         leftTime: leftTime

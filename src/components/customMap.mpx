@@ -1,10 +1,15 @@
 <template>
-  <map class="map" setting="{{setting}}" bindmarkertap="clickMarker" bindcallouttap="clickCallout" bindpoitap="clickPoi" />
+  <map wx:if="{{darkMode}}" class="map" style="height:{{mapH}}px" layer-style="2" markers="{{markers}}" polyline="{{polyline}}" include-points="{{includePoints}}" setting="{{setting}}" bindmarkertap="clickMarker" bindcallouttap="clickCallout" bindpoitap="clickPoi" />
+  <map wx:elif="{{!darkMode}}" class="map" style="height:{{mapH}}px" layer-style="1" markers="{{markers}}" polyline="{{polyline}}" include-points="{{includePoints}}" setting="{{setting}}" bindmarkertap="clickMarker" bindcallouttap="clickCallout" bindpoitap="clickPoi" />
 </template>
 
 <script>
   import { createComponent } from '@mpxjs/core'
+  import { storeMode } from '../stores/storeCommon'
   import toMap from '../image/icon/toMap.png'
+  import net from '../utils/net'
+
+  const common = require('../utils/common.js')
 
   // 一些待研究的参数 polygons
   createComponent({
@@ -12,105 +17,69 @@
       styleIsolation: 'shared'
     },
     properties: {
+      mapH: {
+        type: Number,
+        value: 100
+      },
+      latitude: {
+        type: Number,
+        value: 0
+      },
+      longitude: {
+        type: Number,
+        value: 0
+      },
+      showLocation: { // 个人页时不一定要展示
+        type: Boolean,
+        value: true
+      },
+      enableZoom: { // 是否支持缩放
+        type: Boolean,
+        value: true
+      },
+      enableScroll: { // 是否支持拖动
+        type: Boolean,
+        value: true
+      },
+      markers: {
+        type: Array,
+        value: []
+      },
+      polyline: {
+        type: Array,
+        value: []
+      },
+      includePoints: {
+        type: Array,
+        value: []
+      }
     },
     data: {
       setting: {
-        latitude: 23.099994,
-        longitude: 100.344520,
-        skew: 0, // 倾斜角度，范围 0 ~ 40 , 关于 z 轴的倾角
-        rotate: 0, // y轴与正北方向的夹角，默认0
-        showLocation: true, // todo 个人页时不一定要展示
-        enableZoom: true, // 是否支持缩放
-        enableScroll: true, // 是否支持拖动
+        subkey: 'HF6BZ-ZR4CU-SKTVM-BBDQC-ZB5M2-VQB2Q',
         enableRotate: false, // 是否支持旋转
-        showScale: false, // 显示比例尺，工具暂不支持
-        showCompass: false, // 显示指南针
         enable3D: false, 	// 展示3D楼块(工具暂不支持）
         enableOverlooking: false, // 开启俯视
         enableSatellite: false, // 是否开启卫星图
-        enableTraffic: false, // 是否开启实时路况
-        includePoints: [ // 缩放视野以包含所有给定的坐标点
-          {
-            latitude: 12.099994,
-            longitude: 100.344520
-          },{
-            latitude: 23.099994,
-            longitude: 110.344520
-          },{
-            latitude: 34.099994,
-            longitude: 120.344520
-          }
-        ],
-        polyline: [{ // 连线
-          points: [
-            {
-              latitude: 12.099994,
-              longitude: 100.344520
-            },{
-              latitude: 23.099994,
-              longitude: 100.344520
-            },{
-              latitude: 34.099994,
-              longitude: 120.344520,
-            }
-          ],
-          color: "#2ab3f3",
-          width: 2,
-          arrowLine: true,
-          borderColor: "#000"
-        }],
-        markers: [
-          {
-            id: 1,
-            latitude: 12.099994,
-            longitude: 100.344520,
-            iconPath: toMap,
-            label: {
-              content: '这里是120'
-            },
-            callout: {
-              content: '这里是120,callout'
-            }
-          },{
-            id: 2,
-            latitude: 23.099994,
-            longitude: 110.344520,
-            iconPath: toMap,
-            label: {
-              content: '这里是110'
-            },
-            callout: {
-              content: '这里是110,callout'
-            }
-          },{
-            id: 3,
-            latitude: 34.099994,
-            longitude: 120.344520,
-            iconPath: toMap,
-            label: {
-              content: '这里是100'
-            },
-            callout: {
-              content: '这里是100,callout'
-            }
-          }
-        ]
+        enableTraffic: false // 是否开启实时路况
       }
     },
-    pageShow() {
-      // 所在页面显示之后就会执行一次
-      console.log('page show')
+    computed: {
+      ...storeMode.mapState(['darkMode'])
     },
-    pageHide() {
-      // 页面切入后台执行
-      console.log('page hide')
+    lifetimes: {
+      attached: function () {
+      }
     },
     methods: {
       clickMarker (e) {
         console.log('clickMarker', e)
       },
       clickCallout (e) {
-        console.log('clickCallout', e)
+        console.log('clickCallout', e.markerId)
+        wx.navigateTo({
+          url: './recordDetail?recordId=' + e.markerId
+        })
       },
       clickPoi (e) {
         console.log('clickPoi', e)
@@ -122,7 +91,7 @@
 <style>
   .map {
     width: 100%;
-    height: 800rpx;
+    height: 100%;
   }
 </style>
 

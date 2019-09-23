@@ -72,7 +72,7 @@
   const strReleaseLocationGPS = 'release_locationGPS'
   const strReleaseContentText = 'release_contentText'
   const strReleaseImageList = 'release_ImageList'
-  const allowedDistance = 20 // 单位km
+  const allowedDistance = 2000 // 单位km
 
   createPage({
     behaviors: [behaviorOnPage],
