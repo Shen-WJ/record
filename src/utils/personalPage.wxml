@@ -10,7 +10,7 @@
         <image class="me_hd_gender" src="{{genderImg}}" mode="aspectFit" catchtap="clickToSome" data-type="0"></image>
       </view>
       <view class="me_hd_desc_follow me_hd_flex_group">
-        <text class="me_hd_desc_following">关注：{{followCount}}999999</text>
+        <text class="me_hd_desc_following">关注：{{followCount}}</text>
         <view class="me_hd_desc_separate"/>
         <text class="me_hd_desc_followed">粉丝：{{followedCount}}</text>
       </view>

@@ -19,7 +19,7 @@
     <template is="emptyView" data="{{isShow: isReachBottom, type: 1, textArr:['已经到底啦！去','发现','查看更多内容吧～0v0']}}"/>
     </view>
   </view>
-  <view class="point themeMode" catchtap="clickToMap">地图</view>
+  <view class="point themeMode" catchtap="clickToMapPage">地图</view>
   <view class="bottomHolder"/>
 </template>
 
@@ -144,7 +144,7 @@
         })
       }
     },
-    clickToMap: function () {
+    clickToMapPage: function () {
       wx.navigateTo({
         url: './mapPage'
       })

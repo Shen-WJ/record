@@ -1,5 +1,5 @@
 <template>
-  <navigationBar pageName="点迹" showBackIcon="{{false}}"/>
+  <navigationBar pageName="点迹" showBackIcon="{{false}}" showCoverImg="{{false}}"/>
 
   <view class="container">
     <wxs module="common" src="../utils/common.wxs"></wxs>

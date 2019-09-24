@@ -133,7 +133,7 @@ function _formatRecordsOnMap ({ list = [], isNeedLine = false, isNeedInclude = f
         content: item.location
       },
       callout: {
-        content: item.content || '[图片](点击查看)'
+        content: item.content.substring(0, 10) + '...(点击查看)' || '[图片](点击查看)'
       }
     })
     if (isNeedLine || isNeedInclude) {

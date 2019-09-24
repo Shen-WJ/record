@@ -10,7 +10,7 @@
     </view>
   </view>
   <view wx:if="{{showHolder}}" class="navbar_holder" style="height:{{navH}}px"></view>
-  <view class="coverPage {{darkMode?'darkMode':'dayMode'}}" style="opacity:{{opacity}}"/>
+  <view class="coverPage {{darkMode?'darkMode':'dayMode'}}" style="{{showCoverImg?'opacity:'+opacity:''}}"/>
   <image wx:if="{{coverImg.length>0}}" class="coverImg" mode='aspectFill' src="{{coverImg}}"/>
 </template>
 
@@ -43,6 +43,10 @@
       onlyShowIcon: {
         type: Boolean,
         value: false
+      },
+      showCoverImg: {
+        type: Boolean,
+        value: true
       }
     },
     data: {

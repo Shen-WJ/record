@@ -1,5 +1,5 @@
 <template>
-  <navigationBar pageName="点迹"/>
+  <navigationBar pageName="设置"/>
 
   <view class="container">
     <view wx:if="{{pageType === 'settings'}}" class="table1">
@@ -12,7 +12,7 @@
         <switch class="switch" checked="{{darkMode}}" bindchange="clickToSome" data-type="mode"></switch>
       </view>
       <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToSome" data-type="chooseImg">
-        <text>更改背景图</text>
+        <text>修改背景图</text>
         <image src="../image/icon/arrow_right.png" />
       </view>
       <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToSome" data-type="about">
@@ -28,10 +28,6 @@
       </label>
     </view>
     <view wx:elif="{{pageType === 'bgImg'}}" class="table1">
-      <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
-        <text>黑色/白色<text class="sub_desc">  开-黑色，关-白色</text></text>
-        <switch class="switch" checked="{{darkMode}}" bindchange="clickBgImgOf" data-type="theme"></switch>
-      </view>
       <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickBgImgOf" data-type="choose">
         <text>选择图片<text class="sub_desc">  将重启小程序</text></text>
         <image src="../image/icon/arrow_right.png" />
@@ -39,6 +35,10 @@
       <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickBgImgOf" data-type="clear">
         <text>清空背景图</text>
         <image src="../image/icon/arrow_right.png" />
+      </view>
+      <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
+        <text>黑色/白色<text class="sub_desc">  开-黑色，关-白色</text></text>
+        <switch class="switch" checked="{{darkMode}}" bindchange="clickBgImgOf" data-type="theme"></switch>
       </view>
       <view class="slider_cell settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
         <text>更改透明度</text>
