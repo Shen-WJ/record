@@ -72,7 +72,7 @@
   const strReleaseLocationGPS = 'release_locationGPS'
   const strReleaseContentText = 'release_contentText'
   const strReleaseImageList = 'release_ImageList'
-  const allowedDistance = 2000 // 单位km
+  const allowedDistance = 20 // 单位km
 
   createPage({
     behaviors: [behaviorOnPage],
@@ -81,11 +81,9 @@
       contentText: '',
       loactionNameCount: 0,
       contentTextCount: 0,
-      locationDigit: {},
       locationGPS: '',
       imageList: [],
       privateTypeIndex: 0,
-      privateTypeIndexTemp: 0,
       privateType: [[{ text: '公开', value: 1 }, { text: '私密', value: 0 }]],
       isAnonymous: 0,
 
@@ -103,33 +101,31 @@
     },
 
     onLoad: function (options) {
+      this.privateTypeIndexTemp = 0
+
       const name = wx.getStorageSync(strReleaseLocationName)
       if (name) {
-        this.setData({
-          locationName: name
-        })
+        this.locationName = name
+        this.loactionNameCount = name.length
       }
 
       const digit = wx.getStorageSync(strReleaseLocationDigit)
       if (digit) {
         this.locationDigit = digit
-        this.setData({
-          locationGPS: common.formatLocation(digit.longitude, digit.latitude)
-        })
+        this.locationGPS = common.formatLocation(digit.longitude, digit.latitude)
+      } else {
+        this.locationDigit = {}
       }
 
       const text = wx.getStorageSync(strReleaseContentText)
       if (text) {
-        this.setData({
-          contentText: text
-        })
+        this.contentText = text
+        this.contentTextCount = text.length
       }
 
       const list = wx.getStorageSync(strReleaseImageList)
       if (list) {
-        this.setData({
-          imageList: list
-        })
+        this.imageList = list
       }
     },
 
@@ -146,30 +142,22 @@
           success: (res) => {
             console.log(res)
             if (!res.authSetting['scope.userInfo']) {
-              this.setData({
-                isShowDialog: true
-              })
+              this.isShowDialog = true
             } else {
-              this.setData({
-                isShowDialog: false
-              })
+              this.isShowDialog = false
             }
           }
         })
       } else { // 在其他页面授权获得了信息，则消失
-        this.setData({
-          isShowDialog: false
-        })
+        this.isShowDialog = false
         this.authRelease = { ...storeUser.getters.authRelease }
       }
 
-      if (common.isEmpty(this.data.locationName) && common.isEmpty(this.data.contentText) && common.isEmpty(this.data.imageList)) {
+      if (common.isEmpty(this.locationName) && common.isEmpty(this.contentText) && common.isEmpty(this.imageList)) {
         common.getLocation({
           success: (res) => {
             this.locationDigit = { latitude: res.latitude, longitude: res.longitude }
-            this.setData({
-              locationGPS: common.formatLocation(res.longitude, res.latitude)
-            })
+            this.locationGPS = common.formatLocation(res.longitude, res.latitude)
             this.autoSave(1)
           }
         })
@@ -182,23 +170,23 @@
       switch (type) {
         case 0: {
           key = strReleaseLocationName
-          data = this.data.locationName
+          data = this.locationName
           break
         }
         case 1: {
           key = strReleaseLocationDigit
           data = this.locationDigit
-          wx.setStorageSync(strReleaseLocationGPS, this.data.locationGPS)
+          wx.setStorageSync(strReleaseLocationGPS, this.locationGPS)
           break
         }
         case 2: {
           key = strReleaseContentText
-          data = this.data.contentText
+          data = this.contentText
           break
         }
         case 3: {
           key = strReleaseImageList
-          data = this.data.imageList
+          data = this.imageList
           break
         }
       }
@@ -220,33 +208,29 @@
       common.getLocation({
         success: (res) => {
           this.locationDigit = { latitude: res.latitude, longitude: res.longitude }
-          this.setData({
-            locationGPS: common.formatLocation(res.longitude, res.latitude)
-          })
+          this.locationGPS = common.formatLocation(res.longitude, res.latitude)
         }
       })
 
-      this.setData({
-        locationName: '',
-        contentText: '',
-        loactionNameCount: 0,
-        contentTextCount: 0,
-        imageList: [],
-        isAnonymous: 0,
-        privateTypeIndex: 0
-      })
+      this.locationName = ''
+      this.contentText = ''
+      this.loactionNameCount = 0
+      this.contentTextCount = 0
+      this.imageList = []
+      this.isAnonymous = 0
+      this.privateTypeIndex = 0
     },
 
     clickBtnRelease: function (e) {
       console.log('clickBtnRelease')
 
-      if (common.isEmpty(this.data.locationName)) {
+      if (common.isEmpty(this.locationName)) {
         wx.showToast({
           title: '一定要说清楚这是哪儿哦\nOvO',
           icon: 'none'
         })
         return
-      } else if (common.isEmpty(this.data.contentText) && common.isEmpty(this.data.imageList)) {
+      } else if (common.isEmpty(this.contentText) && common.isEmpty(this.imageList)) {
         wx.showToast({
           title: '正文或图片，至少要有一个呐~',
           icon: 'none'
@@ -292,10 +276,10 @@
       wx.showLoading({
         title: ''
       })
-      if (this.data.imageList.length > 0) { // 有图片，需要考虑异步处理
+      if (this.imageList.length > 0) { // 有图片，需要考虑异步处理
         // 上传图片文件，获取URL列表
         let imgUrls = []
-        let imgs = this.data.imageList
+        let imgs = this.imageList
         let waitingCount = imgs.length
         for (let i = 0; i < imgs.length; i++) {
           wx.uploadFile({
@@ -348,8 +332,8 @@
       }
 
       const param = {
-        location: this.data.locationName,
-        content: this.data.contentText,
+        location: this.locationName,
+        content: this.contentText,
         img1: imgUrls[0],
         img2: imgUrls[1],
         img3: imgUrls[2],
@@ -361,8 +345,8 @@
         img9: imgUrls[8],
         lng: this.locationDigit.longitude,
         lat: this.locationDigit.latitude,
-        isAnonymous: this.data.isAnonymous,
-        isPublic: this.data.privateType[0][this.data.privateTypeIndex].value
+        isAnonymous: this.isAnonymous,
+        isPublic: this.privateType[0][this.privateTypeIndex].value
       }
 
       net.reqPost({
@@ -384,10 +368,8 @@
     },
 
     locationInput: function (e) {
-      this.setData({
-        locationName: e.detail.value,
-        loactionNameCount: e.detail.value.length
-      })
+      this.locationName = e.detail.value
+      this.loactionNameCount = e.detail.value.length
       this.autoSave(0)
     },
 
@@ -405,10 +387,8 @@
                   duration: 5000
                 })
               } else {
-                this.setData({
-                  locationName: choose.name,
-                  locationGPS: common.formatLocation(choose.longitude, choose.latitude)
-                })
+                this.locationName = choose.name
+                this.locationGPS = common.formatLocation(choose.longitude, choose.latitude)
                 this.locationDigit = { latitude: choose.latitude, longitude: choose.longitude }
               }
             }
@@ -418,15 +398,13 @@
     },
 
     textInput: function (e) {
-      this.setData({
-        contentText: e.detail.value,
-        contentTextCount: e.detail.value.length
-      })
+      this.contentText = e.detail.value
+      this.contentTextCount = e.detail.value.length
       this.autoSave(2)
     },
 
     chooseImage () {
-      var imgs = this.data.imageList
+      var imgs = this.imageList
       if (imgListLength - imgs.length > 0) {
         wx.chooseImage({
           sourceType: ['camera', 'album'],
@@ -434,12 +412,18 @@
           count: (imgListLength - imgs.length),
           success: (res) => {
             console.log(res)
-            for (let i = 0; i < res.tempFilePaths.length; i++) {
-              imgs.push(res.tempFilePaths[i])
+            for (let i in res.tempFiles) {
+              let item = res.tempFiles[i]
+              if (item.size > 1000000) { // 大于1M则过滤并提示
+                wx.showToast({
+                  title: '有些图片太大，已被过滤',
+                  icon: 'none'
+                })
+              } else {
+                imgs.push(item.path)
+              }
             }
-            this.setData({
-              imageList: imgs
-            })
+            this.imageList = imgs
 
             this.autoSave(3)
           }
@@ -457,49 +441,42 @@
       const current = e.target.dataset.src
       wx.previewImage({
         current,
-        urls: this.data.imageList
+        urls: this.imageList
       })
     },
 
     removeImg (e) {
       console.log(e)
-      let imgs = this.data.imageList
-      imgs.splice(e.currentTarget.dataset.index, 1)
-      this.setData({
-        imageList: imgs
-      })
+      // let imgs = this.imageList
+      // imgs.splice(e.currentTarget.dataset.index, 1)
+      // this.setData({
+      //   imageList: imgs
+      // })
+      this.imageList.splice(e.currentTarget.dataset.index, 1)
       this.autoSave(3)
     },
 
     changeAnonymous: function (e) {
-      this.setData({
-        isAnonymous: e.detail.value ? 1 : 0
-      })
+      this.isAnonymous = e.detail.value ? 1 : 0
     },
 
     changePrivateType: function (e) {
       console.log(e)
 
-      this.setData({
-        privateTypeIndex: e.detail.value[0]
-      })
+      this.privateTypeIndex = e.detail.value[0]
     },
     columnchange: function (e) {
-      this.setData({
-        privateTypeIndex: e.detail.value
-      })
+      this.privateTypeIndex = e.detail.value
     },
     // 恢复当前状态
     cancelChange: function (e) {
       console.log(e)
-      this.setData({
-        privateTypeIndex: this.data.privateTypeIndexTemp
-      })
+      this.privateTypeIndex = this.privateTypeIndexTemp
     },
     // 保存当前状态
     clickPicker: function (e) {
       console.log(e)
-      this.data.privateTypeIndexTemp = this.data.privateTypeIndex
+      this.privateTypeIndexTemp = this.privateTypeIndex
     },
 
     authorizeUserInfo (e) {
@@ -507,13 +484,9 @@
         success: (res) => {
           console.log(res)
           if (!res.authSetting['scope.userInfo']) {
-            this.setData({
-              isShowDialog: true
-            })
+            this.isShowDialog = true
           } else {
-            this.setData({
-              isShowDialog: false
-            })
+            this.isShowDialog = false
             common.updateUserInfo({ userInfo: e.detail.detail.userInfo })
           }
         }
@@ -523,7 +496,6 @@
 </script>
 
 <style >
-
   .container {} 
   .top_buttons{
     height: 70rpx;
