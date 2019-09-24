@@ -1,5 +1,5 @@
 <template>
-  <navigationBar pageName="点迹"/>
+  <navigationBar pageName="收藏"/>
   <import src="../utils/recordItem.wxml"/>
   <import src="../utils/common.wxml"/>
   <view class="container">

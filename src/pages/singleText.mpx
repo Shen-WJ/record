@@ -2,11 +2,11 @@
   <navigationBar pageName="点迹"/>
 
   <view class="container">
-    <block wx:if="{{type == 'userAgreement'}}">
+    <block wx:if="{{pageType == 'userAgreement'}}">
       <import src="../utils/userAgreement.wxml"/>
       <template is="userAgreement" data="{{darkMode:darkMode}}" />
     </block>
-    <block wx:elif="{{type == 'about'}}">
+    <block wx:elif="{{pageType == 'about'}}">
       <view class="about_content {{darkMode?'fontColorW1':'fontColorB1'}}">
         <image class="about_logo" src="../image/launch.jpeg" mode="aspectFill" />
         <text>基于定位的社交APP（暂定名称，途说）</text>
@@ -27,18 +27,28 @@
   createPage({
     behaviors: [behaviorOnPage],
     data: {
-      type: ''
+      pageType: ''
     },
     computed: {
-      ...storeMode.mapState(['darkMode'])
+      ...storeMode.mapState(['darkMode']),
+      pageName () {
+        switch (this.pageType) {
+          case 'about': {
+            return '关于'
+          }
+          case 'userAgreement': {
+            return '用户协议'
+          }
+        }
+      }
     },
 
     onLoad: function (option) {
-      this.type = option.type
+      this.pageType = option.pageType
     },
     clickToUserAgreement () {
       wx.navigateTo({
-        url: './singleText?type=userAgreement'
+        url: './singleText?pageType=userAgreement'
       })
     }
   })

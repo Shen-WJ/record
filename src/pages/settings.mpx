@@ -90,7 +90,7 @@
         }
         case 'about': {
           wx.navigateTo({
-            url: './singleText?type=' + type
+            url: './singleText?pageType=' + type
           })
           break
         }
@@ -102,7 +102,7 @@
         case 'choose': {
           wx.chooseImage({
             sourceType: ['camera', 'album'],
-            sizeType: ['compressed'],
+            sizeType: ['original', 'compressed'],
             count: 1,
             success: (res) => {
               console.log(res.tempFilePaths[0])

@@ -1,8 +1,14 @@
 <template>
   <import src="../utils/personalPage.wxml"/>
 
-  <navigationBar showThemeBgColor="{{true}}"/>
-  <template is="personalPage" data="{{pageType:pageType, darkMode:darkMode, isShowDialog:isShowDialog, recordListH:recordListH, animationsText:animationsText, animations:animations, recordList:recordList, recordsTotal:recordsTotal, isFollowed:otherIsFollowed, isShowFollowBtn:isShowFollowBtn, followCount:otherFollowCount, followedCount:otherFollowedCount, signature:otherSignature, headUrl:otherHeadUrl, nickname:otherNickname, genderImg:genderImg}}" />
+  <navigationBar showThemeBgColor="{{true}}" pageName="{{otherNickname}}"/>
+  <template is="personalPage" data="{{pageType:pageType, darkMode:darkMode,
+    recordListH:recordListH, recordList:recordList, recordsTotal:recordsTotal,
+    animationsText:animationsText, animations:animations,
+    isShowDialog:isShowDialog, isFollowed:otherIsFollowed, isShowFollowBtn:isShowFollowBtn,
+    followCount:otherFollowCount, followedCount:otherFollowedCount,
+    signature:otherSignature, headUrl:otherHeadUrl, nickname:otherNickname, genderImg:genderImg}}">
+  </template>
 </template>
 
 <script>

@@ -1,14 +1,19 @@
 <template>
-  <view class="navbar {{navBarClass}}" style='height:{{navH}}px'>
+  <view wx:if="{{!onlyShowIcon}}" class="navbar {{navBarClass}}" style='height:{{navH}}px'>
     <view wx:if="{{showBackIcon}}" class='navbar-icon'>
-      <image src='{{navBackIcon}}' mode='aspectFit' bindtap='navBack'></image>
-      <view class="{{darkMode?'bgColorW0':'bgColorB0'}}"></view>
-      <image src='{{navHomeIcon}}' mode='aspectFit' bindtap='navHome'></image>
+      <image class="navbar-icon-image" src='{{navBackIcon}}' mode='aspectFit' bindtap='navBack'></image>
+      <view class="navbar-icon-view {{darkMode?'bgColorW0':'bgColorB0'}}"></view>
+      <image class="navbar-icon-image" src='{{navHomeIcon}}' mode='aspectFit' bindtap='navHome'></image>
     </view>
-    <view wx:if="{{!onlyShowIcon}}" class="navbar-title {{darkMode?'fontColorW0':'fontColorB0'}}">
+    <view class="navbar-title {{darkMode?'fontColorW0':'fontColorB0'}}">
       {{pageName}}
     </view>
   </view>
+  <cover-view wx:else class='navbar-icon' style="top:{{navH-5-34}}px">
+    <cover-image class="navbar-icon-image" src='{{navBackIcon}}' mode='aspectFit' bindtap='navBack'></cover-image>
+    <cover-view class="navbar-icon-view {{darkMode?'bgColorW0':'bgColorB0'}}"></cover-view>
+    <cover-image class="navbar-icon-image" src='{{navHomeIcon}}' mode='aspectFit' bindtap='navHome'></cover-image>
+  </cover-view>
   <view wx:if="{{showHolder}}" class="navbar_holder" style="height:{{navH}}px"></view>
   <view class="coverPage {{darkMode?'darkMode':'dayMode'}}" style="{{showCoverImg?'opacity:'+opacity:''}}"/>
   <image wx:if="{{coverImg.length>0}}" class="coverImg" mode='aspectFill' src="{{coverImg}}"/>
@@ -126,24 +131,25 @@
     position: absolute;
     bottom: 10rpx;
     left: 10rpx;
+    height: 34px;
     box-sizing: border-box;
     display: flex;
     z-index: 20;
   }
   
-  .navbar-icon image {
+  .navbar-icon-image {
     display: inline-block;
     overflow: hidden;
-    width: 32rpx;
-    height: 36rpx;
-    padding: 16rpx 32rpx;
+    width: 16px;
+    height: 18px;
+    padding: 8px 16px;
     text-align: center;
   }
   
-  .navbar-icon view {
-    height: 36rpx;
-    width: 2rpx;
-    margin-top: 16rpx;
+  .navbar-icon-view {
+    height: 18px;
+    width: 1px;
+    margin-top: 8px;
   }
   .coverPage {
     top: 0rpx;

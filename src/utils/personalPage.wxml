@@ -4,7 +4,7 @@
 <template name="personalPage">
   <view class="me_hd" bindtap="clickHead">
     <image class="me_hd_bg_img {{darkMode?'darkMode':'themeMode'}}" mode="aspectFill">
-      <image class="me_hd_photo" mode="aspectFit" src="{{headUrl}}" catchtap="clickToSome" data-type="0"></image>
+      <image class="me_hd_photo" mode="aspectFit" src="{{headUrl}}" catchtap="clickToSome" data-type="0" data-position="head"></image>
       <view class="me_hd_name me_hd_flex_group">
         <text class="me_hd_nameStr" catchtap="clickToSome" data-type="0">{{nickname}}</text>
         <image class="me_hd_gender" src="{{genderImg}}" mode="aspectFit" catchtap="clickToSome" data-type="0"></image>

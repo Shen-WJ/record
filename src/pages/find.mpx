@@ -1,5 +1,5 @@
 <template>
-  <navigationBar pageName="点迹" showBackIcon="{{false}}"/>
+  <navigationBar pageName="发现" showBackIcon="{{false}}"/>
 
   <view class="container">
     <view class="header {{darkMode?'bgColorB1':'bgColorW1'}}" style="top:{{navH}}px">

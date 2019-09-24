@@ -75,6 +75,12 @@ export const behaviorOnPeople = Behavior({
             wx.navigateTo({
               url: './userInfo'
             })
+          } else if (this.pageType === 'others') {
+            if (e.currentTarget.dataset.position === 'head') {
+              wx.previewImage({
+                urls: [this.otherHeadUrl]
+              })
+            }
           }
           break
         }

@@ -1,5 +1,5 @@
 <template>
-  <navigationBar pageName="点迹" showBackIcon="{{false}}"/>
+  <navigationBar pageName="关注" showBackIcon="{{false}}"/>
   <import src="../utils/recordItem.wxml"/>
   <import src="../utils/common.wxml"/>
   <view class="container">

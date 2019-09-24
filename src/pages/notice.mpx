@@ -1,5 +1,5 @@
 <template>
-  <navigationBar pageName="点迹"/>
+  <navigationBar pageName="通知消息"/>
 
   <view class="container">
     <view class="table">
