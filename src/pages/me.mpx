@@ -1,24 +1,71 @@
 <template>
-  <personalPage id="personalPage" pageType="me"/>
+  <import src="../utils/personalPage.wxml"/>
+
+  <navigationBar showBackIcon="{{false}}" showThemeBgColor="{{true}}"/>
+  <template is="personalPage" data="{{pageType:pageType, darkMode:darkMode,
+    recordList:recordList, recordsTotal:recordsTotal, recordListH:recordListH, templateListH:templateListH, templateList:templateList,
+    animationsText:animationsText, animations:animations,
+    isShowDialog:isShowDialog, isShowNoticeRedDot:isShowNoticeRedDot,
+    noticeCount:noticeCount, followCount:followCount, followedCount:followedCount, signature:signature, headUrl:headUrl, nickname:nickname, genderImg:genderImg}}">
+  </template>
+  <view class="bottomHolder"/>
 </template>
 
 <script>
   import { createPage } from '@mpxjs/core'
   import { behaviorOnPeople } from '../behavior/behaviorOnPeople'
   import { storeUser } from '../stores/storeUser'
+  import { storeMode, storeNotice } from '../stores/storeCommon'
+  import net from '../utils/net'
 
   const app = getApp()
+  const common = require('../utils/common.js')
 
   createPage({
     behaviors: [behaviorOnPeople],
     data: {
+      pageType: 'me',
+
+      recordsTotal: 0,
+      noticeCount: '',
+      recordList: [],
+      animations: [],
+      animationsText: ['分', '享', '生', '活'],
+      templateList: [],
+      templateListH: 0,
+      recordListH: [],
+      isShowNoticeRedDot: false,
+      isShowDialog: false
+    },
+    computed: {
+      ...storeMode.mapState(['darkMode']),
+      ...storeUser.mapState(['nickname', 'headUrl', 'signature', 'followedCount', 'followCount']),
+      genderImg: function () {
+        return require('../image/icon/gender' + (storeUser.state.sex || '0') + '.png')
+      }
     },
     onShow: function () {
+      this.clickHead()
+
       if (typeof this.getTabBar === 'function' && this.getTabBar()) {
         this.getTabBar().setData({
           selected: 4,
           isShowNative: !storeUser.state.hasHadUserInfo // 没有userInfo即false，则展示原生
         })
+      }
+
+      if (!storeUser.state.hasHadUserInfo) { // 无则判断授权
+        wx.getSetting({
+          success: (res) => {
+            if (!res.authSetting['scope.userInfo']) { // 依旧没授权
+              this.isShowDialog = true
+            } else { // 已经授权
+              this.isShowDialog = false
+            }
+          }
+        })
+      } else { // 在其他页面授权获得了信息，则消失
+        this.isShowDialog = false
       }
 
       // 显示后相应其他页面要求的刷新
@@ -27,22 +74,181 @@
           scrollTop: 0,
           duration: 0
         })
-        this._getRequest(true)
+        this.getRequest(true)
         app.globalData.isTabbarPageRefresh['me'] = false
       }
+    },
+    creattemplateList: function () {
+      let templateList = []
+      for (let i in templates) {
+        templateList.push({
+          content: templates[i].content,
+          location: templates[i].location,
+          distance: ' 1314km',
+          isLiked: true,
+          isFavorited: false,
+          locStr: 'N:5°20′ E:13°14′',
+          love: 666,
+          timeStr: '以前'
+        })
+      }
+      this.setData({
+        templateList: templateList
+      }, (res) => {
+        const query = wx.createSelectorQuery().in(this)
+        // 计算各个cell高度来确定线条长度
+        query.selectAll('.record_item').boundingClientRect((rect) => {
+          let recordsH = []
+          for (let i = 0; i < rect.length; i++) {
+            recordsH.push(rect[i].height - 30)
+          }
+          this.recordListH = recordsH
+        }).exec()
+        // 整个temp的高度，防止留白也防止被点击
+        query.select('.me_template_bd').boundingClientRect((rect) => {
+          this.templateListH = rect.height
+        }).exec()
+      })
+    },
+
+    getRequest: function (isRefresh) {
+      if (isRefresh) {
+        net.reqGet({
+          url: 'user/info'
+        }).then(data => {
+          storeUser.commit('updateUserInfo', {
+            sex: data.data.sex,
+            nickname: data.data.nickname,
+            headUrl: data.data.headUrl
+          })
+          storeUser.commit('updateSignature', { signature: data.data.signature })
+          storeUser.commit('updateFollowCount', {
+            followCount: data.data.followCount,
+            followedCount: data.data.followedCount
+          })
+        })
+
+        net.reqGet({
+          url: 'notice/count'
+        }).then(data => {
+          let count = data.data
+          count += (!wx.getStorageSync('isReadLocalNotice') ? 1 : 0)
+          if (count > 0) {
+            storeNotice.commit('updateRedDots', {
+              redDots: [0, 0, 0, 0, count]
+            })
+          }
+          this.noticeCount = (count === 0 ? '' : count.toString()),
+          this.isShowNoticeRedDot = count > 0
+        })
+      }
+
+      let pageNum = isRefresh ? 0 : this.httpsData.nextPage
+      net.reqGet({
+        url: 'record/list/person',
+        query: {
+          pageNum: pageNum
+        }
+      }).then(data => {
+        if (isRefresh) {
+          wx.stopPullDownRefresh()
+          this.recordsTotal = data.data.total
+          if (data.data.total <= 0) {
+            this.creattemplateList()
+            return
+          }
+        }
+
+        let records = isRefresh ? [] : this.recordList
+        records = records.concat(common.getRecordListFrom(data.data.list))
+        this.httpsData = data.data
+        this.setData({
+          recordList: records
+        }, (res) => {
+          const query = wx.createSelectorQuery().in(this)
+          query.selectAll('.record_item').boundingClientRect((rect) => {
+            let recordsH = []
+            for (let i = 0; i < rect.length; i++) {
+              recordsH.push(rect[i].height - 30)
+            }
+            this.recordListH = recordsH
+          }).exec()
+        })
+      })
     }
   })
+
+  var templates = [
+    {
+      content: '你好，北京。初来乍到，请多指教。',
+      location: '北京南站'
+    }, {
+      content: '王小明到此一游',
+      location: '八达岭长城'
+    }, {
+      content: '上周，我们就是在这里分的手。其实我当时就想质问你，为什么你个学摄影的，古道、西风、瘦马、小桥、流水拍得那么多，就是不拍人家！？',
+      location: '我在天涯'
+    }, {
+      content: '大学时还在这里跟同学吃过好多好多好多次小炒，可惜现在换店了，唉。',
+      location: '本部西门新莉小炒'
+    }, {
+      content: '8说了，我已经在这里等伞2小时33分25秒了。',
+      location: 'XXX海底捞门口'
+    }, {
+      content: '苏州中心的大厅，真的好香啊。',
+      location: '苏州中心'
+    }, {
+      content: '我走丢了，别问我在哪，总之快来找我，在线等，挺急的。',
+      location: '记我走丢的第233个点'
+    }, {
+      content: '所以这里为什么叫王府井？王府的井咩？求告知',
+      location: '王府井大街'
+    }, {
+      content: '这栋楼有点高，我刚数到30层就有事溜了，mark下，下次来再数。',
+      location: '金茂大厦'
+    }, {
+      content: '垃圾分为，干垃圾，湿垃圾，有害垃圾，可回收垃圾，和我这个小垃圾。',
+      location: '某垃圾丢弃点'
+    }, {
+      content: '这个路灯怕是已经罢工很多年？',
+      location: '某匿名路灯'
+    }, {
+      content: '外婆家这边的这个小桥快要留不住了，因为是危桥，村里已经决定要拆了重建，所以我打算记下一些回忆——有瓜有粥有蒲扇，有笑有闹有故事，还有孩子的勾指，不燥的微风。夏天傍晚，人们在这里乘凉，各家拿出井里冰好的瓜和粥。因外婆熬的粥特别好喝，她常常多备几副碗筷，好分些给人家，当然了，对方也会给些西瓜或别的，做些简单的交换。无风的日子，大人们，常常带着蒲扇，小孩们挥不动蒲扇，就依偎到各自家人旁边，也就有“不劳而获“的风了，乘凉时的欢笑多是来自小家伙们意外频出的打闹，也有某人突然想起的一个趣事或是灵光一闪抖了个机灵，没有前翻后仰的大笑，却都是发自真心。村里没什么大事，所以经常把小事说细了，或把过去的大事重提，却也时提时新，总有说不完的话题，也不觉乏味。吃口瓜喝口粥，再来点甜玉米汤，我又跑进孩子群中，迎着河面的风，听着大家的笑声，想着接下来玩点什么。',
+      location: '外婆桥'
+    }, {
+      content: '这里的夕阳，真的很美，每次路过都会驻足。这是我的小确幸，现在，分享给路过的，可爱的你们。',
+      location: '阳光正好大桥'
+    }, {
+      content: '这个公交车站台是真的辣鸡，公交车行驶路线图都烂到看不清了。',
+      location: '倒霉的我和破败的站台'
+    }, {
+      content: '昨天在这里偶遇了一个小姐姐，当时她拧不动瓶盖，帮她拧开了。她笑着向我道谢，那一刻，我的心，比阳光还要明媚。',
+      location: '幸福火车站快乐号动车组'
+    }, {
+      content: '爱就一个字，我只说亿次。',
+      location: '某景点/某许愿树'
+    }, {
+      content: '此刻，一位不愿意透露姓名的网友从某个裤裆下钻过。',
+      location: '东方之门'
+    }, {
+      content: '虽然你闯红灯的样子很狼狈，但是你交罚款的样子真的很靓仔。',
+      location: '人参十字路口'
+    }
+  ]
 </script>
 
 <style>
-  .container {} 
+  .container {}
+  @import '../utils/personalStyle.wxss'
+
 </style>
 
 <script  type='application/json' lang='json'>
   {
     "enablePullDownRefresh": true,
     "usingComponents": {
-      "personalPage": "../components/personalPage"
+      "dialog": "../components/dialog",
+      "navigationBar": "../components/navigationBar"
     }
   }
 </script>

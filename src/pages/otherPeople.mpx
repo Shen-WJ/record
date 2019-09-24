@@ -1,28 +1,112 @@
 <template>
-  <personalPage id="personalPage" pageType="others" otherUserId="{{otherUserId}}" showBackIcon="{{true}}"/>
+  <import src="../utils/personalPage.wxml"/>
+
+  <navigationBar showThemeBgColor="{{true}}"/>
+  <template is="personalPage" data="{{pageType:pageType, darkMode:darkMode, isShowDialog:isShowDialog, recordListH:recordListH, animationsText:animationsText, animations:animations, recordList:recordList, recordsTotal:recordsTotal, isFollowed:otherIsFollowed, isShowFollowBtn:isShowFollowBtn, followCount:otherFollowCount, followedCount:otherFollowedCount, signature:otherSignature, headUrl:otherHeadUrl, nickname:otherNickname, genderImg:genderImg}}" />
 </template>
 
 <script>
   import { createPage } from '@mpxjs/core'
   import { behaviorOnPeople } from '../behavior/behaviorOnPeople'
+  import { storeUser } from '../stores/storeUser'
+  import { storeMode } from '../stores/storeCommon'
+  import net from '../utils/net'
+  const common = require('../utils/common.js')
 
   createPage({
     behaviors: [behaviorOnPeople],
     data: {
-      otherUserId: 0
+      pageType: 'others',
+
+      otherNickname: '',
+      otherSex: 0,
+      otherHeadUrl: '',
+      otherSignature: '',
+      otherFollowedCount: 0,
+      otherFollowCount: 0,
+      otherIsFollowed: false,
+
+      recordsTotal: 0,
+      recordList: [],
+      recordListH: [],
+
+      animations: [],
+      animationsText: ['分', '享', '生', '活'],
+
+      isShowDialog: false,
+      isShowFollowBtn: false
+    },
+    computed: {
+      genderImg: function () {
+        return require('../image/icon/gender' + (this.otherSex || '0') + '.png')
+      },
+      ...storeMode.mapState(['darkMode'])
+    },
+    onShow () {
+      this.clickHead()
+    },
+    getRequest: function (isRefresh) {
+      if (isRefresh) {
+        net.reqGet({
+          url: 'user/info/other',
+          query: {
+            otherUserId: this.otherUserId
+          }
+        }).then(data => {
+          this.otherSex = data.data.sex
+          this.otherNickname = data.data.nickname
+          this.otherHeadUrl = data.data.headUrl
+          this.otherSignature = data.data.signature || '暂无简介'
+          this.otherFollowedCount = data.data.followedCount
+          this.otherFollowCount = data.data.followCount || 0
+          this.otherIsFollowed = data.data.follow
+        })
+      }
+
+      let pageNum = isRefresh ? 0 : this.httpsData.nextPage
+      net.reqGet({
+        url: 'record/list/other',
+        query: {
+          otherUserId: this.otherUserId,
+          pageNum: pageNum
+        }
+      }).then(data => {
+        if (isRefresh) {
+          wx.stopPullDownRefresh()
+          this.recordsTotal = data.data.total
+        }
+
+        let records = isRefresh ? [] : this.data.recordList
+        records = records.concat(common.getRecordListFrom(data.data.list))
+        this.httpsData = data.data
+        this.setData({
+          recordList: records
+        }, (res) => {
+          const query = wx.createSelectorQuery().in(this)
+          query.selectAll('.record_item').boundingClientRect((rect) => {
+            let recordsH = []
+            for (let i = 0; i < rect.length; i++) {
+              recordsH.push(rect[i].height - 30)
+            }
+            this.recordListH = recordsH
+          }).exec()
+        })
+      })
     }
   })
 </script>
 
 <style>
-  .container {} 
+  .container {}
+  @import '../utils/personalStyle.wxss'
 </style>
 
 <script  type='application/json' lang='json'>
   {
     "enablePullDownRefresh": true,
     "usingComponents": {
-      "personalPage": "../components/personalPage"
+      "dialog": "../components/dialog",
+      "navigationBar": "../components/navigationBar"
     }
   }
 </script>

@@ -135,7 +135,7 @@
   })
 </script>
 
-<style>
+<style src="">
   .container0 {
     height: 100%;
     display: flex;
@@ -145,7 +145,7 @@
     padding: 200rpx 0;
     box-sizing: border-box;
   }
-  @import "utils/common.wxss"
+  @import './utils/common.wxss'
 </style>
 
 <script type="application/json">
