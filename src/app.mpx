@@ -112,6 +112,7 @@
           this.globalData.navTop = navTop
           this.globalData.statusBarHeight = statusBarHeight
           this.globalData.windowHeight = res.windowHeight
+          this.globalData.windowWidth = res.windowWidth
           console.log('windowHeight: ', res.windowHeight)
         }
       })

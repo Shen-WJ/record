@@ -1,15 +1,23 @@
 <template>
-  <map wx:if="{{darkMode}}" class="map" style="height:{{mapH}}px" layer-style="2" markers="{{markers}}" polyline="{{polyline}}" include-points="{{includePoints}}" setting="{{setting}}" bindmarkertap="clickMarker" bindcallouttap="clickCallout" bindpoitap="clickPoi" />
-  <map wx:elif="{{!darkMode}}" class="map" style="height:{{mapH}}px" layer-style="1" markers="{{markers}}" polyline="{{polyline}}" include-points="{{includePoints}}" setting="{{setting}}" bindmarkertap="clickMarker" bindcallouttap="clickCallout" bindpoitap="clickPoi" />
+  <map wx:if="{{darkMode}}" id="map2" class="map" layer-style="2" style="height:{{mapH}}px"
+    setting="{{setting}}"
+    latitude="{{latitude}}" longitude="{{longitude}}"
+    show-location="{{showLocation}}" enable-scroll="{{enableScroll}}"
+    markers="{{markers}}" polyline="{{polyline}}" include-points="{{includePoints}}"
+    bindregionchange="regionChange" bindcallouttap="clickCallout" bindpoitap="clickPoi">
+  </map>
+  <map wx:else id="map1" class="map" layer-style="1" style="height:{{mapH}}px"
+    setting="{{setting}}"
+    latitude="{{latitude}}" longitude="{{longitude}}"
+    show-location="{{showLocation}}" enable-scroll="{{enableScroll}}"
+    markers="{{markers}}" polyline="{{polyline}}" include-points="{{includePoints}}"
+    bindregionchange="regionChange" bindcallouttap="clickCallout" bindpoitap="clickPoi">
+  </map>
 </template>
 
 <script>
   import { createComponent } from '@mpxjs/core'
   import { storeMode } from '../stores/storeCommon'
-  import toMap from '../image/icon/toMap.png'
-  import net from '../utils/net'
-
-  const common = require('../utils/common.js')
 
   // 一些待研究的参数 polygons
   createComponent({
@@ -33,10 +41,6 @@
         type: Boolean,
         value: true
       },
-      enableZoom: { // 是否支持缩放
-        type: Boolean,
-        value: true
-      },
       enableScroll: { // 是否支持拖动
         type: Boolean,
         value: true
@@ -57,8 +61,9 @@
     data: {
       setting: {
         subkey: 'HF6BZ-ZR4CU-SKTVM-BBDQC-ZB5M2-VQB2Q',
+        enableZoom: true, // 是否支持缩放
         enableRotate: false, // 是否支持旋转
-        enable3D: false, 	// 展示3D楼块(工具暂不支持）
+        enable3D: false, // 展示3D楼块(工具暂不支持）
         enableOverlooking: false, // 开启俯视
         enableSatellite: false, // 是否开启卫星图
         enableTraffic: false // 是否开启实时路况
@@ -72,9 +77,6 @@
       }
     },
     methods: {
-      clickMarker (e) {
-        console.log('clickMarker', e)
-      },
       clickCallout (e) {
         console.log('clickCallout', e.markerId)
         wx.navigateTo({
@@ -83,6 +85,9 @@
       },
       clickPoi (e) {
         console.log('clickPoi', e)
+      },
+      regionChange (e) {
+        this.triggerEvent('regionchange', e, {})
       }
     }
   })

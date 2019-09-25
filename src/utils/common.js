@@ -1,6 +1,8 @@
 import net from './net'
 import { storeUser } from '../stores/storeUser'
-let app = getApp()
+import toMap from '../image/icon/toMap.png'
+
+const app = getApp()
 
 function _getKilometerDistance (lat1, lng1, lat2, lng2) {
   var radLat1 = lat1 * Math.PI / 180.0
@@ -122,18 +124,24 @@ function _formatRecordsOnMap ({ list = [], isNeedLine = false, isNeedInclude = f
   let points = []
   for (let i in list) {
     let item = list[i]
+    let callout = ''
+    if (item.content) {
+      callout = item.content.substring(0, 10) + '...(点击查看)'
+    } else {
+      callout = '[图片](点击查看)'
+    }
     markers.push({
       id: item.recordId,
       latitude: item.lat,
       longitude: item.lng,
-      iconPath: item.headUrl,
+      iconPath: item.headUrl || toMap,
       width: '40rpx',
       height: '40rpx',
       label: {
         content: item.location
       },
       callout: {
-        content: item.content.substring(0, 10) + '...(点击查看)' || '[图片](点击查看)'
+        content: callout
       }
     })
     if (isNeedLine || isNeedInclude) {
@@ -148,7 +156,6 @@ function _formatRecordsOnMap ({ list = [], isNeedLine = false, isNeedInclude = f
     points: points
   }
 }
-
 
 function _updateUserInfo ({ userInfo, success = function () { } }) {
   storeUser.commit('updateUserInfo', {

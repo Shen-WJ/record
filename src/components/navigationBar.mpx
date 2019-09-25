@@ -10,9 +10,9 @@
     </view>
   </view>
   <cover-view wx:else class='navbar-icon' style="top:{{navH-5-34}}px">
-    <cover-image class="navbar-icon-image" src='{{navBackIcon}}' mode='aspectFit' bindtap='navBack'></cover-image>
+    <cover-image wx:if="{{navBackIcon}}" class="navbar-icon-image" src='{{navBackIcon}}' mode='aspectFit' bindtap='navBack'></cover-image>
     <cover-view class="navbar-icon-view {{darkMode?'bgColorW0':'bgColorB0'}}"></cover-view>
-    <cover-image class="navbar-icon-image" src='{{navHomeIcon}}' mode='aspectFit' bindtap='navHome'></cover-image>
+    <cover-image wx:if="{{navHomeIcon}}" class="navbar-icon-image" src='{{navHomeIcon}}' mode='aspectFit' bindtap='navHome'></cover-image>
   </cover-view>
   <view wx:if="{{showHolder}}" class="navbar_holder" style="height:{{navH}}px"></view>
   <view class="coverPage {{darkMode?'darkMode':'dayMode'}}" style="{{showCoverImg?'opacity:'+opacity:''}}"/>
@@ -66,9 +66,7 @@
         return require('../image/icon/nav_home' + (storeMode.state.darkMode ? 1 : 0) + '.png')
       },
       navBarClass () {
-        if (this.onlyShowIcon) {
-          return ''
-        } else if (storeMode.state.darkMode) {
+        if (storeMode.state.darkMode) {
           return 'darkMode borderB'
         } else if (this.showThemeBgColor) {
           return 'themeMode'

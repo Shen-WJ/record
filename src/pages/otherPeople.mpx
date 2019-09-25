@@ -14,7 +14,6 @@
 <script>
   import { createPage } from '@mpxjs/core'
   import { behaviorOnPeople } from '../behavior/behaviorOnPeople'
-  import { storeUser } from '../stores/storeUser'
   import { storeMode } from '../stores/storeCommon'
   import net from '../utils/net'
   const common = require('../utils/common.js')

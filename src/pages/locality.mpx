@@ -4,7 +4,6 @@
   
     <import src="../utils/recordItem.wxml"/>
     <import src="../utils/common.wxml"/>
-    <view class="locality">
     <block wx:for="{{sections}}" wx:for-item="sectionName" wx:for-index="section" wx:key="{{sectionName}}">
       <!-- section0即使为空也要显示 -->
       <block wx:if="{{recordList[section].length || section==0}}">
@@ -17,9 +16,8 @@
     </block>
 
     <template is="emptyView" data="{{isShow: isReachBottom, type: 1, textArr:['已经到底啦！去','发现','查看更多内容吧～0v0']}}"/>
-    </view>
+    <view class="point themeMode" catchtap="clickToMapPage">地图</view>
   </view>
-  <view class="point themeMode" catchtap="clickToMapPage">地图</view>
   <view class="bottomHolder"/>
 </template>
 
@@ -146,7 +144,7 @@
     },
     clickToMapPage: function () {
       wx.navigateTo({
-        url: './mapPage'
+        url: './mapPage?pageType=locality'
       })
     }
   })

@@ -1,4 +1,6 @@
 <template>
+  <import src="../utils/recordItem.wxml"/>
+  <import src="../utils/common.wxml"/>
   <navigationBar pageName="发现" showBackIcon="{{false}}"/>
 
   <view class="container">
@@ -12,14 +14,12 @@
     </view>
     <view class="header_holder"></view>
 
-    <import src="../utils/recordItem.wxml"/>
-    <import src="../utils/common.wxml"/>
-    <view class="find">
-      <template is="emptyView" data="{{isShow: !recordList[0].length, type:0, textArr:['要不点击上方⬆换个筛选条件试试？或者','去发布','分享给你的附近吧～0v0']}}"/>
-      <block wx:for="{{recordList[0]}}" wx:key="{{item.recordId}}" wx:for-index="row">
-      <template is="recordItem" data="{{record:item, rcdIndex:{section:0, row:row}, rcdType:1, darkMode:darkMode}}"/>
-      </block>
-    </view>
+    <template is="emptyView" data="{{isShow: !recordList[0].length, type:0, textArr:['要不点击上方⬆换个筛选条件试试？或者','去发布','分享给你的附近吧～0v0']}}"/>
+    <block wx:for="{{recordList[0]}}" wx:key="{{item.recordId}}" wx:for-index="row">
+    <template is="recordItem" data="{{record:item, rcdIndex:{section:0, row:row}, rcdType:1, darkMode:darkMode}}"/>
+    </block>
+
+    <view class="point themeMode" catchtap="clickToMapPage">地图</view>
   </view>
   <view class="bottomHolder"/>
 </template>
@@ -156,6 +156,11 @@
     clickToSwitch: function () {
       wx.switchTab({
         url: './release'
+      })
+    },
+    clickToMapPage: function () {
+      wx.navigateTo({
+        url: './mapPage?pageType=find'
       })
     }
   })

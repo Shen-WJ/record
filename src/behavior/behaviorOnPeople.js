@@ -85,7 +85,7 @@ export const behaviorOnPeople = Behavior({
           break
         }
         case 1: { // 通知
-          this.noticeCount = '',
+          this.noticeCount = ''
           this.isShowNoticeRedDot = false
           storeNotice.commit('updateRedDots', {
             redDots: [0, 0, 0, 0, 0]
@@ -306,7 +306,7 @@ export const behaviorOnPeople = Behavior({
     },
     clickToMapPage: function () {
       wx.navigateTo({
-        url: './mapPage?personType='+this.pageType+'&otherUserId='+(this.otherUserId||0)
+        url: './mapPage?pageType=person&personType=' + this.pageType + '&otherUserId=' + (this.otherUserId || 0)
       })
     }
   }

@@ -1,13 +1,37 @@
 <template>
   <navigationBar onlyShowIcon="{{true}}" showHolder="{{false}}"/>
   <view class='container'>
-    <customMap mapH="{{mapH}}" markers="{{markers}}" polyline="{{polyline}}" includePoints="{{includePoints}}"></customMap>
+    <customMap id="customMap" mapH="{{mapH}}"
+      showLocation="{{showLocation}}" latitude="{{firstLatitude}}" longitude="{{firstLongitude}}"
+      enableScroll="{{enableScroll}}"
+      markers="{{markers}}" polyline="{{polyline}}" includePoints="{{includePoints}}" 
+      bindregionchange="regionChange">
+    </customMap>
+    <view class="pickerDate {{darkMode?'bgColorB0 fontColorW1':'bgColorW0 fontColorB1'}} {{isShowPickerDate?'pickerDate_show':''}}">
+      <text>选择：从  </text>
+      <picker class="{{darkMode?'map_menu_borderB':'map_menu_borderW'}}" mode="date" value="{{startDate}}" start="2019-01-01" end="2029-01-01" bindchange="changeDate" data-type="start">
+        <view>{{startDate}}</view>
+      </picker>
+      <text>  到  </text>
+      <picker class="{{darkMode?'map_menu_borderB':'map_menu_borderW'}}" mode="date" value="{{endDate}}" start="2019-01-01" end="2029-01-01" bindchange="changeDate" data-type="end">
+        <view>{{endDate}}</view>
+      </picker>
+      <button catchtap="pickerDateConfirm">完成</button>
+    </view>
+    <cover-view wx:if="{{isShowMenu}}" class="map_menu {{darkMode?'bgColorB0 fontColorW1':'bgColorW0 fontColorB1'}}">
+      <cover-view class="map_menu_tip">筛选以下时间段的内容：</cover-view>
+      <cover-view wx:for="{{menu}}" wx:key="index" class="map_menu_select {{darkMode?'map_menu_borderB':'map_menu_borderW'}} {{index===selected?'selected':''}}" catchtap="clickMenu" data-index="{{index}}">{{index===selected?'■':'□'}}{{item}}</cover-view>
+      <button class="map_menu_share" catchtap="saveImg">保存</button>
+    </cover-view>
+    <canvas canvas-id='canvasSave' class="canvas"></canvas>
   </view>
 </template>
 
 <script>
   import { createPage } from '@mpxjs/core'
   import net from '../utils/net'
+  import { storeMode } from '../stores/storeCommon'
+  import { storeUser } from '../stores/storeUser'
 
   const app = getApp()
   const common = require('../utils/common.js')
@@ -15,89 +39,355 @@
   createPage({
     data: {
       mapH: app.globalData.windowHeight,
+      showLocation: true,
+      firstLatitude: app.globalData.location.latitude || 0,
+      firstLongitude: app.globalData.location.longitude || 0,
+      enableScroll: true,
       markers: [], // 标记点
       polyline: [
         {
           points: [],
-          color: "#2ab3f3",
+          color: '#2ab3f3',
           width: 2,
           arrowLine: true,
-          borderColor: "#000"
+          borderColor: '#000'
         }
       ],
-      includePoints: [] // 缩放视野以包含所有给定的坐标点
+      includePoints: [], // 缩放视野以包含所有给定的坐标点
+
+      menu: ['三天内', '一周内', '一个月内', '其他时间段'],
+      isShowMenu: false,
+      selected: 0,
+      startDate: '2019-01-01',
+      endDate: '2019-01-01',
+      isShowPickerDate: false
     },
     computed: {
+      ...storeMode.mapState(['darkMode'])
     },
     onLoad (option) {
-      this.otherUserId = option.otherUserId || 0
-      option.personType === 'others'? this.getRequset2(true) : this.getRequset(true)
+      this.pageType = option.pageType
+      this.mapId = storeMode.state.darkMode ? 'map2' : 'map1'
+      this.customMap = this.selectComponent('#customMap')
+      wx.createMapContext(this.mapId, this.customMap).moveToLocation()
+
+      switch (this.pageType) {
+        case 'person': {
+          this.showLocation = false
+          this.isShowMenu = true
+          this.otherUserId = parseInt(option.otherUserId) || 0
+          this.personType = option.personType
+
+          if (!option.fromShare) {
+            this.personType === 'others' ? this.getRequsetOnOthers(1) : this.getRequsetOnMe(1)
+          } else {
+            this.type = option.type || 1
+            this.startDate = option.startDate || '2019-01-01'
+            this.endDate = option.endDate || '2019-01-01'
+            this.getRequsetOnOthers() 
+          }
+          break
+        }
+        case 'locality': {
+          this.enableScroll = false
+          this.RegionDistance = 0
+          this.getRequestOnLocality(true)
+          break
+        }
+        case 'find': {
+          if (option.fromShare) {
+            this.latitude = option.latitude
+            this.longitude = option.longitude
+          }
+          this.getRequestOnFind(true)
+          break
+        }
+      }
     },
-    getRequset (isRefresh) {
+    onShareAppMessage: function (res) {
+      switch (this.pageType) {
+        case 'person': {
+          return {
+            title: '来看看ta的',
+            path: '/pages/mapPage?pageType=person&personType=others&fromShare=1&type=' + this.type + '&otherUserId=' + (this.otherUserId || storeUser.state.userId) + '&startDate=' + this.startDate + '&endDate' + this.endDate
+          }
+          break
+        }
+        case 'locality': {
+          return {
+            title: '看看你附近有些啥好玩的',
+            path: '/pages/mapPage?pageType=locality&fromShare=1'
+          }
+        }
+        case 'find': {
+          return {
+            title: '看看你附近有些啥好玩的',
+            path: '/pages/mapPage?pageType=find&fromShare=1&latitude=' + this.latitude + '&longitude=' + this.longitude
+          }
+        }
+      }
+    },
+    getRequestOnLocality: function (isRefresh) {
+      if (this.httpsData && !this.httpsData.hasNextPage) return
+
       let pageNum = isRefresh ? 0 : this.httpsData.nextPage
       net.reqGet({
-        url: 'record/list/person',
+        url: 'record/list/byLocation',
         query: {
-          pageNum: pageNum
+          pageNum: pageNum,
+          distance: 20,
+          lng: app.globalData.location.longitude,
+          lat: app.globalData.location.latitude
         }
       }).then(data => {
         this.originalRecords = isRefresh ? [] : this.originalRecords
         this.originalRecords = this.originalRecords.concat(data.data.list)
         this.httpsData = data.data
-        if (!this.httpsData.isLastPage) {
-          this.getRequset(false)
+
+        let recordsOnMap = common.formatRecordsOnMap({
+          list: this.originalRecords,
+          isNeedInclude: false
+        })
+        this.markers = recordsOnMap.markers
+
+        if (data.data.hasNextPage) {
+          // 查看是否请求到了边界
+          const lastOne = this.originalRecords[this.originalRecords.length - 1]
+          if (common.getDistanceToMe(lastOne.lat, lastOne.lng) < this.RegionDistance) {
+            this.getRequestOnLocality(false)
+          }
         } else {
-          let recordsOnMap = common.formatRecordsOnMap({
-            list: this.originalRecords,
-            isNeedLine: true,
-            isNeedInclude: true
-          })
-          this.markers = recordsOnMap.markers
-          this.polyline = [
-            {
-              points: recordsOnMap.points,
-              color: "#2ab3f3",
-              width: 2,
-              arrowLine: true,
-              borderColor: "#000"
-            }
-          ]
-          this.includePoints = recordsOnMap.points
+          this.getHotList()
         }
       })
     },
-    getRequset2 (isRefresh) {
-    let pageNum = isRefresh ? 0 : this.httpsData.nextPage
+    getHotList: function () {
       net.reqGet({
-        url: 'record/list/other',
+        url: 'record/list/hot',
         query: {
-          otherUserId: this.otherUserId,
-          pageNum: pageNum
+          size: 5
         }
       }).then(data => {
-        this.originalRecords = isRefresh ? [] : this.originalRecords
-        this.originalRecords = this.originalRecords.concat(data.data.list)
-        this.httpsData = data.data
-        if (!this.httpsData.isLastPage) {
-          this.getRequset2(false)
-        } else {
-          let recordsOnMap = common.formatRecordsOnMap({
-            list: this.originalRecords,
-            isNeedLine: true,
-            isNeedInclude: true
+        if (this.httpsData.total <= 0) {
+          wx.showToast({
+            title: '附近空空的，去发现看看吧～OvO',
+            icon: 'none',
+            duration: 3000
           })
-          this.markers = recordsOnMap.markers
-          this.polyline = [
-            {
-              points: recordsOnMap.points,
-              color: "#2ab3f3",
-              width: 2,
-              arrowLine: true,
-              borderColor: "#000"
-            }
-          ]
-          this.includePoints = recordsOnMap.points
+        } else {
+          wx.showToast({
+            title: '附近就这些啦，剩下的去发现看看吧～OvO',
+            icon: 'none',
+            duration: 4000
+          })
         }
+
+        this.originalRecords = this.originalRecords || []
+        this.originalRecords = this.originalRecords.concat(data.data.list)
+
+        let recordsOnMap = common.formatRecordsOnMap({
+          list: this.originalRecords,
+          isNeedInclude: false
+        })
+        this.markers = recordsOnMap.markers
+      })
+    },
+    // 刷新即第一次请求的意思
+    getRequestOnFind: function (isRefresh) {
+      console.log('getRequestOnFind')
+      net.reqGet({
+        url: 'record/list/byLocation', // 发现地图按距离拉取，所以10条附近的
+        query: {
+          pageNum: 0, // 发现地图只显示10条
+          lng: this.longitude || app.globalData.location.longitude, // todo
+          lat: this.latitude || app.globalData.location.latitude,
+          distance: 100 // 100km,确保数据少时，能拉取到10条
+        }
+      }).then(data => {
+        this.originalRecords = data.data.list
+        this.httpsData = data.data
+
+        let recordsOnMap = common.formatRecordsOnMap({
+          list: this.originalRecords,
+          isNeedInclude: true
+        })
+        this.markers = recordsOnMap.markers
+        if (!this.isIncluded) { // 第一次进来，自动包括一次
+          this.includePoints = recordsOnMap.points
+          this.isIncluded = true
+        }
+      })
+    },
+    getRequsetOnMe (type) {
+      this.type = type || this.type
+      net.reqGet({
+        url: 'record/gps/person',
+        query: {
+          type: this.type,
+          startDate: this.startDate,
+          endDate: this.endDate
+        }
+      }).then(data => {
+        if (data.data.length === 0 || !data.data) {
+          wx.showToast({
+            title: this.menu[parseInt(this.type)] + '没发布内容呢，换个时间段吧～',
+            icon: 'none'
+          })
+          this.firstLongitude = app.globalData.location.longitude
+          this.firstLatitude = app.globalData.location.latitude
+          return
+        }
+        this.originalRecords = []
+        this.originalRecords = this.originalRecords.concat(data.data)
+        let recordsOnMap = common.formatRecordsOnMap({
+          list: this.originalRecords,
+          isNeedLine: true,
+          isNeedInclude: true
+        })
+        this.markers = recordsOnMap.markers
+        this.polyline = [
+          {
+            points: recordsOnMap.points,
+            color: '#2ab3f3',
+            width: 2,
+            arrowLine: true,
+            borderColor: '#000'
+          }
+        ]
+        this.includePoints = recordsOnMap.points
+      })
+    },
+    getRequsetOnOthers (type) {
+      this.type = type || this.type
+      net.reqGet({
+        url: 'record/gps/other',
+        query: {
+          otherUserId: this.otherUserId,
+          type: this.type,
+          startDate: this.startDate,
+          endDate: this.endDate
+        }
+      }).then(data => {
+        if (data.data.length === 0 || !data.data) {
+          wx.showToast({
+            title: this.menu[parseInt(this.type)] + '没发布内容呢，换个时间段吧～',
+            icon: 'none'
+          })
+          this.firstLongitude = app.globalData.location.longitude
+          this.firstLatitude = app.globalData.location.latitude
+          return
+        }
+        this.originalRecords = []
+        this.originalRecords = this.originalRecords.concat(data.data)
+        let recordsOnMap = common.formatRecordsOnMap({
+          list: this.originalRecords,
+          isNeedLine: true,
+          isNeedInclude: true
+        })
+        this.markers = recordsOnMap.markers
+        this.polyline = [
+          {
+            points: recordsOnMap.points,
+            color: '#2ab3f3',
+            width: 2,
+            arrowLine: true,
+            borderColor: '#000'
+          }
+        ]
+        this.includePoints = recordsOnMap.points
+      })
+    },
+
+    regionChange (e) {
+      const change = e.detail
+      if (change.type === 'end') {
+        if (change.causedBy === 'drag' && this.pageType === 'find') { // 发现页拖拽
+          wx.createMapContext(this.mapId, this.customMap).getCenterLocation({
+            success: (ctrLoc) => {
+              if (this.longitude !== ctrLoc.longitude || this.latitude !== ctrLoc.latitude) {
+                if (this.timer) clearTimeout(this.timer)
+                this.timer = setTimeout(res => {
+                  console.log('this.timer: ~~~', this.timer)
+                  clearTimeout(this.timer)
+                  this.longitude = ctrLoc.longitude
+                  this.latitude = ctrLoc.latitude
+                  this.getRequestOnFind(true)
+                }, 700)
+              }
+            }
+          })
+        } else if (change.causedBy === 'scale' && this.pageType === 'locality') { // 附近页视野放缩
+          wx.createMapContext(this.mapId, this.customMap).getRegion({
+            success: (region) => {
+              this.RegionDistance = common.getDistanceToMe(region.southwest.latitude, region.southwest.longitude)
+              if (this.httpsData.hasNextPage || !this.httpsData) {
+                // 查看是否有下一页
+                const lastOne = this.originalRecords[this.originalRecords.length - 1]
+                if (common.getDistanceToMe(lastOne.lat, lastOne.lng) < this.RegionDistance) {
+                  // 有下一页，且当前视野增加，才开启请求倒计时
+                  if (this.timer) clearTimeout(this.timer)
+                  this.timer = setTimeout(res => {
+                    console.log('this.timer: ~~~', this.timer)
+                    clearTimeout(this.timer)
+                    this.getRequestOnLocality(false)
+                  }, 700)
+                }
+              }
+            }
+          })
+        }
+      }
+    },
+    clickMenu (e) {
+      let index = e.currentTarget.dataset.index
+      this.selected = index
+      switch (index) {
+        case 0:
+        case 1:
+        case 2: {
+          this.isShowPickerDate = false
+          this.getRequsetOnMe(++index)
+          break
+        }
+        case 3: {
+          this.isShowPickerDate = true
+        }
+      }
+    },
+    changeDate (e) {
+      console.log(e)
+      if (e.currentTarget.dataset.type === 'start') {
+        this.startDate = e.detail.value
+      } else if (e.currentTarget.dataset.type === 'end') {
+        this.endDate = e.detail.value
+      }
+    },
+    pickerDateConfirm () {
+      this.getRequsetOnMe(4)
+    },
+    saveImg (e) {
+      console.log(e)
+      var context = wx.createCanvasContext('canvasSave')
+      context.setStrokeStyle("#00ff00")
+      context.setLineWidth(5)
+      context.rect(0, 0, app.globalData.windowWidth, app.globalData.windowHeight)
+      context.stroke()
+      context.draw(false, res => {
+        wx.canvasToTempFilePath({
+          canvasId: 'canvasSave',
+          success: (res) => {
+            console.log(res)
+            wx.saveImageToPhotosAlbum({
+              filePath: res.tempFilePath,
+              success:(res)=>{
+                console.log(res)
+              },
+              fail:(err)=>{
+                console.log(err)
+              }
+            })
+          }
+        })
       })
     }
   })
@@ -107,6 +397,93 @@
   .container {}
   .custom_map {
     width: 750rpx;
+  }
+  .map_menu {
+    z-index: 1001;
+    position: fixed;
+    bottom: env(safe-area-inset-bottom);
+    left: 30rpx;
+    right: 30rpx;
+    height: 96rpx;
+    border-radius: 48rpx;
+    padding: 0rpx 48rpx;
+    opacity: 0.8;
+    border: 2rpx solid #888;
+  }
+  .map_menu_tip {
+    font-size: 20rpx;
+    margin: 5rpx 10rpx 10rpx;
+  }
+  .map_menu_select {
+    display: inline-block;
+    font-size: 22rpx;
+
+    margin: 0rpx 5rpx 10rpx;
+  }
+  .selected {
+    border: 2rpx solid #2ab3f3;
+    color: #2ab3f3;
+  }
+  .pickerDate {
+    z-index: 1000;
+    position: absolute;
+    bottom: 96rpx;
+    left: 78rpx;
+    margin-bottom: env(safe-area-inset-bottom);
+    padding: 15rpx;
+    border-radius: 10rpx;
+
+    font-size: 22rpx;
+
+    opacity: 0;
+    transform: translateY(100%);
+    transition: .3s;
+  }
+  .pickerDate_show {
+    opacity: 0.9;
+    transform: translateY(0%);
+  }
+  .pickerDate picker {
+    display: inline-block;
+  }
+  .pickerDate button {
+    background-color: #2ab3f3;
+    color: #fff;
+    font-size: 22rpx;
+    line-height: 36rpx;
+    height: 36rpx;
+    width: 100rpx;
+    border-radius: 5rpx;
+    margin-top: 15rpx;
+  }
+
+  .map_menu_borderB {
+    border-radius: 5rpx;
+    padding: 3rpx 7rpx;
+    border: 2rpx solid #ccc;
+  }
+  .map_menu_borderW {
+    border-radius: 5rpx;
+    padding: 3rpx 7rpx;
+    border: 2rpx solid #555;
+  }
+  .map_menu_share {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #2ab3f3;
+    color: #fff;
+    line-height:96rpx;
+    height: 96rpx;
+    width: 102rpx;
+  }
+  .canvas {
+    position: fixed;
+    width: 750rpx;
+    height: 1000px;
+    top: 100%;
+    left: 100%;
+    overflow: hidden; 
   }
 </style>
 
