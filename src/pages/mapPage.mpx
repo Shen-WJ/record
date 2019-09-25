@@ -21,9 +21,11 @@
     <cover-view wx:if="{{isShowMenu}}" class="map_menu {{darkMode?'bgColorB0 fontColorW1':'bgColorW0 fontColorB1'}}">
       <cover-view class="map_menu_tip">筛选以下时间段的内容：</cover-view>
       <cover-view wx:for="{{menu}}" wx:key="index" class="map_menu_select {{darkMode?'map_menu_borderB':'map_menu_borderW'}} {{index===selected?'selected':''}}" catchtap="clickMenu" data-index="{{index}}">{{index===selected?'■':'□'}}{{item}}</cover-view>
-      <button class="map_menu_share" catchtap="saveImg">保存</button>
+      <button class="map_menu_share" open-type="share">分享</button>
+
     </cover-view>
-    <canvas canvas-id='canvasSave' class="canvas"></canvas>
+    <!--<canvas canvas-id='canvasSave' class="canvas"></canvas>
+      保存图片 -->
   </view>
 </template>
 
@@ -40,8 +42,8 @@
     data: {
       mapH: app.globalData.windowHeight,
       showLocation: true,
-      firstLatitude: app.globalData.location.latitude || 0,
-      firstLongitude: app.globalData.location.longitude || 0,
+      firstLatitude: app.globalData.location.latitude || 1,
+      firstLongitude: app.globalData.location.longitude || 1,
       enableScroll: true,
       markers: [], // 标记点
       polyline: [
@@ -78,26 +80,41 @@
           this.otherUserId = parseInt(option.otherUserId) || 0
           this.personType = option.personType
 
-          if (!option.fromShare) {
-            this.personType === 'others' ? this.getRequsetOnOthers(1) : this.getRequsetOnMe(1)
-          } else {
+          if (option.fromShare) {
             this.type = option.type || 1
             this.startDate = option.startDate || '2019-01-01'
             this.endDate = option.endDate || '2019-01-01'
             this.getRequsetOnOthers() 
+          } else {
+            this.personType === 'others' ? this.getRequsetOnOthers(1) : this.getRequsetOnMe(1)
           }
           break
         }
         case 'locality': {
-          this.enableScroll = false
           this.RegionDistance = 0
-          this.getRequestOnLocality(true)
+          this.enableScroll = false
+          if (option.fromShare) {
+            common.getLocation({
+              success: res => {
+                this.firstLatitude = app.globalData.location.latitude
+                this.firstLongitude = app.globalData.location.longitude
+                this.getRequestOnLocality(true)
+              }
+            })
+          } else {
+            this.firstLatitude = app.globalData.location.latitude
+            this.firstLongitude = app.globalData.location.longitude
+            this.getRequestOnLocality(true)
+          }
           break
         }
         case 'find': {
           if (option.fromShare) {
             this.latitude = option.latitude
             this.longitude = option.longitude
+          } else {
+            this.latitude = app.globalData.location.latitude
+            this.longitude = app.globalData.location.longitude
           }
           this.getRequestOnFind(true)
           break
@@ -121,7 +138,7 @@
         }
         case 'find': {
           return {
-            title: '看看你附近有些啥好玩的',
+            title: '快看，这个地方好好玩啊',
             path: '/pages/mapPage?pageType=find&fromShare=1&latitude=' + this.latitude + '&longitude=' + this.longitude
           }
         }
@@ -149,7 +166,11 @@
           isNeedInclude: false
         })
         this.markers = recordsOnMap.markers
+        
+        if (!this.notFirstIn) { // 第一次进来，自动定位一次
 
+          this.notFirstIn = true
+        }
         if (data.data.hasNextPage) {
           // 查看是否请求到了边界
           const lastOne = this.originalRecords[this.originalRecords.length - 1]
@@ -194,7 +215,6 @@
     },
     // 刷新即第一次请求的意思
     getRequestOnFind: function (isRefresh) {
-      console.log('getRequestOnFind')
       net.reqGet({
         url: 'record/list/byLocation', // 发现地图按距离拉取，所以10条附近的
         query: {
@@ -230,7 +250,7 @@
       }).then(data => {
         if (data.data.length === 0 || !data.data) {
           wx.showToast({
-            title: this.menu[parseInt(this.type)] + '没发布内容呢，换个时间段吧～',
+            title: this.menu[parseInt(this.type)-1] + '没发布内容呢，换个时间段吧～',
             icon: 'none'
           })
           this.firstLongitude = app.globalData.location.longitude
@@ -270,7 +290,7 @@
       }).then(data => {
         if (data.data.length === 0 || !data.data) {
           wx.showToast({
-            title: this.menu[parseInt(this.type)] + '没发布内容呢，换个时间段吧～',
+            title: this.menu[parseInt(this.type)-1] + '没发布内容呢，换个时间段吧～',
             icon: 'none'
           })
           this.firstLongitude = app.globalData.location.longitude
@@ -346,7 +366,11 @@
         case 1:
         case 2: {
           this.isShowPickerDate = false
-          this.getRequsetOnMe(++index)
+          if (this.personType === 'me') {
+            this.getRequsetOnMe(++index)
+          } else {
+            this.getRequsetOnOthers(++index)
+          }
           break
         }
         case 3: {
@@ -363,7 +387,11 @@
       }
     },
     pickerDateConfirm () {
-      this.getRequsetOnMe(4)
+      if (this.personType === 'me') {
+        this.getRequsetOnMe(4)
+      } else {
+        this.getRequsetOnOthers(4)
+      }
     },
     saveImg (e) {
       console.log(e)
