@@ -250,7 +250,7 @@
       }).then(data => {
         if (data.data.length === 0 || !data.data) {
           wx.showToast({
-            title: this.menu[parseInt(this.type)-1] + '没发布内容呢，换个时间段吧～',
+            title: '该时间段没发布内容呢，换个时间段吧～',
             icon: 'none'
           })
           this.firstLongitude = app.globalData.location.longitude
@@ -290,7 +290,7 @@
       }).then(data => {
         if (data.data.length === 0 || !data.data) {
           wx.showToast({
-            title: this.menu[parseInt(this.type)-1] + '没发布内容呢，换个时间段吧～',
+            title: '该时间段没发布内容呢，换个时间段吧～',
             icon: 'none'
           })
           this.firstLongitude = app.globalData.location.longitude
@@ -360,11 +360,11 @@
     },
     clickMenu (e) {
       let index = e.currentTarget.dataset.index
-      this.selected = index
       switch (index) {
         case 0:
         case 1:
         case 2: {
+          this.selected = index
           this.isShowPickerDate = false
           if (this.personType === 'me') {
             this.getRequsetOnMe(++index)
@@ -387,6 +387,7 @@
       }
     },
     pickerDateConfirm () {
+      this.selected = 3
       if (this.personType === 'me') {
         this.getRequsetOnMe(4)
       } else {
