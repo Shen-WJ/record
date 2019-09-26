@@ -1,22 +1,11 @@
 <template>
-  <block wx:if="{{!isShowNative}}">
-    <view class="tab-bar {{darkMode?'darkMode':'dayMode'}}">
-      <view wx:for="{{list}}" wx:key="index" class="tab-bar-item" data-path="{{item.pagePath}}" data-index="{{index}}" bindtap="switchTab">
-        <image class="tab-bar-item-image" src="{{icons[index]}}"></image>
-        <view class="tab-bar-item-view" style="color: {{selected === index ? selectedColor : color}}">{{item.text}}</view>
-        <view wx:if="{{redDots[index] !== 0}}" class="tab-bar-item-redDot">{{redDots[index]}}</view>
-      </view>
+  <view class="tab-bar {{darkMode?'darkMode':'dayMode'}}">
+    <view wx:for="{{list}}" wx:key="index" class="tab-bar-item" data-path="{{item.pagePath}}" data-index="{{index}}" bindtap="switchTab">
+      <image class="tab-bar-item-image" src="{{icons[index]}}"></image>
+      <view class="tab-bar-item-view" style="color: {{selected === index ? selectedColor : color}}">{{item.text}}</view>
+      <view wx:if="{{redDots[index] !== 0}}" class="tab-bar-item-redDot">{{redDots[index]}}</view>
     </view>
-  </block>
-  <block wx:else>
-    <cover-view class="tab-bar {{darkMode?'darkMode':'dayMode'}}">
-      <cover-view wx:for="{{list}}" wx:key="index" class="tab-bar-item" data-path="{{item.pagePath}}" data-index="{{index}}" bindtap="switchTab">
-        <cover-image class="tab-bar-item-image" src="{{icons[index]}}"></cover-image>
-        <cover-view class="tab-bar-item-view" style="color: {{selected === index ? selectedColor : color}}">{{item.text}}</cover-view>
-        <cover-view wx:if="{{redDots[index] !== 0}}" class="tab-bar-item-redDot">{{redDots[index]}}</cover-view>
-      </cover-view>
-    </cover-view>
-  </block>
+  </view>
 </template>
 
 <script>
@@ -40,7 +29,6 @@
     properties: { // 自定义tabbar目前不支持外界直接控制传值
     },
     data: {
-      isShowNative: false,
       selected: 0,
       color: '#7A7E83',
       selectedColor: '#2ab3f3',
@@ -101,6 +89,7 @@
     display: flex;
     border-radius: 24px;
     border: 2rpx solid #888;
+    z-index: 10000;
   }
 
   .tab-bar-item {

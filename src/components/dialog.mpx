@@ -1,17 +1,17 @@
 <template>
-  <cover-view class='mask' wx:if='{{isShow}}'>
-    <cover-view class='modal'>
-      <cover-view class='title' wx:if='{{title}}'>{{title}}</cover-view>
-      <cover-view class='content'>{{content}}</cover-view>
-      <cover-view wx:if={{showAllBtn}} class='btns'>
+  <view class='mask' wx:if='{{isShow}}' catchtouchmove='true' catchtap="true" catchtouchstart="true" catchtouchend="true" catchlongpress="true">
+    <view class='modal'>
+      <view class='title' wx:if='{{title}}'>{{title}}</view>
+      <view class='content'>{{content}}</view>
+      <view wx:if={{showAllBtn}} class='btns'>
         <button class='cancel' bindtap='Cancel' wx:if='{{showCancel}}'>取消</button>
         <button wx:if="{{open_type === 'contact'}}" class='success' bindcontact='Success' open-type='{{open_type}}'>{{confirmText}}</button>
         <button wx:elif="{{open_type === 'getUserInfo'}}" class='success' bindgetuserinfo='Success' open-type='{{open_type}}'>{{confirmText}}</button>
         <button wx:elif="{{open_type === 'getPhoneNumber'}}" class='success' bindgetphonenumber='Success' open-type='{{open_type}}'>{{confirmText}}</button>
         <button wx:else class='success' bindtap='Success' open-type='{{open_type}}'>{{confirmText}}</button>
-      </cover-view>
-    </cover-view>
-  </cover-view>
+      </view>
+    </view>
+  </view>
 </template>
 
 <script>
@@ -74,6 +74,9 @@
         var myEventOption = {} // 触发事件的选项
         this.triggerEvent('Cancel', myEventDetail, myEventOption)
         this.close()
+      },
+      true () {
+        // 占位置的，省的各种警告
       }
     }
   })
@@ -88,6 +91,7 @@
     top: 0;
     width: 100vw;
     height: 100vh;
+    z-index: 9000;
   }
   
   .modal {
