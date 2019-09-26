@@ -16,7 +16,7 @@
     </block>
 
     <template is="emptyView" data="{{isShow: isReachBottom, type: 1, textArr:['已经到底啦！去','发现','查看更多内容吧～0v0']}}"/>
-    <image class="point themeMode" src="../image/icon/toMapPage3.png" mode="aspectFit" catchtap="clickToMapPage"></image>
+    <image class="point themeMode" src="../image/icon/toMapPage.png" mode="aspectFit" catchtap="clickToMapPage"></image>
   </view>
   <view class="bottomHolder"/>
 </template>

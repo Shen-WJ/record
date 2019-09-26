@@ -56,5 +56,5 @@
   </view>
 
   <dialog isShow="{{isShowDialog}}" title="{{pageType==='me'?'获取信息':'关注需要昵称/头像'}}" content="{{pageType==='me'?'个人页面的展示需要昵称和头像。之后可以点击头像/昵称进行修改。':'你还没有昵称头像，关注不了哦OvO～快去授权吧！'}}" showCancel="{{false}}" confirmText="去授权" open_type="getUserInfo" bindSuccess='authorizeUserInfo'></dialog>
-  <image class="point themeMode" src="../image/icon/toMapPage5.png" mode="aspectFit" catchtap="clickToMapPage"></image>
+  <image class="point themeMode" src="../image/icon/toMapPage.png" mode="aspectFit" catchtap="clickToMapPage"></image>
 </template>

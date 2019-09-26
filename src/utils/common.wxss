@@ -309,7 +309,7 @@ display: none;
 .point {
   position: fixed;
   z-index: 1000;
-  right: 60rpx;
+  right: 30rpx;
   bottom: 58px;
   margin-bottom: env(safe-area-inset-bottom);
   padding: 25rpx;

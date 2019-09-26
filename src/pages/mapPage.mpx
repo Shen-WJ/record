@@ -22,7 +22,6 @@
       <cover-view class="map_menu_tip">筛选以下时间段的内容：</cover-view>
       <cover-view wx:for="{{menu}}" wx:key="index" class="map_menu_select {{darkMode?'map_menu_borderB':'map_menu_borderW'}} {{index===selected?'selected':''}}" catchtap="clickMenu" data-index="{{index}}">{{index===selected?'■':'□'}}{{item}}</cover-view>
       <button class="map_menu_share" open-type="share">分享</button>
-
     </cover-view>
     <!--<canvas canvas-id='canvasSave' class="canvas"></canvas>
       保存图片 -->
@@ -487,10 +486,6 @@
 
     margin: 0rpx 5rpx 10rpx;
   }
-  .selected {
-    border: 2rpx solid #2ab3f3;
-    color: #2ab3f3;
-  }
   .pickerDate {
     z-index: 1000;
     position: absolute;
@@ -533,6 +528,10 @@
     border-radius: 5rpx;
     padding: 3rpx 7rpx;
     border: 2rpx solid #555;
+  }
+  .selected {
+    border: 2rpx solid #2ab3f3;
+    color: #2ab3f3;
   }
   .map_menu_share {
     position: absolute;
