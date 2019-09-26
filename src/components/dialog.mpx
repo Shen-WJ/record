@@ -1,5 +1,5 @@
 <template>
-  <view class='mask' wx:if='{{isShow}}' catchtouchmove='true' catchtap="true" catchtouchstart="true" catchtouchend="true" catchlongpress="true">
+  <view class='mask' wx:if='{{isShow}}' catchtouchmove='true' catchtap="true" catchlongpress="true">
     <view class='modal'>
       <view class='title' wx:if='{{title}}'>{{title}}</view>
       <view class='content'>{{content}}</view>
@@ -75,7 +75,8 @@
         this.triggerEvent('Cancel', myEventDetail, myEventOption)
         this.close()
       },
-      true () {
+      true (e) {
+        console.log('catch true: ', e)
         // 占位置的，省的各种警告
       }
     }
@@ -134,6 +135,7 @@
     background-color: #f6f6f6;
     font-size: 32rpx;
     border-top: 1rpx solid #e6e6e6;
+    z-index: 1;
   }
   
   .cancel {
