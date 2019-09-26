@@ -3,14 +3,14 @@
     setting="{{setting}}"
     latitude="{{latitude}}" longitude="{{longitude}}"
     show-location="{{showLocation}}" enable-scroll="{{enableScroll}}"
-    markers="{{markers}}" polyline="{{polyline}}" include-points="{{includePoints}}"
+    markers="{{markers}}" polyline="{{polyline}}" include-points="{{includePoints}}" circles="{{circles}}"
     bindregionchange="regionChange" bindcallouttap="clickCallout" bindpoitap="clickPoi">
   </map>
   <map wx:else id="map1" class="map" layer-style="1" style="height:{{mapH}}px"
     setting="{{setting}}"
     latitude="{{latitude}}" longitude="{{longitude}}"
     show-location="{{showLocation}}" enable-scroll="{{enableScroll}}"
-    markers="{{markers}}" polyline="{{polyline}}" include-points="{{includePoints}}"
+    markers="{{markers}}" polyline="{{polyline}}" include-points="{{includePoints}}" circles="{{circles}}"
     bindregionchange="regionChange" bindcallouttap="clickCallout" bindpoitap="clickPoi">
   </map>
 </template>
@@ -54,6 +54,10 @@
         value: []
       },
       includePoints: {
+        type: Array,
+        value: []
+      },
+      circles: {
         type: Array,
         value: []
       }

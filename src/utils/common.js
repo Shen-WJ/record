@@ -1,5 +1,6 @@
 import net from './net'
 import { storeUser } from '../stores/storeUser'
+import { storeMode } from '../stores/storeCommon'
 import toMap from '../image/icon/toMap.png'
 
 const app = getApp()
@@ -14,6 +15,10 @@ function _getKilometerDistance (lat1, lng1, lat2, lng2) {
   s = s * 6378.137//  EARTH_RADIUS单位km
   s = Math.round(s * 10000) / 10000.00
   return s
+}
+
+function _getKmDistanceFromPoi (poi1 = {latitude, longitude}, poi2 = {latitude, longitude}) {
+  return _getKilometerDistance(poi1.latitude, poi1.longitude, poi2.latitude, poi2.longitude)
 }
 
 function _getDistanceToMe (lat, lng) {
@@ -122,6 +127,9 @@ function _formatRecordsOnMap ({ list = [], isNeedLine = false, isNeedInclude = f
   // list.reverse()
   let markers = []
   let points = []
+  const darkMode = storeMode.state.darkMode
+  const bgColor = darkMode ? '#222222' : '#f6f6f6'
+  const color = darkMode ? '#cccccc' : '#555555'
   for (let i in list) {
     let item = list[i]
     let callout = ''
@@ -135,13 +143,21 @@ function _formatRecordsOnMap ({ list = [], isNeedLine = false, isNeedInclude = f
       latitude: item.lat,
       longitude: item.lng,
       iconPath: item.headUrl || toMap,
-      width: '40rpx',
-      height: '40rpx',
+      width: '25px',
+      height: '25px',
       label: {
-        content: item.location
+        content: '   ' + item.location,
+        color: '#2ab3f3',
+        fontSize: 14
       },
       callout: {
-        content: callout
+        content: callout,
+        color: color,
+        fontSize: 14,
+        borderWidth: 1,
+        borderColor: '#888',
+        bgColor: bgColor,
+        padding: 2
       }
     })
     if (isNeedLine || isNeedInclude) {
@@ -275,6 +291,7 @@ function _changeStatus ({ type, index, that } = {}) {
 }
 
 export const getKilometerDistance = _getKilometerDistance
+export const getKmDistanceFromPoi = _getKmDistanceFromPoi
 export const getDistanceToMe = _getDistanceToMe
 export const isEmpty = _isEmpty
 export const strToJson = _strToJson

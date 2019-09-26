@@ -4,7 +4,7 @@
     <customMap id="customMap" mapH="{{mapH}}"
       showLocation="{{showLocation}}" latitude="{{firstLatitude}}" longitude="{{firstLongitude}}"
       enableScroll="{{enableScroll}}"
-      markers="{{markers}}" polyline="{{polyline}}" includePoints="{{includePoints}}" 
+      markers="{{markers}}" polyline="{{polyline}}" includePoints="{{includePoints}}" circles="{{circles}}"
       bindregionchange="regionChange">
     </customMap>
     <view class="pickerDate {{darkMode?'bgColorB0 fontColorW1':'bgColorW0 fontColorB1'}} {{isShowPickerDate?'pickerDate_show':''}}">
@@ -56,6 +56,7 @@
         }
       ],
       includePoints: [], // 缩放视野以包含所有给定的坐标点
+      circles: [],
 
       menu: ['三天内', '一周内', '一个月内', '其他时间段'],
       isShowMenu: false,
@@ -91,27 +92,29 @@
           break
         }
         case 'locality': {
-          this.RegionDistance = 0
-          this.enableScroll = false
           if (option.fromShare) {
             common.getLocation({
               success: res => {
                 this.firstLatitude = app.globalData.location.latitude
                 this.firstLongitude = app.globalData.location.longitude
+                this.RegionDistance = 0
+                this.enableScroll = false
                 this.getRequestOnLocality(true)
               }
             })
           } else {
             this.firstLatitude = app.globalData.location.latitude
             this.firstLongitude = app.globalData.location.longitude
+            this.RegionDistance = 0
+            this.enableScroll = false
             this.getRequestOnLocality(true)
           }
           break
         }
         case 'find': {
           if (option.fromShare) {
-            this.latitude = option.latitude
-            this.longitude = option.longitude
+            this.latitude = parseFloat(option.latitude)
+            this.longitude = parseFloat(option.longitude)
           } else {
             this.latitude = app.globalData.location.latitude
             this.longitude = app.globalData.location.longitude
@@ -153,8 +156,8 @@
         query: {
           pageNum: pageNum,
           distance: 20,
-          lng: app.globalData.location.longitude,
-          lat: app.globalData.location.latitude
+          lng: this.firstLongitude,
+          lat: this.firstLatitude
         }
       }).then(data => {
         this.originalRecords = isRefresh ? [] : this.originalRecords
@@ -165,15 +168,22 @@
           list: this.originalRecords,
           isNeedInclude: false
         })
-        this.markers = recordsOnMap.markers
-        
-        if (!this.notFirstIn) { // 第一次进来，自动定位一次
+        this.markers = recordsOnMap.markers || []
 
-          this.notFirstIn = true
+        const lastOne = this.originalRecords[this.originalRecords.length - 1]
+        if (data.data.total > 0) { // 有附近数据才画圆
+          this.createCircles(
+            {
+              latitude: this.firstLatitude,
+              longitude: this.firstLongitude
+            }, {
+              latitude: lastOne.lat,
+              longitude: lastOne.lng
+            }
+          )
         }
         if (data.data.hasNextPage) {
           // 查看是否请求到了边界
-          const lastOne = this.originalRecords[this.originalRecords.length - 1]
           if (common.getDistanceToMe(lastOne.lat, lastOne.lng) < this.RegionDistance) {
             this.getRequestOnLocality(false)
           }
@@ -224,6 +234,14 @@
           distance: 100 // 100km,确保数据少时，能拉取到10条
         }
       }).then(data => {
+        if (data.data.total <= 0) {
+        this.markers = []
+          wx.showToast({
+            title: '这附近没有内容哦，换个地方试试吧～OvO',
+            icon: 'none'
+          })
+          return
+        }
         this.originalRecords = data.data.list
         this.httpsData = data.data
 
@@ -231,11 +249,21 @@
           list: this.originalRecords,
           isNeedInclude: true
         })
-        this.markers = recordsOnMap.markers
+        this.markers = recordsOnMap.markers || []
         if (!this.isIncluded) { // 第一次进来，自动包括一次
-          this.includePoints = recordsOnMap.points
+          this.includePoints = recordsOnMap.points || []
           this.isIncluded = true
         }
+        const lastOne = this.originalRecords[this.originalRecords.length - 1]
+        this.createCircles(
+          {
+            latitude: this.latitude,
+            longitude: this.longitude
+          }, {
+            latitude: lastOne.lat,
+            longitude: lastOne.lng
+          }
+        )
       })
     },
     getRequsetOnMe (type) {
@@ -317,7 +345,17 @@
         this.includePoints = recordsOnMap.points
       })
     },
-
+    createCircles (centerPoi, borderPoi) {
+      const radius = common.getKmDistanceFromPoi(centerPoi, borderPoi)
+      this.circles = [{
+        latitude: centerPoi.latitude,
+        longitude: centerPoi.longitude,
+        fillColor: '#2ab3f322',
+        color: '#0498fa',
+        radius: radius*1000,
+        strokeWidth: 2
+      }]
+    },
     regionChange (e) {
       const change = e.detail
       if (change.type === 'end') {
