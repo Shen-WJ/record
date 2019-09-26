@@ -312,6 +312,8 @@ display: none;
   right: 60rpx;
   bottom: 58px;
   margin-bottom: env(safe-area-inset-bottom);
+  padding: 25rpx;
+  box-sizing: border-box;
 
   width: 100rpx;
   height: 100rpx;

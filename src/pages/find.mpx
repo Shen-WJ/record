@@ -19,7 +19,7 @@
     <template is="recordItem" data="{{record:item, rcdIndex:{section:0, row:row}, rcdType:1, darkMode:darkMode}}"/>
     </block>
 
-    <view class="point themeMode" catchtap="clickToMapPage">地图</view>
+    <image class="point themeMode" src="../image/icon/toMapPage2.png" mode="aspectFit" catchtap="clickToMapPage"></image>
   </view>
   <view class="bottomHolder"/>
 </template>
