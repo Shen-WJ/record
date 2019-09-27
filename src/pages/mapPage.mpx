@@ -85,7 +85,7 @@
             this.type = option.type || 1
             this.startDate = option.startDate || '2019-01-01'
             this.endDate = option.endDate || '2019-01-01'
-            this.getRequsetOnOthers() 
+            this.getRequsetOnOthers()
           } else {
             this.personType === 'others' ? this.getRequsetOnOthers(1) : this.getRequsetOnMe(1)
           }
@@ -133,7 +133,6 @@
             title: '来看看ta的',
             path: '/pages/mapPage?pageType=person&personType=others&fromShare=1&type=' + this.type + '&otherUserId=' + (this.otherUserId || storeUser.state.userId) + '&startDate=' + this.startDate + '&endDate' + this.endDate
           }
-          break
         }
         case 'locality': {
           return {
@@ -241,7 +240,7 @@
         this.createMap()
 
         if (data.data.total <= 0) {
-        this.markers = []
+          this.markers = []
           wx.showToast({
             title: '这附近没有内容哦，换个地方试试吧～OvO',
             icon: 'none'
@@ -374,7 +373,7 @@
         longitude: centerPoi.longitude,
         fillColor: '#2ab3f322',
         color: '#0498fa',
-        radius: radius * 1000  + 100,
+        radius: radius * 1000 + 100,
         strokeWidth: 2
       }]
     },
@@ -460,7 +459,7 @@
     saveImg (e) {
       console.log(e)
       var context = wx.createCanvasContext('canvasSave')
-      context.setStrokeStyle("#00ff00")
+      context.setStrokeStyle('#00ff00')
       context.setLineWidth(5)
       context.rect(0, 0, app.globalData.windowWidth, app.globalData.windowHeight)
       context.stroke()
@@ -471,10 +470,10 @@
             console.log(res)
             wx.saveImageToPhotosAlbum({
               filePath: res.tempFilePath,
-              success:(res)=>{
+              success: (res) => {
                 console.log(res)
               },
-              fail:(err)=>{
+              fail: (err) => {
                 console.log(err)
               }
             })
