@@ -1,12 +1,16 @@
 <template>
-  <navigationBar onlyShowIcon="{{true}}" showHolder="{{false}}"/>
+  <navigationBar onlyShowIcon="{{true}}"/>
   <view class='container'>
-    <customMap id="customMap" mapH="{{mapH}}"
+    <customMap wx:if="{{isShowMap}}" id="customMap" mapH="{{mapH}}"
       showLocation="{{showLocation}}" latitude="{{firstLatitude}}" longitude="{{firstLongitude}}"
       enableScroll="{{enableScroll}}"
       markers="{{markers}}" polyline="{{polyline}}" includePoints="{{includePoints}}" circles="{{circles}}"
       bindregionchange="regionChange">
     </customMap>
+    <cover-view wx:if="{{isShowMapTip}}" class="map_tip" style="top:{{navH}}px">
+      <cover-view class="map_tip_content {{darkMode?'bgColorB0 fontColorW1':'bgColorW0 fontColorB1'}}">{{mapTip}}</cover-view>
+      <cover-view class="map_tip_close {{darkMode?'bgColorB0 fontColorW1':'bgColorW0 fontColorB1'}}" catchtap='clickMapTipClose'>×</cover-view>
+    </cover-view>
     <view class="pickerDate {{darkMode?'bgColorB0 fontColorW1':'bgColorW0 fontColorB1'}} {{isShowPickerDate?'pickerDate_show':''}}">
       <text>选择：从  </text>
       <picker class="{{darkMode?'map_menu_borderB':'map_menu_borderW'}}" mode="date" value="{{startDate}}" start="2019-01-01" end="2029-01-01" bindchange="changeDate" data-type="start">
@@ -36,24 +40,17 @@
 
   const app = getApp()
   const common = require('../utils/common.js')
+  const tipList = ['只能放大缩小，不能拖动哦(去’发现‘页面，玩转可划动的地图)。', '拖动以查看其他地区的内容吧！', '点击底部按钮，看看别的时间段的轨迹吧！']
   // 请求在这一层做，下一层只做数据展示和点击响应
   createPage({
     data: {
       mapH: app.globalData.windowHeight,
       showLocation: true,
-      firstLatitude: app.globalData.location.latitude || 1,
-      firstLongitude: app.globalData.location.longitude || 1,
+      firstLatitude: app.globalData.location.latitude,
+      firstLongitude: app.globalData.location.longitude,
       enableScroll: true,
       markers: [], // 标记点
-      polyline: [
-        {
-          points: [],
-          color: '#2ab3f3',
-          width: 2,
-          arrowLine: true,
-          borderColor: '#000'
-        }
-      ],
+      polyline: [],
       includePoints: [], // 缩放视野以包含所有给定的坐标点
       circles: [],
 
@@ -62,7 +59,12 @@
       selected: 0,
       startDate: '2019-01-01',
       endDate: '2019-01-01',
-      isShowPickerDate: false
+      isShowPickerDate: false,
+
+      isShowMap: false,
+      mapTip: '',
+      isShowMapTip: true,
+      navH: app.globalData.navHeight
     },
     computed: {
       ...storeMode.mapState(['darkMode'])
@@ -70,11 +72,10 @@
     onLoad (option) {
       this.pageType = option.pageType
       this.mapId = storeMode.state.darkMode ? 'map2' : 'map1'
-      this.customMap = this.selectComponent('#customMap')
-      wx.createMapContext(this.mapId, this.customMap).moveToLocation()
 
       switch (this.pageType) {
         case 'person': {
+          this.mapTip = tipList[2]
           this.showLocation = false
           this.isShowMenu = true
           this.otherUserId = parseInt(option.otherUserId) || 0
@@ -91,6 +92,7 @@
           break
         }
         case 'locality': {
+          this.mapTip = tipList[0]
           if (option.fromShare) {
             common.getLocation({
               success: res => {
@@ -111,6 +113,7 @@
           break
         }
         case 'find': {
+          this.mapTip = tipList[1]
           if (option.fromShare) {
             this.latitude = parseFloat(option.latitude)
             this.longitude = parseFloat(option.longitude)
@@ -159,6 +162,8 @@
           lat: this.firstLatitude
         }
       }).then(data => {
+        this.createMap()
+
         this.originalRecords = isRefresh ? [] : this.originalRecords
         this.originalRecords = this.originalRecords.concat(data.data.list)
         this.httpsData = data.data
@@ -233,6 +238,8 @@
           distance: 100 // 100km,确保数据少时，能拉取到10条
         }
       }).then(data => {
+        this.createMap()
+
         if (data.data.total <= 0) {
         this.markers = []
           wx.showToast({
@@ -275,6 +282,8 @@
           endDate: this.endDate
         }
       }).then(data => {
+        this.createMap()
+
         if (data.data.length === 0 || !data.data) {
           wx.showToast({
             title: '该时间段没发布内容呢，换个时间段吧～',
@@ -315,6 +324,8 @@
           endDate: this.endDate
         }
       }).then(data => {
+        this.createMap()
+
         if (data.data.length === 0 || !data.data) {
           wx.showToast({
             title: '该时间段没发布内容呢，换个时间段吧～',
@@ -344,6 +355,18 @@
         this.includePoints = recordsOnMap.points
       })
     },
+    createMap () {
+      if (!this.isMapHasShowed) {
+        this.isMapHasShowed = true
+        this.setData({
+          isShowMap: true
+        }, res => {
+          this.customMap = this.selectComponent('#customMap')
+          // warning: 这里有个风险，可能includePoints与它产生冲突，期望是此处先执行然后是includePoints，理论也是如此
+          wx.createMapContext(this.mapId, this.customMap).moveToLocation()
+        })
+      }
+    },
     createCircles (centerPoi, borderPoi) {
       const radius = common.getKmDistanceFromPoi(centerPoi, borderPoi)
       this.circles = [{
@@ -351,7 +374,7 @@
         longitude: centerPoi.longitude,
         fillColor: '#2ab3f322',
         color: '#0498fa',
-        radius: radius*1000,
+        radius: radius * 1000  + 100,
         strokeWidth: 2
       }]
     },
@@ -431,6 +454,9 @@
         this.getRequsetOnOthers(4)
       }
     },
+    clickMapTipClose () {
+      this.isShowMapTip = false
+    },
     saveImg (e) {
       console.log(e)
       var context = wx.createCanvasContext('canvasSave')
@@ -464,6 +490,28 @@
   .custom_map {
     width: 750rpx;
   }
+  .map_tip {
+    position: fixed;
+    left: 0;
+    width: 750rpx;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .map_tip_content {
+    opacity: 0.8;
+    font-size: 20rpx;
+    padding: 3rpx 10rpx;
+    border-radius: 20rpx;
+  }
+  .map_tip_close {
+    opacity: 0.8;
+    font-size: 20rpx;
+    font-weight: bold;
+    padding: 3rpx 15rpx;
+    border-radius: 20rpx;
+  }
+
   .map_menu {
     z-index: 1001;
     position: fixed;

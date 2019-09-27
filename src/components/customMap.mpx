@@ -1,17 +1,17 @@
 <template>
   <map wx:if="{{darkMode}}" id="map2" class="map" layer-style="2" style="height:{{mapH}}px"
-    setting="{{setting}}"
     latitude="{{latitude}}" longitude="{{longitude}}"
+    subkey="HF6BZ-ZR4CU-SKTVM-BBDQC-ZB5M2-VQB2Q" 
     show-location="{{showLocation}}" enable-scroll="{{enableScroll}}"
     markers="{{markers}}" polyline="{{polyline}}" include-points="{{includePoints}}" circles="{{circles}}"
-    bindregionchange="regionChange" bindcallouttap="clickCallout" bindpoitap="clickPoi">
+    bindregionchange="regionChange" bindcallouttap="clickCallout">
   </map>
   <map wx:else id="map1" class="map" layer-style="1" style="height:{{mapH}}px"
-    setting="{{setting}}"
     latitude="{{latitude}}" longitude="{{longitude}}"
+    subkey="HF6BZ-ZR4CU-SKTVM-BBDQC-ZB5M2-VQB2Q" 
     show-location="{{showLocation}}" enable-scroll="{{enableScroll}}"
     markers="{{markers}}" polyline="{{polyline}}" include-points="{{includePoints}}" circles="{{circles}}"
-    bindregionchange="regionChange" bindcallouttap="clickCallout" bindpoitap="clickPoi">
+    bindregionchange="regionChange" bindcallouttap="clickCallout">
   </map>
 </template>
 
@@ -63,15 +63,6 @@
       }
     },
     data: {
-      setting: {
-        subkey: 'HF6BZ-ZR4CU-SKTVM-BBDQC-ZB5M2-VQB2Q',
-        enableZoom: true, // 是否支持缩放
-        enableRotate: false, // 是否支持旋转
-        enable3D: false, // 展示3D楼块(工具暂不支持）
-        enableOverlooking: false, // 开启俯视
-        enableSatellite: false, // 是否开启卫星图
-        enableTraffic: false // 是否开启实时路况
-      }
     },
     computed: {
       ...storeMode.mapState(['darkMode'])
@@ -86,9 +77,6 @@
         wx.navigateTo({
           url: './recordDetail?recordId=' + e.markerId
         })
-      },
-      clickPoi (e) {
-        console.log('clickPoi', e)
       },
       regionChange (e) {
         this.triggerEvent('regionchange', e, {})

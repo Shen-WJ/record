@@ -100,16 +100,17 @@
       } else {
         getData(this)
       }
-
-      let menuButtonObject = wx.getMenuButtonBoundingClientRect()
+      // 因为此接口的bug，直到微信7.0.7才修复，故暂时弃用
+      // let menuButtonObject = wx.getMenuButtonBoundingClientRect()
       wx.getSystemInfo({
         success: (res) => {
           console.log(res)
           let statusBarHeight = res.statusBarHeight
-          let navTop = menuButtonObject.top
-          let navHeight = statusBarHeight + menuButtonObject.height + (menuButtonObject.top - statusBarHeight) * 2
-          this.globalData.navHeight = navHeight
-          this.globalData.navTop = navTop
+          // let navTop = menuButtonObject.top
+          // let navHeight = statusBarHeight + menuButtonObject.height + (menuButtonObject.top - statusBarHeight) * 2
+          // this.globalData.navHeight = navHeight
+          this.globalData.navHeight = statusBarHeight + 46
+          // this.globalData.navTop = navTop
           this.globalData.statusBarHeight = statusBarHeight
           this.globalData.windowHeight = res.windowHeight
           this.globalData.windowWidth = res.windowWidth

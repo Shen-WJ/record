@@ -1,22 +1,26 @@
 <template>
-  <view wx:if="{{!onlyShowIcon}}" class="navbar {{navBarClass}}" style='height:{{navH}}px'>
-    <view wx:if="{{showBackIcon}}" class='navbar-icon'>
-      <image class="navbar-icon-image" src='{{navBackIcon}}' mode='aspectFit' bindtap='navBack'></image>
-      <view class="navbar-icon-view {{darkMode?'bgColorW0':'bgColorB0'}}"></view>
-      <image class="navbar-icon-image" src='{{navHomeIcon}}' mode='aspectFit' bindtap='navHome'></image>
+  <block wx:if="{{!onlyShowIcon}}">
+    <view class="navbar {{navBarClass}}" style='height:{{navH}}px'>
+      <view wx:if="{{showBackIcon}}" class='navbar-icon'>
+        <image class="navbar-icon-image" src='{{navBackIcon}}' mode='aspectFit' bindtap='navBack'></image>
+        <view class="navbar-icon-view {{darkMode?'bgColorW0':'bgColorB0'}}"></view>
+        <image class="navbar-icon-image" src='{{navHomeIcon}}' mode='aspectFit' bindtap='navHome'></image>
+      </view>
+      <view class="navbar-title {{darkMode?'fontColorW0':'fontColorB0'}}">
+        {{pageName}}
+      </view>
     </view>
-    <view class="navbar-title {{darkMode?'fontColorW0':'fontColorB0'}}">
-      {{pageName}}
-    </view>
-  </view>
-  <cover-view wx:else class='navbar-icon' style="top:{{navH-5-34}}px">
-    <cover-image wx:if="{{navBackIcon}}" class="navbar-icon-image" src='{{navBackIcon}}' mode='aspectFit' bindtap='navBack'></cover-image>
-    <cover-view class="navbar-icon-view {{darkMode?'bgColorW0':'bgColorB0'}}"></cover-view>
-    <cover-image wx:if="{{navHomeIcon}}" class="navbar-icon-image" src='{{navHomeIcon}}' mode='aspectFit' bindtap='navHome'></cover-image>
-  </cover-view>
-  <view wx:if="{{showHolder}}" class="navbar_holder" style="height:{{navH}}px"></view>
-  <view class="coverPage {{darkMode?'darkMode':'dayMode'}}" style="{{showCoverImg?'opacity:'+opacity:''}}"/>
-  <image wx:if="{{coverImg.length>0}}" class="coverImg" mode='aspectFill' src="{{coverImg}}"/>
+    <view class="navbar_holder" style="height:{{navH}}px"></view>
+    <view class="coverPage {{darkMode?'darkMode':'dayMode'}}" style="{{showCoverImg?'opacity:'+opacity:''}}"/>
+    <image wx:if="{{coverImg.length>0}}" class="coverImg" mode='aspectFill' src="{{coverImg}}"/>
+  </block>
+  <block wx:else>
+    <cover-view class='navbar-icon-onlyShow' style="top:{{navH-5-34}}px">
+      <cover-image wx:if="{{navBackIcon}}" class="navbar-icon-image" src='{{navBackIcon}}' mode='aspectFit' bindtap='navBack'></cover-image>
+      <cover-view class="navbar-icon-view {{darkMode?'bgColorW0':'bgColorB0'}}"></cover-view>
+      <cover-image wx:if="{{navHomeIcon}}" class="navbar-icon-image" src='{{navHomeIcon}}' mode='aspectFit' bindtap='navHome'></cover-image>
+    </cover-view>
+  </block>
 </template>
 
 <script>
@@ -40,10 +44,6 @@
       showThemeBgColor: {
         type: Boolean,
         value: false
-      },
-      showHolder: {
-        type: Boolean,
-        value: true
       },
       onlyShowIcon: {
         type: Boolean,
@@ -128,6 +128,15 @@
   .navbar-icon {
     position: absolute;
     bottom: 10rpx;
+    left: 10rpx;
+    height: 34px;
+    box-sizing: border-box;
+    display: flex;
+    z-index: 1000;
+  }
+
+  .navbar-icon-onlyShow {
+    position: fixed;
     left: 10rpx;
     height: 34px;
     box-sizing: border-box;
