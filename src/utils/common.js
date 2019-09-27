@@ -17,8 +17,8 @@ function _getKilometerDistance (lat1, lng1, lat2, lng2) {
   return s
 }
 
-function _getKmDistanceFromPoi ({ latitude1, longitude1 }, { latitude2, longitude2 }) {
-  return _getKilometerDistance(latitude1, longitude1, latitude2, longitude2)
+function _getKmDistanceFromPoi (poi1 = {}, poi2 = {}) {
+  return _getKilometerDistance(poi1.latitude, poi1.longitude, poi2.latitude, poi2.longitude)
 }
 
 function _getDistanceToMe (lat, lng) {

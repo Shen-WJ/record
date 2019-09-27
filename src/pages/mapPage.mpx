@@ -217,7 +217,7 @@
         }
 
         this.originalRecords = this.originalRecords || []
-        this.originalRecords = this.originalRecords.concat(data.data.list)
+        this.originalRecords = this.originalRecords.concat(data.data)
 
         let recordsOnMap = common.formatRecordsOnMap({
           list: this.originalRecords,
@@ -423,8 +423,11 @@
         case 0:
         case 1:
         case 2: {
-          this.selected = index
           this.isShowPickerDate = false
+
+          if (this.selected === index) return
+
+          this.selected = index
           if (this.personType === 'me') {
             this.getRequsetOnMe(++index)
           } else {
@@ -433,7 +436,7 @@
           break
         }
         case 3: {
-          this.isShowPickerDate = true
+          this.isShowPickerDate = !this.isShowPickerDate
         }
       }
     },
@@ -549,7 +552,7 @@
     transition: .3s;
   }
   .pickerDate_show {
-    opacity: 0.9;
+    opacity: 1;
     transform: translateY(0%);
   }
   .pickerDate picker {
