@@ -149,7 +149,7 @@ export const behaviorOnPeople = Behavior({
       let timer1 = setTimeout(() => {
         clearTimeout(timer1)
         this.animationOnHead(1)
-      }, 3000)
+      }, 1500)
     },
     animationOnHead (type) {
       let exports = []

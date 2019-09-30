@@ -8,7 +8,7 @@
 
   createPage({
     data: {
-      counter: 2
+      counter: 1
     },
     onLoad () {
       this.timer = setInterval(() => {
