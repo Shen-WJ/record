@@ -102,7 +102,7 @@
         case 'choose': {
           wx.chooseImage({
             sourceType: ['camera', 'album'],
-            sizeType: ['original', 'compressed'],
+            sizeType: ['compressed'], // 不能用原图，原图过大时，加载页面会有闪烁，体验极差
             count: 1,
             success: (res) => {
               console.log(res.tempFilePaths[0])
