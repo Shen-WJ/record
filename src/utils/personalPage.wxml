@@ -29,7 +29,7 @@
         <button class="me_hd_share me_hd_btn" hover-class="me_hd_touch_btn" open-type="share" id="shareOtherPeople">分享</button>
       </block>
       <block wx:for="{{animations}}" wx:key="{{index}}">
-        <view class="me_hd_element{{index}}" animation="{{animations[index]}}">{{animationsText[index]}}</view>
+        <view class="me_hd_element me_hd_element{{index}}" animation="{{animations[index]}}">{{animationsText[index]}}</view>
       </block>
     </image>
   </view>

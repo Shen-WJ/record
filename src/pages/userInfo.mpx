@@ -57,8 +57,8 @@
                 this.isShowDialog = true
               } else {
                 wx.showModal({
-                  title: '确定更新头像？',
-                  content: '点击“确定”以使用当前微信头像。(由于微信后台的延迟，新头像可能无法及时获取。如此，请过几小时再试。)',
+                  title: '确定更换头像？',
+                  content: '将更换为当前微信使用的头像。(由于微信后台的延迟，新头像可能无法及时获取。如此，请过几小时再试。)',
                   confirmColor: '#2ab3f3',
                   success: (res) => {
                     if (res.confirm) {
@@ -92,7 +92,7 @@
           wx.showActionSheet({
             itemList: ['男', '女'],
             success: res => {
-              const sex = (res.tapIndex + 1).toString()
+              const sex = res.tapIndex + 1
               net.reqPut({
                 url: 'user/info/sexUpdate',
                 body: {

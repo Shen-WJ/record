@@ -19,6 +19,17 @@ export const behaviorOnPeople = Behavior({
     onLoad: function (option) {
       if (option.otherUserId) { // otherPeople
         this.otherUserId = parseInt(option.otherUserId)
+        if (this.otherUserId < 10000) { // userId不合法，如匿名
+          wx.navigateBack({
+            delta: 1,
+            fail: (res) => {
+              wx.switchTab({
+                url: './locality'
+              })
+            }
+          })
+          return
+        }
         this.getRequest(true)
         this.isShowFollowBtn = storeUser.state.userId !== this.otherUserId
       } else { // me
@@ -179,7 +190,7 @@ export const behaviorOnPeople = Behavior({
       } else {
         for (let i = 0; i < elements.length; i++) {
           let animation = elements[i]
-          animation.left('325rpx').top('75rpx').step()
+          animation.left('325rpx').top('65rpx').step()
           exports.push(animation.export())
         }
         this.isAnimating = false
@@ -221,7 +232,7 @@ export const behaviorOnPeople = Behavior({
         itemList: sheet,
         success: res => {
           if (res.tapIndex === 0) {
-            const status = (isAnonymous ? 0 : 1).toString()
+            const status = isAnonymous ? 0 : 1
             wx.showModal({
               title: `确认${(isAnonymous ? '取消' : '')}匿名？`,
               content: `点击以确认${(isAnonymous ? '取消' : '')}匿名`,
