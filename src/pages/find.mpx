@@ -116,8 +116,10 @@
         if (data.data.total > 0) {
           records = records.concat(common.getRecordListFrom(data.data.list))
           this.httpsData = data.data
-        } else if (this.distanceIndex !== 5) { // 无数据则选择全网
+        } else if (!this.hasFirstAutoChange && (this.distanceIndex !== 5 || this.sortIndex !== 2)) { // 无数据则选择全网最新，仅执行一次
           this.distanceIndex = 5
+          this.sortIndex = 2
+          this.hasFirstAutoChange = true
           this.getRequest(true)
         }
         this.recordList.splice(0, 1, records)
