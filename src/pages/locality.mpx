@@ -48,7 +48,7 @@
     },
 
     onLoad: function (options) {
-      wx.canIUse("hideTabBar") && wx.hideTabBar()
+      wx.canIUse('hideTabBar') && wx.hideTabBar()
 
       common.getLocation({
         success: (res) => {

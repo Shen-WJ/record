@@ -32,7 +32,7 @@
       ...storeMode.mapState(['darkMode'])
     },
     onLoad: function () {
-      wx.canIUse("hideTabBar") && wx.hideTabBar()
+      wx.canIUse('hideTabBar') && wx.hideTabBar()
 
       this.getRequest(true)
     },

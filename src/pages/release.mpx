@@ -102,7 +102,7 @@
     },
 
     onLoad: function (options) {
-      wx.canIUse("hideTabBar") && wx.hideTabBar()
+      wx.canIUse('hideTabBar') && wx.hideTabBar()
 
       this.privateTypeIndexTemp = 0
 

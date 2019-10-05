@@ -33,7 +33,7 @@ export const behaviorOnPeople = Behavior({
         this.getRequest(true)
         this.isShowFollowBtn = storeUser.state.userId !== this.otherUserId
       } else { // me
-        wx.canIUse("hideTabBar") && wx.hideTabBar()
+        wx.canIUse('hideTabBar') && wx.hideTabBar()
 
         this.getRequest(true)
       }
