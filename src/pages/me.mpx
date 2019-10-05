@@ -8,6 +8,7 @@
     isShowDialog:isShowDialog, isShowNoticeRedDot:isShowNoticeRedDot,
     noticeCount:noticeCount, followCount:followCount, followedCount:followedCount, signature:signature, headUrl:headUrl, nickname:nickname, genderImg:genderImg}}">
   </template>
+  <tabbar selected="4" />
   <view class="bottomHolder"/>
 </template>
 
@@ -46,12 +47,6 @@
     },
     onShow: function () {
       this.clickHead()
-
-      if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-        this.getTabBar().setData({
-          selected: 4
-        })
-      }
 
       if (!storeUser.state.hasHadUserInfo) { // 无则判断授权
         wx.getSetting({
@@ -247,7 +242,8 @@
     "enablePullDownRefresh": true,
     "usingComponents": {
       "dialog": "../components/dialog",
-      "navigationBar": "../components/navigationBar"
+      "navigationBar": "../components/navigationBar",
+      "tabbar": "../components/tabbar"
     }
   }
 </script>

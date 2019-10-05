@@ -10,6 +10,7 @@
       </block>
     </view>
   </view>
+  <tabbar selected="3" />
   <view class="bottomHolder"/>
 </template>
 
@@ -31,14 +32,11 @@
       ...storeMode.mapState(['darkMode'])
     },
     onLoad: function () {
+      wx.canIUse("hideTabBar") && wx.hideTabBar()
+
       this.getRequest(true)
     },
     onShow: function () {
-      if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-        this.getTabBar().setData({
-          selected: 3
-        })
-      }
     },
     getRequest: function (isRefresh) {
       let pageNum = isRefresh ? 0 : this.httpsData.nextPage
@@ -74,7 +72,8 @@
   {
     "enablePullDownRefresh": true,
     "usingComponents": {
-      "navigationBar": "../components/navigationBar"
+      "navigationBar": "../components/navigationBar",
+      "tabbar": "../components/tabbar"
     }
   }
 </script>

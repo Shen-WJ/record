@@ -26,10 +26,13 @@
     options: {
       styleIsolation: 'shared'
     },
-    properties: { // 自定义tabbar目前不支持外界直接控制传值
+    properties: {
+      selected: {
+        type: Number,
+        value: 0
+      }
     },
     data: {
-      selected: 0,
       color: '#7A7E83',
       selectedColor: '#2ab3f3',
       list: [
@@ -71,9 +74,6 @@
         const data = e.currentTarget.dataset
         const url = data.path
         wx.switchTab({ url })
-        this.setData({
-          selected: data.index
-        })
       }
     }
   })

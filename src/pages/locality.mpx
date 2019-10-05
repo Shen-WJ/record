@@ -18,6 +18,7 @@
     <template is="emptyView" data="{{isShow: isReachBottom, type: 1, textArr:['已经到底啦！去','发现','查看更多内容吧～0v0']}}"/>
     <image class="point themeMode" src="../image/icon/toMapPage.png" mode="aspectFit" catchtap="clickToMapPage"></image>
   </view>
+  <tabbar selected="0" />
   <view class="bottomHolder"/>
 </template>
 
@@ -47,6 +48,8 @@
     },
 
     onLoad: function (options) {
+      wx.canIUse("hideTabBar") && wx.hideTabBar()
+
       common.getLocation({
         success: (res) => {
           this.getRequest(true)
@@ -60,12 +63,6 @@
     },
 
     onShow: function () {
-      if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-        this.getTabBar().setData({
-          selected: 0
-        })
-      }
-
       // 非第一次请求才需要做比较
       if (!common.isEmpty(this.pageLocation)) {
         if (common.getDistanceToMe(this.pageLocation.latitude, this.pageLocation.longitude) > 1) {
@@ -172,7 +169,8 @@
   {
     "enablePullDownRefresh": true,
     "usingComponents": {
-      "navigationBar": "../components/navigationBar"
+      "navigationBar": "../components/navigationBar",
+      "tabbar": "../components/tabbar"
     }
   }
 </script>

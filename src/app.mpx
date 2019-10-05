@@ -177,7 +177,6 @@
       "navigationStyle": "custom"
     },
     "tabBar": {
-      "custom": true,
       "color": "#7A7E83",
       "selectedColor": "#2ab3f3",
       "borderStyle": "black",
@@ -205,7 +204,7 @@
           "pagePath": "pages/following",
           "text": "关注",
           "iconPath": "image/tabBar/following.png",
-          "selectedIconPath": "image/tabBar/following.png"
+          "selectedIconPath": "image/tabBar/following1.png"
         },
         {
           "pagePath": "pages/me",
