@@ -15,17 +15,17 @@
         <text>修改背景图</text>
         <image src="../image/icon/arrow_right.png" />
       </view>
+      <button class="hided" open-type="feedback" id="feedbackBtn"/>
+      <label for="feedbackBtn">
+        <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
+          <text>建议与反馈</text>
+          <image src="../image/icon/arrow_right.png" />
+        </view>
+      </label>
       <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToSome" data-type="about">
         <text>关于</text>
         <image src="../image/icon/arrow_right.png" />
       </view>
-      <button class="hided" open-type="feedback" id="feedbackBtn"/>
-      <label for="feedbackBtn">
-        <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
-          <text>反馈/建议</text>
-          <image src="../image/icon/arrow_right.png" />
-        </view>
-      </label>
     </view>
     <view wx:elif="{{pageType === 'bgImg'}}" class="table1">
       <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickBgImgOf" data-type="choose">
@@ -37,8 +37,17 @@
         <image src="../image/icon/arrow_right.png" />
       </view>
       <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
-        <text>黑色/白色<text class="sub_desc">  开-黑色，关-白色</text></text>
-        <switch class="switch" checked="{{darkMode}}" bindchange="clickBgImgOf" data-type="theme"></switch>
+        <text>主题皮肤</text>
+        <view class="select_theme">
+          <view class="select_item" style="border:2rpx solid #{{darkMode ? '2ab3f3': '888'}}" bindtap="selectTheme" data-index="0">
+            <view class="select_icon" style="opacity:{{darkMode ? 1: 0}}"></view>
+            <view class="select_text" style="color:#{{darkMode ? '2ab3f3': '888'}}">黑</view>
+          </view>
+          <view class="select_item" style="border:2rpx solid #{{!darkMode ? '2ab3f3': '888'}}" bindtap="selectTheme" data-index="1">
+            <view class="select_icon" style="opacity:{{!darkMode ? 1: 0}}"></view>
+            <view class="select_text" style="color:#{{!darkMode ? '2ab3f3': '888'}}">白</view>
+          </view>
+        </view>
       </view>
       <view class="slider_cell settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
         <text>更改透明度</text>
@@ -129,6 +138,12 @@
         }
       }
     },
+    selectTheme: function (e) {
+      const index = parseInt(e.currentTarget.dataset.index)
+      storeMode.commit('openDarkMode', {
+        isOpen: index === 0
+      })
+    },
     sliderChange: function (e) {
       storeMode.commit('updateOpacity', {
         opacity: e.detail.value * 0.1
@@ -138,10 +153,7 @@
 </script>
 
 <style>
-  .container {}
-  .settings_cell {
-  }
-  .settings_cell image{
+  .settings_cell image {
     position: relative;
     top: 50%;
     width: 40rpx;
@@ -160,7 +172,27 @@
     padding: 20rpx;
     border-radius: 10rpx;
   }
-  .slider_opacity {
+
+  .select_theme {
+    display: flex;
+  }
+  .select_item {
+    border-radius: 7rpx;
+    margin-right: 10rpx;
+    padding: 3rpx 10rpx;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    font-size: 26rpx;
+  }
+  .select_icon {
+    width: 15rpx;
+    height: 15rpx;
+    border-radius: 50%;
+    background-color: #2ab3f3;
+    margin-right: 10rpx;
   }
 </style>
 

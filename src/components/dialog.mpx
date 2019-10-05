@@ -1,6 +1,6 @@
 <template>
   <view class='mask' wx:if='{{isShow}}' catchtouchmove='true' catchtap="true" catchlongpress="true">
-    <view class='modal'>
+    <view class="modal {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
       <view class='title' wx:if='{{title}}'>{{title}}</view>
       <view class='content'>{{content}}</view>
       <view wx:if={{showAllBtn}} class='btns'>
@@ -16,7 +16,12 @@
 
 <script>
   import { createComponent } from '@mpxjs/core'
+  import { storeMode } from '../stores/storeCommon'
+
   createComponent({
+    options: {
+      styleIsolation: 'shared'
+    },
     properties: {
       // 是否显示
       isShow: {
@@ -56,6 +61,9 @@
       // bindCancel 在HTML使用该属性可将 使用页面 的函数绑定到取消按钮的事件当中去
     },
     data: {
+    },
+    computed: {
+      ...storeMode.mapState(['darkMode', 'opacity'])
     },
     methods: {
       close: function () {
@@ -97,7 +105,6 @@
   
   .modal {
     width: 580rpx;
-    background-color: #fff;
     border-radius: 8rpx;
     position: absolute;
     left: 50%;
@@ -107,17 +114,16 @@
   
   .title {
     font-size: 32rpx;
-    color: #0e0e0e;
     text-align: center;
     line-height: 105rpx;
     margin: 0 20rpx;
     box-sizing: border-box;
-    border-bottom: 1rpx solid #e6e6e6;
+    border-bottom: 1rpx solid #999;
     font-weight: 700;
   }
   
   .content {
-    color: #878787;
+    color: #888;
     font-size: 28rpx;
     line-height: 47rpx;
     white-space: pre-wrap;
@@ -132,19 +138,20 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #f6f6f6;
     font-size: 32rpx;
-    border-top: 1rpx solid #e6e6e6;
+    border-top: 1rpx solid #999;
     z-index: 1;
   }
   
   .cancel {
+    background-color: transparent;
     line-height: 100rpx;
     flex-grow: 1;
-    border-right: 1rpx solid #e6e6e6;
+    border-right: 1rpx solid #999;
   }
   
   .success {
+    background-color: transparent;
     line-height: 100rpx;
     flex-grow: 1;
     color: #2ab3f3;

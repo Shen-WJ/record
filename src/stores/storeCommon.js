@@ -19,6 +19,7 @@ export const storeMode = createStore({
     updateCoverImg (state, { imgUrl = '' }) {
       // 无图将重置为不透明，有图会辅助重置数据
       if (imgUrl.length <= 0) {
+        wx.setStorageSync('opacity', 1)
         state.opacity = 1
       } else if (state.opacity === 1 && imgUrl.length > 0) {
         wx.setStorageSync('opacity', 0.7)

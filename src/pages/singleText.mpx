@@ -7,9 +7,9 @@
       <template is="userAgreement" data="{{darkMode:darkMode}}" />
     </block>
     <block wx:elif="{{pageType == 'about'}}">
-      <view class="about_content {{darkMode?'fontColorW1':'fontColorB1'}}">
+      <view class="about_content {{darkMode?'fontColorW2':'fontColorB2'}}">
         <image class="about_logo" src="../image/launch.jpeg" mode="aspectFill" />
-        <text>基于定位的社交APP（暂定名称，途说）</text>
+        <text>点迹  v1.2.0</text>
       </view>
       <view class="cell1 about_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToUserAgreement" data-type="userAgreement">
         <text>用户协议</text>
@@ -58,18 +58,21 @@
   .container {
     margin: 20rpx;
   }
-  .about_content{
-    margin: 20rpx 60rpx 10rpx 60rpx;
-    font-size: 30rpx;
-    font-weight: normal;
-    text-indent: 2em;
+  .about_content {
+    margin-bottom: 60rpx;
   }
-  .about_logo {
-    display: block;
-    position: absolute;
-    left: 300rpx;
+  .about_content image {
+    margin: 100rpx 280rpx 40rpx;
+
     height: 150rpx;
     width: 150rpx;
+    border-radius: 20%;
+  }
+  .about_content text {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 26rpx;
   }
   .about_cell {
   }
