@@ -1,14 +1,14 @@
 <template>
-  <view class='mask' wx:if='{{isShow}}' catchtouchmove='true' catchtap="true" catchlongpress="true">
-    <view class="modal {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
-      <view class='title' wx:if='{{title}}'>{{title}}</view>
-      <view class='content'>{{content}}</view>
-      <view wx:if={{showAllBtn}} class='btns'>
-        <button class='cancel' bindtap='Cancel' wx:if='{{showCancel}}'>取消</button>
-        <button wx:if="{{open_type === 'contact'}}" class='success' bindcontact='Success' open-type='{{open_type}}'>{{confirmText}}</button>
-        <button wx:elif="{{open_type === 'getUserInfo'}}" class='success' bindgetuserinfo='Success' open-type='{{open_type}}'>{{confirmText}}</button>
-        <button wx:elif="{{open_type === 'getPhoneNumber'}}" class='success' bindgetphonenumber='Success' open-type='{{open_type}}'>{{confirmText}}</button>
-        <button wx:else class='success' bindtap='Success' open-type='{{open_type}}'>{{confirmText}}</button>
+  <view class='dialog_mask' wx:if='{{isShow}}' catchtouchmove='true' catchtap="true" catchlongpress="true">
+    <view class="dialog_modal {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
+      <view class='dialog_title' style="border-bottom: 1rpx solid #{{darkMode?'333':'eee'}};" wx:if='{{title}}'>{{title}}</view>
+      <view class='dialog_content'>{{content}}</view>
+      <view wx:if={{showAllBtn}} class='dialog_btns' style="border-top: 1rpx solid #{{darkMode?'333':'eee'}};">
+        <button class='dialog_cancel' style="border-right: 1rpx solid #{{darkMode?'333':'eee'}};" bindtap='Cancel' wx:if='{{showCancel}}'>{{cancelText}}</button>
+        <button wx:if="{{open_type === 'contact'}}" class='dialog_success' bindcontact='Success' open-type='{{open_type}}'>{{confirmText}}</button>
+        <button wx:elif="{{open_type === 'getUserInfo'}}" class='dialog_success' bindgetuserinfo='Success' open-type='{{open_type}}'>{{confirmText}}</button>
+        <button wx:elif="{{open_type === 'getPhoneNumber'}}" class='dialog_success' bindgetphonenumber='Success' open-type='{{open_type}}'>{{confirmText}}</button>
+        <button wx:else class='dialog_success' bindtap='Success' open-type='{{open_type}}'>{{confirmText}}</button>
       </view>
     </view>
   </view>
@@ -52,6 +52,10 @@
         type: String,
         value: '确定'
       },
+      cancelText: {
+        type: String,
+        value: '取消'
+      },
       // 确认按钮的open-type
       open_type: {
         type: String,
@@ -74,13 +78,13 @@
       Success: function (e) {
         var myEventDetail = e // detail对象，提供给事件监听函数
         var myEventOption = {} // 触发事件的选项
-        this.triggerEvent('Success', myEventDetail, myEventOption)
+        this.triggerEvent('success', myEventDetail, myEventOption)
         this.close()
       },
       Cancel: function (e) {
         var myEventDetail = e // detail对象，提供给事件监听函数
         var myEventOption = {} // 触发事件的选项
-        this.triggerEvent('Cancel', myEventDetail, myEventOption)
+        this.triggerEvent('cancel', myEventDetail, myEventOption)
         this.close()
       },
       true (e) {
@@ -93,7 +97,7 @@
 
 <style >
   .container {} 
-  .mask {
+  .dialog_mask {
     background-color: rgba(0, 0, 0, 0.7);
     position: fixed;
     left: 0;
@@ -103,7 +107,7 @@
     z-index: 9000;
   }
   
-  .modal {
+  .dialog_modal {
     width: 580rpx;
     border-radius: 8rpx;
     position: absolute;
@@ -112,17 +116,16 @@
     transform: translate(-50%, -50%);
   }
   
-  .title {
+  .dialog_title {
     font-size: 32rpx;
     text-align: center;
     line-height: 105rpx;
     margin: 0 20rpx;
     box-sizing: border-box;
-    border-bottom: 1rpx solid #999;
     font-weight: 700;
   }
   
-  .content {
+  .dialog_content {
     color: #888;
     font-size: 28rpx;
     line-height: 47rpx;
@@ -132,25 +135,24 @@
     letter-spacing: 1rpx;
   }
   
-  .btns {
+  .dialog_btns {
     height: 100rpx;
     text-align: center;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 32rpx;
-    border-top: 1rpx solid #999;
     z-index: 1;
   }
   
-  .cancel {
+  .dialog_cancel {
+    color: inherit;
     background-color: transparent;
     line-height: 100rpx;
     flex-grow: 1;
-    border-right: 1rpx solid #999;
   }
   
-  .success {
+  .dialog_success {
     background-color: transparent;
     line-height: 100rpx;
     flex-grow: 1;

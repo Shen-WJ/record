@@ -48,7 +48,7 @@
     </view>
     <button class="bottom_btn" bindtap="clickBtnRelease">发布</button>
 
-    <dialog isShow="{{isShowDialog}}" title='发布需要头像/昵称' content='在这里，留下你的点滴痕迹。没有头像/昵称可没法发布哦' showCancel="{{false}}" confirmText="去授权" open_type="getUserInfo" bindSuccess='authorizeUserInfo'></dialog>
+    <dialog isShow="{{isShowDialog}}" title='发布需要头像/昵称' content='在这里，留下你的点滴痕迹。没有头像/昵称可没法发布哦' showCancel="{{false}}" confirmText="去授权" open_type="getUserInfo" bindsuccess='authorizeUserInfo'></dialog>
     <dialog isShow="{{!authRelease.canRelease}}" showAllBtn="{{false}}" title='您已被封禁' content="{{'由于您发布了违规信息，已被禁止使用发布，剩余' + authRelease.leftTime}}"></dialog>
   </view>
   <view class="bottomHolder"/>

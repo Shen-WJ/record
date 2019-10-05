@@ -1,5 +1,5 @@
 <template>
-  <navigationBar pageName="{{pageName}}"/>
+  <navigationBar pageName="{{pageName}}" isCustomBack="{{isCustomBack}}" bindback="navBack" bindhomw="navBack"/>
 
   <view class="container">
     <textarea wx:if="{{pageType === 'report' || pageType === 'signature'}}" class="report_area {{darkMode?'fontColorW1':'fontColorB1'}}" value="{{contentText}}" bindinput="textInput" maxlength="{{contentTextLength}}" placeholder="{{placeHolder}}" placeholder-style="{{darkMode?'color:#555;':'color:#aaa;'}}"/>
@@ -10,6 +10,8 @@
     </view>
 
     <button class="bottom_btn" bindtap="clickBtnSend">{{btnName}}</button>
+
+    <dialog isShow="{{isShowDialog}}" title='是否保存' content="是否保存修改？" cancelText="不保存" confirmText="保存" bindsuccess="clickSave" bindcancel="clickCancelSave"></dialog>
   </view>
 </template>
 
@@ -28,7 +30,9 @@
       contentTextCount: 0,
       pageType: '',
       btnName: '',
-      placeHolder: '请输入...'
+      placeHolder: '请输入...',
+      isCustomBack: true,
+      isShowDialog: false
     },
     computed: {
       ...storeMode.mapState(['darkMode']),
@@ -48,6 +52,8 @@
     },
 
     onLoad: function (options) {
+      this.hasChanged = false
+
       this.pageType = options.pageType
       switch (options.pageType) {
         case 'report': {
@@ -56,6 +62,8 @@
           this.contentTextLength = 140
           this.btnName = '举报'
           this.placeHolder = '告诉我们举报的原因吧，我们将第一时间解决'
+
+          this.isCustomBack = false
           break
         }
         case 'nickname': {
@@ -76,11 +84,12 @@
     },
 
     textInput: function (e) {
+      this.hasChanged = true
       this.contentText = e.detail.value
       this.contentTextCount = e.detail.value.length
     },
 
-    clickBtnSend: function (e) {
+    clickBtnSend: function () {
       if (this.contentText.length <= 0 && this.pageType !== 'signature') {
         wx.showToast({
           title: '不得为空',
@@ -153,6 +162,27 @@
           })
         }
       }
+    },
+
+    navBack: function () {
+      if (this.hasChanged) {
+        this.isShowDialog = true
+      } else {
+        this.clickCancelSave()
+      }
+    },
+    clickSave () {
+      this.clickBtnSend()
+    },
+    clickCancelSave () {
+      wx.navigateBack({
+        delta: 1,
+        fail: (res) => {
+          wx.switchTab({
+            url: './locality'
+          })
+        }
+      })
     }
   })
 </script>
@@ -201,6 +231,7 @@
 <script  type='application/json'>
   {
     "usingComponents": {
+      "dialog": "../components/dialog",
       "navigationBar": "../components/navigationBar"
     }
   }

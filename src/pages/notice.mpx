@@ -8,7 +8,7 @@
         <view class="notice_cell_title {{darkMode?'fontColorW0':'fontColorB0'}}">
           <text >给用户的第一封信</text><text class="notice_cell_tag">置顶</text>
         </view>
-        <text class="notice_cell_time fontColorC">2019-8-20</text>
+        <text class="notice_cell_time fontColorC0">2019-8-20</text>
         <text class="notice_cell_content {{darkMode?'fontColorW2':'fontColorB2'}}">欢迎来到这个与你有关的虚拟世界，可爱的陌生人。
         你现在在哪里呀？想些什么呢？我猜猜哈。
         你可能刚下高速、火车、飞机，亦或正准备离开一个美妙/简单的城。前者让你满心期待，后者让你依依不舍。可这样的感情，不记录下来，会很容易溜走的。以后你会忘了发现这座青石古桥时的欣喜，忘记曾在某个街角遇到可爱的流浪猫一家时融化的心，忘记在夏日最炎热的那个下午吹到的最凉爽的风吃过的最棒的炒冰。
@@ -19,7 +19,7 @@
         <view class="cell notice_cell">
           <view wx:if="{{!item.isRead}}" class="notice_cell_redDot"></view>
           <text class="notice_cell_title {{darkMode?'fontColorW0':'fontColorB0'}}">{{item.title}}</text>
-          <text class="notice_cell_time fontColorC">{{item.timeStr}}</text>
+          <text class="notice_cell_time fontColorC0">{{item.timeStr}}</text>
           <text class="notice_cell_content {{darkMode?'fontColorW2':'fontColorB2'}}">{{item.content}}</text>
         </view>
       </block>

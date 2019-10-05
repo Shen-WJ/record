@@ -21,7 +21,7 @@
       </view>
     </view>
 
-    <dialog isShow="{{isShowDialog}}" title='需要授权' content='需要获得头像的授权才能获取最新的微信头像' showCancel="{{false}}" confirmText="去授权" open_type="getUserInfo" bindSuccess='authorizeUserInfo'></dialog>
+    <dialog isShow="{{isShowDialog}}" title='需要授权' content='需要获得头像的授权才能获取最新的微信头像' showCancel="{{false}}" confirmText="去授权" open_type="getUserInfo" bindsuccess='authorizeUserInfo'></dialog>
   </view>
 
 </template>

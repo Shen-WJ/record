@@ -273,7 +273,7 @@ display: none;
 .fontColorB2 {
   color: #777;
 }
-.fontColorC {
+.fontColorC0 {
   color: #888;
 }
 .fontColorC1 {
@@ -286,7 +286,7 @@ display: none;
   background-color: #222;
 }
 .bgColorB2 {
-  background-color: #565656;
+  background-color: #444;
 }
 .bgColorW0 {
   background-color: #ffffff;
@@ -295,7 +295,7 @@ display: none;
   background-color: #f6f6f6;
 }
 .bgColorW2 {
-  background-color: #bbb;
+  background-color: #ddd;
 }
 
 /* 自定义tabbar */

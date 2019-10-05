@@ -52,6 +52,10 @@
       showCoverImg: {
         type: Boolean,
         value: true
+      },
+      isCustomBack: {
+        type: Boolean,
+        value: false
       }
     },
     data: {
@@ -77,6 +81,10 @@
     },
     methods: {
       navBack: function () {
+        if (this.isCustomBack) {
+          this.triggerEvent('back', {}, {})
+          return
+        }
         wx.navigateBack({
           delta: 1,
           fail: (res) => {
@@ -86,6 +94,10 @@
         })
       },
       navHome: function () {
+        if (this.isCustomBack) {
+          this.triggerEvent('home', {}, {})
+          return
+        }
         wx.switchTab({
           url: './locality'
         })
