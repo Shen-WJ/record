@@ -1,5 +1,5 @@
 <template>
-  <navigationBar pageName="设置"/>
+  <navigationBar pageName="{{pageName}}"/>
 
   <view class="container">
     <view wx:if="{{pageType === 'settings'}}" class="table1">
@@ -12,7 +12,7 @@
         <switch class="switch" checked="{{darkMode}}" bindchange="clickToSome" data-type="mode"></switch>
       </view>
       <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToSome" data-type="chooseImg">
-        <text>修改背景图</text>
+        <text>自定义背景</text>
         <image src="../image/icon/arrow_right.png" />
       </view>
       <button class="hided" open-type="feedback" id="feedbackBtn"/>
@@ -29,28 +29,28 @@
     </view>
     <view wx:elif="{{pageType === 'bgImg'}}" class="table1">
       <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickBgImgOf" data-type="choose">
-        <text>选择图片<text class="sub_desc">  将重启小程序</text></text>
+        <text>选择背景<text class="sub_desc">  将重启小程序</text></text>
         <image src="../image/icon/arrow_right.png" />
       </view>
       <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickBgImgOf" data-type="clear">
-        <text>清空背景图</text>
+        <text>清空背景</text>
         <image src="../image/icon/arrow_right.png" />
       </view>
       <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
         <text>主题皮肤</text>
         <view class="select_theme">
           <view class="select_item" style="border:2rpx solid #{{darkMode ? '2ab3f3': '888'}}" bindtap="selectTheme" data-index="0">
-            <view class="select_icon" style="opacity:{{darkMode ? 1: 0}}"></view>
-            <view class="select_text" style="color:#{{darkMode ? '2ab3f3': '888'}}">黑</view>
+            <view class="select_icon" style="background-color: #{{darkMode ? '2ab3f3': '888'}};"></view>
+            <view class="select_text" style="color:#{{darkMode ? '2ab3f3': '888'}}">商务黑</view>
           </view>
           <view class="select_item" style="border:2rpx solid #{{!darkMode ? '2ab3f3': '888'}}" bindtap="selectTheme" data-index="1">
-            <view class="select_icon" style="opacity:{{!darkMode ? 1: 0}}"></view>
-            <view class="select_text" style="color:#{{!darkMode ? '2ab3f3': '888'}}">白</view>
+            <view class="select_icon" style="background-color: #{{!darkMode ? '2ab3f3': '888'}};"></view>
+            <view class="select_text" style="color:#{{!darkMode ? '2ab3f3': '888'}}">典雅白</view>
           </view>
         </view>
       </view>
       <view class="slider_cell settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
-        <text>更改透明度</text>
+        <text>透明度</text>
         <slider class="slider_opacity" min="0" max="10" step="1" value="{{opacity*10}}" backgroundColor="{{darkMode?'#222':'#f6f6f6'}}" activeColor="#2ab3f3" block-color="{{darkMode?'#565656':'#fff'}}" show-value="{{true}}" bindchange="sliderChange"/>
       </view>
     </view>
@@ -65,7 +65,8 @@
   createPage({
     behaviors: [behaviorOnPage],
     data: {
-      pageType: 'settings'
+      pageType: 'settings',
+      pageName: '设置'
     },
     computed: {
       ...storeMode.mapState(['darkMode', 'opacity'])
@@ -73,6 +74,16 @@
     onLoad: function (option) {
       if (option.pageType) {
         this.pageType = option.pageType
+        switch (this.pageType) {
+          case 'settings': {
+            this.pageName = '设置'
+            break
+          }
+          case 'bgImg': {
+            this.pageName = '自定义背景'
+            break
+          }
+        }
       }
     },
 
@@ -140,7 +151,7 @@
     },
     selectTheme: function (e) {
       const index = parseInt(e.currentTarget.dataset.index)
-      storeMode.commit('openDarkMode', {
+      storeMode.commit('chooseBlackTheme', {
         isOpen: index === 0
       })
     },
@@ -191,7 +202,6 @@
     width: 15rpx;
     height: 15rpx;
     border-radius: 50%;
-    background-color: #2ab3f3;
     margin-right: 10rpx;
   }
 </style>

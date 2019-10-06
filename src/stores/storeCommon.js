@@ -38,7 +38,7 @@ export const storeMode = createStore({
 
     chooseBlackTheme (state, { isOpen = false }) {
       // 开启黑色/白色主题的背景图样式
-      // 无图时，等同于开启夜间模式openDarkMode
+      // 透明度为0时，等同于开启夜间模式openDarkMode
       wx.setStorageSync('darkMode', isOpen)
       state.darkMode = isOpen
     }
