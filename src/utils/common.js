@@ -2,6 +2,7 @@ import net from './net'
 import { storeUser } from '../stores/storeUser'
 import { storeMode } from '../stores/storeCommon'
 import toMap from '../image/icon/toMap.png'
+import contentBoard from '../image/global/contentBoard.png'
 
 const app = getApp()
 
@@ -290,6 +291,80 @@ function _changeStatus ({ type, index, that } = {}) {
   that.changeRecord(index, record)
 }
 
+function _createContentBoard (content, complete) {
+  const boardW = 250
+  const boardH = 200
+
+  var ctx = wx.createCanvasContext('contentBoardCanvas')
+  // 设置背景
+  ctx.setFillStyle('#ffffff')
+  ctx.fillRect(0, 0, boardW, boardH)
+  // logo
+  ctx.drawImage(contentBoard, 0, 0, boardW, boardH)
+  // 商品名称
+  ctx.setFontSize(14)
+  ctx.setFillStyle('#777777')
+  textHandle(content, 30, 30, boardW - 60, 18, true)
+
+  /**
+   * @function textHandle 绘制文本的换行处理
+   * @param text 在画布上输出的文本
+   * @param numX 绘制文本的左上角x坐标位置
+   * @param numY 绘制文本的左上角y坐标位置
+   * @param textWidth 文本宽度
+   * @param lineHeight 文本的行高
+   * @author Moss
+   */
+  function textHandle (text, numX, numY, textWidth, lineHeight, isAutoCenter = false) {
+    var chr = text.split('') // 将一个字符串分割成字符串数组
+    var temp = ''
+    var row = []
+    for (let a = 0; a < chr.length; a++) {
+      if (ctx.measureText(temp).width < textWidth) {
+        temp += chr[a]
+      } else {
+        a-- // 添加a--，防止字符丢失
+        row.push(temp)
+        temp = ''
+      }
+    }
+    row.push(temp)
+
+    // 如果数组长度大于2 则截取前两个
+    if (row.length > 6) {
+      row = row.slice(0, 6)
+      row.push('...[点击查看]')
+    }
+
+    if (isAutoCenter) { // 居中显示
+      if (row.length === 1) {
+        numX = (boardW - ctx.measureText(row[0]).width) * 0.5
+      }
+      let tempY = (boardH - row.length * lineHeight) * 0.5
+      numY = (tempY < numY ? numY : tempY) + 10 // 不知什么原因，字偏上，加10补足
+    }
+    for (let b = 0; b < row.length; b++) {
+      ctx.fillText(row[b], numX, numY + b * lineHeight)
+    }
+  }
+
+  // 完成
+  ctx.draw()
+  // 需要延时，否则如果接口返回太快，界面可能获取不到contentBoardCanvas
+  let timer = setTimeout(() => {
+    clearTimeout(timer)
+    wx.canvasToTempFilePath({
+      canvasId: 'contentBoardCanvas',
+      fail: err => {
+        console.log('canvasToTempFilePath err:', err)
+      },
+      success: res => {
+        complete(res.tempFilePath)
+      }
+    })
+  }, 100)
+}
+
 export const getKilometerDistance = _getKilometerDistance
 export const getKmDistanceFromPoi = _getKmDistanceFromPoi
 export const getDistanceToMe = _getDistanceToMe
@@ -304,3 +379,4 @@ export const getLocation = _getLocation
 export const clickLike = _clickLike
 export const clickFavorites = _clickFavorites
 export const changeStatus = _changeStatus
+export const createContentBoard = _createContentBoard

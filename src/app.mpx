@@ -104,17 +104,16 @@
       // let menuButtonObject = wx.getMenuButtonBoundingClientRect()
       wx.getSystemInfo({
         success: (res) => {
-          console.log(res)
-          let statusBarHeight = res.statusBarHeight
-          // let navTop = menuButtonObject.top
-          // let navHeight = statusBarHeight + menuButtonObject.height + (menuButtonObject.top - statusBarHeight) * 2
-          // this.globalData.navHeight = navHeight
+          console.log('getSystemInfo: ', res)
+          let statusBarHeight = res.statusBarHeight // 这是statusBar不是menuBar
+          let safeBottom = res.screenHeight - res.safeArea.bottom
+
+          this.globalData.tabBarBottom = safeBottom < 0 ? 0 : safeBottom
           this.globalData.navHeight = statusBarHeight + 46
-          // this.globalData.navTop = navTop
           this.globalData.statusBarHeight = statusBarHeight
           this.globalData.windowHeight = res.windowHeight
           this.globalData.windowWidth = res.windowWidth
-          console.log('windowHeight: ', res.windowHeight)
+          console.log('windowHeight: ', res.windowHeight, '\nthis.globalData.tabBarBottom ', this.globalData.tabBarBottom)
         }
       })
     },
@@ -124,6 +123,7 @@
       navTop: 0,
       windowHeight: 0,
       statusBarHeight: 0,
+      tabBarBottom: 0,
       likesDic: {},
       favoritesDic: {},
       location: {},

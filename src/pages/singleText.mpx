@@ -3,20 +3,29 @@
 
   <view class="container">
     <block wx:if="{{pageType == 'userAgreement'}}">
-      <import src="../utils/userAgreement.wxml"/>
-      <template is="userAgreement" data="{{darkMode:darkMode}}" />
+      <view class="agreement_text fontColorC0">
+        <rich-text nodes="{{nodesContent}}"></rich-text>
+      </view>
     </block>
 
     <block wx:elif="{{pageType == 'about'}}">
       <view class="about_content {{darkMode?'fontColorW2':'fontColorB2'}}">
-        <image class="about_logo" src="../image/launch.jpeg" mode="aspectFill" />
+        <image class="about_logo" src="../image/global/logo1.jpg" mode="aspectFill" />
         <text>点迹  v1.2.0</text>
       </view>
       <view class="cell1 about_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToUserAgreement" data-type="userAgreement">
-        <text>用户协议</text>
+        <text>用户使用协议</text>
         <image src="../image/icon/arrow_right.png" />
       </view>
-      <view class="about_footer fontColorC0">
+      <view class="cell1 about_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToUserAgreement" data-type="userAgreement">
+        <text>隐私政策</text>
+        <image src="../image/icon/arrow_right.png" />
+      </view>
+      <view class="cell1 about_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToUserAgreement" data-type="userAgreement">
+        <text>社区指导原则</text>
+        <image src="../image/icon/arrow_right.png" />
+      </view>
+      <view class="about_footer fontColorC0" style="bottom: {{tabBarBottom}}px;">
         <text>让附近离你更近
         由两个初出茅庐的开发者前后累计耗时一周完成第一版开发</text>
       </view>
@@ -28,12 +37,17 @@
   import { createPage } from '@mpxjs/core'
   import { storeMode } from '../stores/storeCommon'
   import { behaviorOnPage } from '../behavior/behaviorOnPage'
+  import net from '../utils/net'
+
+  const app = getApp()
 
   createPage({
     behaviors: [behaviorOnPage],
     data: {
       pageType: '',
-      pageName: ''
+      pageName: '',
+
+      tabBarBottom: app.globalData.tabBarBottom
     },
     computed: {
       ...storeMode.mapState(['darkMode'])
@@ -41,6 +55,7 @@
 
     onLoad: function (option) {
       this.pageType = option.pageType
+      this.agreementType = option.agreementType
       switch (this.pageType) {
         case 'about': {
           this.pageName = '关于'
@@ -55,6 +70,12 @@
     clickToUserAgreement () {
       wx.navigateTo({
         url: './singleText?pageType=userAgreement'
+      })
+    },
+    getRequest () {
+      net.reqGet({
+        url: ''
+      }).then(data => {
       })
     }
   })
@@ -91,7 +112,6 @@
   }
   .about_footer {
     position: absolute;
-    bottom: env(safe-area-inset-bottom);
     left: 20rpx;
     right: 20rpx;
   }
@@ -101,6 +121,18 @@
     text-align: center;
     font-size: 20rpx;
   }
+
+  .agreement_text {
+  }
+  .p1 {text-align: center; font: 20.0px 'PingFang SC';}
+  .p2 {font: 14.0px 'PingFang SC'; }
+  .p3 {font: 14.0px 'PingFang SC'; min-height: 20.0px}
+  .p4 {font: 16.0px 'PingFang SC Semibold'; }
+  .p5 {font: 16.0px 'PingFang SC'; min-height: 22.0px}
+  .p6 {font: 14.0px 'PingFang SC Semibold'; }
+  .s1 {font-kerning: none}
+  .s2 {font: 16.0px 'PingFang SC'; font-kerning: none}
+  .s3 {font: 14.0px 'PingFang SC'; font-kerning: none}
 </style>
 
 <script  type='application/json' lang='json'>

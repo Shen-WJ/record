@@ -8,6 +8,7 @@
       <template is="recordItem" data="{{record:record, rcdIndex:0, rcdType:0, darkMode:darkMode}}"/>
     </view>
   </view>
+<canvas id="contentBoardCanvas" canvas-id="contentBoardCanvas"></canvas>
 </template>
 
 <script>
@@ -52,6 +53,10 @@
       }).then(data => {
         wx.stopPullDownRefresh()
         this.record = common.getRecordListFrom([data.data], 1)[0]
+
+        common.createContentBoard(this.record.content, path => {
+          this.contentBoardSrc = path
+        })
       })
     },
     clickMore: function (e) {
@@ -148,6 +153,15 @@
     margin-top: 6px;
   }
 
+  /* 评论的生成图片的画板 */
+  #contentBoardCanvas {
+    position: fixed;
+    left: 3000px;
+    top: 0;
+    width: 250px;
+    height: 200px;
+    background: #fff;
+  }
 </style>
 
 <script  type='application/json'>

@@ -1,4 +1,5 @@
-import cover from '../image/launch.jpeg'
+import logo1 from '../image/global/logo1.jpg'
+import contentBoardHolder from '../image/global/contentBoardHolder.png'
 import { behaviorOnRecord } from '../behavior/behaviorOnRecord'
 import { storeUser } from '../stores/storeUser'
 import { storeNotice } from '../stores/storeCommon'
@@ -51,7 +52,7 @@ export const behaviorOnPeople = Behavior({
         let btnId = res.target.id
         if (btnId === 'shareOtherPeople') {
           return {
-            title: '不是诱导分享，讲真，进来看看',
+            title: '这个人好有趣啊！',
             path: '/pages/otherPeople?otherUserId=' + this.otherUserId
           }
         } else {
@@ -67,14 +68,15 @@ export const behaviorOnPeople = Behavior({
             return {
               title: title,
               path: '/pages/recordDetail?recordId=' + record.recordId,
-              imageUrl: cover
+              imageUrl: contentBoardHolder
             }
           }
         }
       } else {
         return {
           title: '了解身边的过去，记录过去的身边',
-          path: '/pages/locality'
+          path: '/pages/locality',
+          imageUrl: logo1
         }
       }
     },

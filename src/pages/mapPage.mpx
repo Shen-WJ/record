@@ -11,7 +11,7 @@
       <cover-view class="map_tip_content {{darkMode?'bgColorB0 fontColorW1':'bgColorW0 fontColorB1'}}">{{mapTip}}</cover-view>
       <cover-view class="map_tip_close {{darkMode?'bgColorB0 fontColorW1':'bgColorW0 fontColorB1'}}" catchtap='clickMapTipClose'>×</cover-view>
     </cover-view>
-    <view class="pickerDate {{darkMode?'bgColorB0 fontColorW1':'bgColorW0 fontColorB1'}} {{isShowPickerDate?'pickerDate_show':''}}">
+    <view class="pickerDate {{darkMode?'bgColorB0 fontColorW1':'bgColorW0 fontColorB1'}} {{isShowPickerDate?'pickerDate_show':''}}" style="bottom: {{tabBarBottom}}px;">
       <text>选择：从  </text>
       <picker class="{{darkMode?'map_menu_borderB':'map_menu_borderW'}}" mode="date" value="{{startDate}}" start="2019-01-01" end="2029-01-01" bindchange="changeDate" data-type="start">
         <view>{{startDate}}</view>
@@ -22,7 +22,7 @@
       </picker>
       <button catchtap="pickerDateConfirm">完成</button>
     </view>
-    <cover-view wx:if="{{isShowMenu}}" class="map_menu {{darkMode?'bgColorB0 fontColorW1':'bgColorW0 fontColorB1'}}">
+    <cover-view wx:if="{{isShowMenu}}" class="map_menu {{darkMode?'bgColorB0 fontColorW1':'bgColorW0 fontColorB1'}}" style="bottom: {{tabBarBottom}}px;">
       <cover-view class="map_menu_tip">筛选以下时间段的内容：</cover-view>
       <cover-view wx:for="{{menu}}" wx:key="index" class="map_menu_select {{darkMode?'map_menu_borderB':'map_menu_borderW'}} {{index===selected?'selected':''}}" catchtap="clickMenu" data-index="{{index}}">{{index===selected?'■':'□'}}{{item}}</cover-view>
       <button class="map_menu_share" open-type="share">分享</button>
@@ -64,7 +64,9 @@
       isShowMap: false,
       mapTip: '',
       isShowMapTip: true,
-      navH: app.globalData.navHeight
+      navH: app.globalData.navHeight,
+
+      tabBarBottom: app.globalData.tabBarBottom
     },
     computed: {
       ...storeMode.mapState(['darkMode'])
@@ -130,7 +132,7 @@
       switch (this.pageType) {
         case 'person': {
           return {
-            title: '来看看ta的',
+            title: '来看看ta都去过哪里',
             path: '/pages/mapPage?pageType=person&personType=others&fromShare=1&type=' + this.type + '&otherUserId=' + (this.otherUserId || storeUser.state.userId) + '&startDate=' + this.startDate + '&endDate' + this.endDate
           }
         }
@@ -517,7 +519,6 @@
   .map_menu {
     z-index: 1001;
     position: fixed;
-    bottom: env(safe-area-inset-bottom);
     left: 30rpx;
     right: 30rpx;
     height: 96rpx;
@@ -539,9 +540,8 @@
   .pickerDate {
     z-index: 1000;
     position: absolute;
-    bottom: 96rpx;
     left: 78rpx;
-    margin-bottom: env(safe-area-inset-bottom);
+    margin-bottom: 96rpx;
     padding: 15rpx;
     border-radius: 10rpx;
 

@@ -306,12 +306,11 @@ display: none;
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-.point {
+.smallMap {
   position: fixed;
   z-index: 1000;
   right: 30rpx;
-  bottom: 58px;
-  margin-bottom: env(safe-area-inset-bottom);
+  margin-bottom: 58px;
   padding: 25rpx;
   box-sizing: border-box;
 

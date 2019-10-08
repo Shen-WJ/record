@@ -2,7 +2,7 @@
   <import src="../utils/personalPage.wxml"/>
 
   <navigationBar showThemeBgColor="{{true}}" pageName="{{otherNickname}}"/>
-  <template is="personalPage" data="{{pageType:pageType, darkMode:darkMode,
+  <template is="personalPage" data="{{pageType:pageType, darkMode:darkMode, tabBarBottom:tabBarBottom,
     recordListH:recordListH, recordList:recordList, recordsTotal:recordsTotal,
     animationsText:animationsText, animations:animations,
     isShowDialog:isShowDialog, isFollowed:otherIsFollowed, isShowFollowBtn:isShowFollowBtn,
@@ -16,7 +16,9 @@
   import { behaviorOnPeople } from '../behavior/behaviorOnPeople'
   import { storeMode } from '../stores/storeCommon'
   import net from '../utils/net'
+
   const common = require('../utils/common.js')
+  const app = getApp()
 
   createPage({
     behaviors: [behaviorOnPeople],
@@ -39,7 +41,9 @@
       animationsText: ['分', '享', '生', '活'],
 
       isShowDialog: false,
-      isShowFollowBtn: false
+      isShowFollowBtn: false,
+
+      tabBarBottom: app.globalData.tabBarBottom
     },
     computed: {
       genderImg: function () {

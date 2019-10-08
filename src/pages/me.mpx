@@ -2,14 +2,14 @@
   <import src="../utils/personalPage.wxml"/>
 
   <navigationBar showBackIcon="{{false}}" showThemeBgColor="{{true}}"/>
-  <template is="personalPage" data="{{pageType:pageType, darkMode:darkMode,
+  <template is="personalPage" data="{{pageType:pageType, darkMode:darkMode, tabBarBottom:tabBarBottom,
     recordList:recordList, recordsTotal:recordsTotal, recordListH:recordListH, templateListH:templateListH, templateList:templateList,
     animationsText:animationsText, animations:animations,
     isShowDialog:isShowDialog, isShowNoticeRedDot:isShowNoticeRedDot,
     noticeCount:noticeCount, followCount:followCount, followedCount:followedCount, signature:signature, headUrl:headUrl, nickname:nickname, genderImg:genderImg}}">
   </template>
   <tabbar selected="4" />
-  <view class="bottomHolder"/>
+  <view class="bottomHolder" style="padding-bottom: {{tabBarBottom}}px;"/>
 </template>
 
 <script>
@@ -36,7 +36,9 @@
       templateListH: 0,
       recordListH: [],
       isShowNoticeRedDot: false,
-      isShowDialog: false
+      isShowDialog: false,
+
+      tabBarBottom: app.globalData.tabBarBottom
     },
     computed: {
       ...storeMode.mapState(['darkMode']),

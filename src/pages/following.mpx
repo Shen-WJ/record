@@ -11,7 +11,7 @@
     </view>
   </view>
   <tabbar selected="3" />
-  <view class="bottomHolder"/>
+  <view class="bottomHolder" style="padding-bottom: {{tabBarBottom}}px;"/>
 </template>
 
 <script>
@@ -22,11 +22,14 @@
   import { behaviorOnPage } from '../behavior/behaviorOnPage'
 
   const common = require('../utils/common.js')
+  const app = getApp()
 
   createPage({
     behaviors: [behaviorOnRecord, behaviorOnPage],
     data: {
-      recordList: [[], []]
+      recordList: [[], []],
+
+      tabBarBottom: app.globalData.tabBarBottom
     },
     computed: {
       ...storeMode.mapState(['darkMode'])

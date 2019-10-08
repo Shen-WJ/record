@@ -1,5 +1,5 @@
 <template>
-  <view class="tab-bar {{darkMode?'darkMode':'dayMode'}}">
+  <view class="tab-bar {{darkMode?'darkMode':'dayMode'}}" style="bottom:{{tabBarBottom}}px;">
     <view wx:for="{{list}}" wx:key="index" class="tab-bar-item" data-path="{{item.pagePath}}" data-index="{{index}}" bindtap="switchTab">
       <image class="tab-bar-item-image" src="{{icons[index]}}"></image>
       <view class="tab-bar-item-view" style="color: {{selected === index ? selectedColor : color}}">{{item.text}}</view>
@@ -21,7 +21,10 @@
   import following1 from '../image/tabBar/following1.png'
   import me from '../image/tabBar/me.png'
   import me1 from '../image/tabBar/me1.png'
+
   const iconList = [home, home1, find, find1, add, add1, following, following1, me, me1]
+  const app = getApp()
+
   createComponent({
     options: {
       styleIsolation: 'shared'
@@ -33,6 +36,7 @@
       }
     },
     data: {
+      tabBarBottom: app.globalData.tabBarBottom,
       color: '#7A7E83',
       selectedColor: '#2ab3f3',
       list: [
@@ -82,7 +86,6 @@
 <style>
   .tab-bar {
     position: fixed;
-    bottom: env(safe-area-inset-bottom);
     left: 30rpx;
     right: 30rpx;
     height: 48px;

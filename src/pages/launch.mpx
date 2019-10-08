@@ -1,6 +1,6 @@
 <template>
   <view class="skip" catchtap="skipLaunch">跳过{{counter}}</view>
-  <image class="launch_img" mode="aspectFill" src="../image/launch.jpeg"></image>
+  <image class="launch_img" mode="aspectFill" src="../image/global/launch.jpg"></image>
 </template>
 
 <script>

@@ -19,10 +19,10 @@
     <template is="recordItem" data="{{record:item, rcdIndex:{section:0, row:row}, rcdType:1, darkMode:darkMode}}"/>
     </block>
 
-    <image class="point themeMode" src="../image/icon/toMapPage.png" mode="aspectFit" catchtap="clickToMapPage"></image>
+    <image class="smallMap themeMode" style="bottom: {{tabBarBottom}}px;" src="../image/icon/toMapPage.png" mode="aspectFit" catchtap="clickToMapPage"></image>
   </view>
   <tabbar selected="1" />
-  <view class="bottomHolder"/>
+  <view class="bottomHolder" style="padding-bottom: {{tabBarBottom}}px;"/>
 </template>
 
 <script>
@@ -59,7 +59,9 @@
       sortType: sortType,
       sortIndex: wx.getStorageSync('find_sortIndex') || 2,
       navH: app.globalData.navHeight,
-      pageLocation: {}
+      pageLocation: {},
+
+      tabBarBottom: app.globalData.tabBarBottom
     },
     computed: {
       ...storeMode.mapState(['darkMode'])

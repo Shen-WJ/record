@@ -1,4 +1,5 @@
-import cover from '../image/launch.jpeg'
+import logo1 from '../image/global/logo1.jpg'
+import contentBoardHolder from '../image/global/contentBoardHolder.png'
 
 const common = require('../utils/common.js')
 
@@ -32,13 +33,14 @@ export const behaviorOnPage = Behavior({
           return {
             title: title,
             path: '/pages/recordDetail?recordId=' + record.recordId,
-            imageUrl: cover
+            imageUrl: this.contentBoardSrc || contentBoardHolder
           }
         }
       } else {
         return {
           title: '了解身边的过去，记录过去的身边',
-          path: '/pages/locality'
+          path: '/pages/locality',
+          imageUrl: logo1
         }
       }
     }

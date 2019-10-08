@@ -16,10 +16,10 @@
     </block>
 
     <template is="emptyView" data="{{isShow: isReachBottom, type: 1, textArr:['已经到底啦！去','发现','查看更多内容吧～0v0']}}"/>
-    <image class="point themeMode" src="../image/icon/toMapPage.png" mode="aspectFit" catchtap="clickToMapPage"></image>
+    <image class="smallMap themeMode" style="bottom: {{tabBarBottom}}px;" src="../image/icon/toMapPage.png" mode="aspectFit" catchtap="clickToMapPage"></image>
   </view>
   <tabbar selected="0" />
-  <view class="bottomHolder"/>
+  <view class="bottomHolder" style="padding-bottom: {{tabBarBottom}}px;"/>
 </template>
 
 <script>
@@ -40,7 +40,9 @@
       sections: ['附近', '全网热说'],
       scrollTop: 0,
       isReachBottom: false,
-      pageLocation: {} // 这是对应页面“上一次”做数据请求的定位记录，不做任何其他用途
+      pageLocation: {}, // 这是对应页面“上一次”做数据请求的定位记录，不做任何其他用途
+
+      tabBarBottom: app.globalData.tabBarBottom
     },
 
     computed: {
@@ -153,7 +155,6 @@
   .locality {
     width: 750rpx;
   }
-
   .section_header{
     padding:0 20rpx;
     font-size: 36rpx;
@@ -162,7 +163,6 @@
     height: 70rpx;
     width: 710rpx;
   }
-
 </style>
 
 <script  type='application/json'>
