@@ -1,10 +1,11 @@
 <template>
-  <navigationBar pageName="{{pageName}}" showCoverImg="{{false}}"/>
+  <navigationBar pageName="{{pageName}}" showCoverImg="{{false}}" canNavHome="{{canNavHome}}"/>
 
   <view class="container">
-    <block wx:if="{{pageType == 'userAgreement'}}">
-      <view class="agreement_text fontColorC0">
+    <block wx:if="{{pageType == 'policy'}}">
+      <view class="policy_text fontColorC0">
         <rich-text nodes="{{nodesContent}}"></rich-text>
+        <button wx:if="{{policyType==='communityRule'}}" class="policy_feedback" open-type="feedback">反馈</button>
       </view>
     </block>
 
@@ -13,15 +14,15 @@
         <image class="about_logo" src="../image/global/logo1.jpg" mode="aspectFill" />
         <text>点迹  v1.2.0</text>
       </view>
-      <view class="cell1 about_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToUserAgreement" data-type="userAgreement">
+      <view class="cell1 about_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToPolicy" data-type="userAgreement">
         <text>用户使用协议</text>
         <image src="../image/icon/arrow_right.png" />
       </view>
-      <view class="cell1 about_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToUserAgreement" data-type="userAgreement">
+      <view class="cell1 about_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToPolicy" data-type="privacy">
         <text>隐私政策</text>
         <image src="../image/icon/arrow_right.png" />
       </view>
-      <view class="cell1 about_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToUserAgreement" data-type="userAgreement">
+      <view class="cell1 about_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToPolicy" data-type="communityRule">
         <text>社区指导原则</text>
         <image src="../image/icon/arrow_right.png" />
       </view>
@@ -46,8 +47,11 @@
     data: {
       pageType: '',
       pageName: '',
+      policyType: '',
+      nodesContent: '',
 
-      tabBarBottom: app.globalData.tabBarBottom
+      tabBarBottom: app.globalData.tabBarBottom,
+      canNavHome: false
     },
     computed: {
       ...storeMode.mapState(['darkMode'])
@@ -55,27 +59,30 @@
 
     onLoad: function (option) {
       this.pageType = option.pageType
-      this.agreementType = option.agreementType
       switch (this.pageType) {
         case 'about': {
           this.pageName = '关于'
+          this.canNavHome = true
           break
         }
-        case 'userAgreement': {
-          this.pageName = '用户协议'
+        case 'policy': { // communityRule, privacy
+          this.pageName = ''
+          this.policyType = option.policyType
+          this.getRequest()
           break
         }
       }
     },
-    clickToUserAgreement () {
+    clickToPolicy (e) {
       wx.navigateTo({
-        url: './singleText?pageType=userAgreement'
+        url: './singleText?pageType=policy&policyType=' + e.currentTarget.dataset.type
       })
     },
     getRequest () {
-      net.reqGet({
-        url: ''
+      net.downloadFile({
+        filePath: this.policyType + '-1.txt'
       }).then(data => {
+        this.nodesContent = data
       })
     }
   })
@@ -122,7 +129,8 @@
     font-size: 20rpx;
   }
 
-  .agreement_text {
+  .policy_text {
+    padding: 20rpx 20rpx 40rpx;
   }
   .p1 {text-align: center; font: 20.0px 'PingFang SC';}
   .p2 {font: 14.0px 'PingFang SC'; }
@@ -133,6 +141,15 @@
   .s1 {font-kerning: none}
   .s2 {font: 16.0px 'PingFang SC'; font-kerning: none}
   .s3 {font: 14.0px 'PingFang SC'; font-kerning: none}
+
+  .policy_feedback {
+    background-color: transparent;
+    margin: 0rpx 200rpx ;
+    height: 70rpx;
+    line-height: 70rpx;
+    border: 2rpx solid #2ab3f3;
+    color: #2ab3f3;
+  }
 </style>
 
 <script  type='application/json' lang='json'>

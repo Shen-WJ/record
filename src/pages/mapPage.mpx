@@ -234,7 +234,7 @@
         url: 'record/list/byLocation', // 发现地图按距离拉取，所以10条附近的
         query: {
           pageNum: 0, // 发现地图只显示10条
-          lng: this.longitude || app.globalData.location.longitude, // todo
+          lng: this.longitude || app.globalData.location.longitude,
           lat: this.latitude || app.globalData.location.latitude,
           distance: 100 // 100km,确保数据少时，能拉取到10条
         }

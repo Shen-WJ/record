@@ -292,8 +292,8 @@ function _changeStatus ({ type, index, that } = {}) {
 }
 
 function _createContentBoard (content, complete) {
-  const boardW = 250
-  const boardH = 200
+  const boardW = 500
+  const boardH = 400
 
   var ctx = wx.createCanvasContext('contentBoardCanvas')
   // 设置背景
@@ -302,9 +302,9 @@ function _createContentBoard (content, complete) {
   // logo
   ctx.drawImage(contentBoard, 0, 0, boardW, boardH)
   // 商品名称
-  ctx.setFontSize(14)
+  ctx.setFontSize(28)
   ctx.setFillStyle('#777777')
-  textHandle(content, 30, 30, boardW - 60, 18, true)
+  textHandle(content, 60, 60, boardW - 120, 36, true)
 
   /**
    * @function textHandle 绘制文本的换行处理
@@ -341,7 +341,7 @@ function _createContentBoard (content, complete) {
         numX = (boardW - ctx.measureText(row[0]).width) * 0.5
       }
       let tempY = (boardH - row.length * lineHeight) * 0.5
-      numY = (tempY < numY ? numY : tempY) + 10 // 不知什么原因，字偏上，加10补足
+      numY = (tempY < numY ? numY : tempY) + 20 // 不知什么原因，字偏上，加10补足
     }
     for (let b = 0; b < row.length; b++) {
       ctx.fillText(row[b], numX, numY + b * lineHeight)

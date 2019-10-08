@@ -11,7 +11,11 @@ export const storeUser = createStore({
     sex: 0,
     signature: '暂无简介',
     followedCount: 0,
-    followCount: 0
+    followCount: 0,
+
+    agreedPolicy: 0,
+    latestPolicy: 0,
+    needAgreePolicy: false
   },
   mutations: {
     updateUserInfo (state, { nickname = '', headUrl = '', sex = 0 }) {
@@ -52,6 +56,16 @@ export const storeUser = createStore({
     updateHasHadUserInfo (state, { hasHadUserInfo = false }) {
       wx.setStorageSync('hasHadUserInfo', hasHadUserInfo)
       state.hasHadUserInfo = hasHadUserInfo
+    },
+    updateAgreedPolicy (state, { agreedPolicy = 0 }) {
+      wx.setStorageSync('agreedPolicy', agreedPolicy)
+      state.agreedPolicy = agreedPolicy
+    },
+    updateLatestPolicy (state, { latestPolicy = 0 }) {
+      state.latestPolicy = latestPolicy
+    },
+    updateNeedAgreePolicy (state, { needAgreePolicy = false }) {
+      state.needAgreePolicy = needAgreePolicy
     }
   },
   getters: {

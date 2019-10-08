@@ -1,0 +1,71 @@
+<template>
+  <view class="policy_view">
+    <view style="color:{{textColor}};">{{action}}即代表您同意《<view style="color:{{canClickColor}};" catchtap="clickToPolicy" data-index="0">用户使用协议</view>》及《<view style="color:{{canClickColor}};" catchtap="clickToPolicy" data-index="1">隐私政策</view>》</view>
+  </view>
+</template>
+
+
+<script>
+  import { createComponent } from '@mpxjs/core'
+  import net from '../utils/net'
+  import { storeUser } from '../stores/storeUser'
+
+  createComponent({
+    properties: {
+      textColor: {
+        type: String,
+        value: ''
+      },
+      canClickColor: {
+        type: String,
+        value: ''
+      },
+      action: {
+        type: String,
+        value: ''
+      }
+    },
+    data: {
+    },
+    methods: {
+      clickToPolicy (e) {
+        let index = parseInt(e.currentTarget.dataset.index)
+        wx.navigateTo({
+          url: './singleText?pageType=policy&policyType=' + (index === 0 ? 'userAgreement' : 'privacy')
+        })
+      },
+      agreePolicy () {
+        console.log('agreePolicy_click')
+        net.reqPut({
+          url: 'user/policy',
+          body: {
+            policy: storeUser.state.latestPolicy
+          }
+        }).then(data => {
+          storeUser.commit('updateAgreedPolicy', { agreedPolicy: storeUser.state.latestPolicy })
+          storeUser.commit('updateNeedAgreePolicy', { needAgreePolicy: false })
+        })
+      }
+    }
+  })
+</script>
+
+<style>
+  .policy_view {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .policy_view view {
+    display: inline;
+    font-size: 22rpx;
+    text-align: center;
+  }
+</style>
+
+<script type='application/json' lang='json'>
+  {
+    "component": true
+  }
+</script>

@@ -151,10 +151,50 @@ const reqDelete = ({ url, query, body, ...other } = {}) => {
   })
 }
 
+const downloadFile = ({ filePath = '', isReadFile = true, ...other }) => {
+  return new Promise((resolve, reject) => {
+    wx.downloadFile({
+      url: getUrl(filePath),
+      ...other,
+      complete: res => {
+        console.log(res)
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          if (isReadFile) {
+            wx.getFileSystemManager().readFile({
+              filePath: res.tempFilePath,
+              encoding: 'utf-8',
+              success: file => {
+                resolve(file.data)
+              },
+              fail: err => {
+                reject(err)
+                wx.showToast({
+                  title: '程序出了点事故，待会试试吧～',
+                  icon: 'none'
+                })
+              }
+            })
+          } else {
+            resolve(res.tempFilePath)
+          }
+        } else {
+          console.log('!!! Request error, res statusCode: ', res.statusCode || 'none')
+          reject(res)
+          wx.showToast({
+            title: '网络出错：' + (res.statusCode || 'none'),
+            icon: 'none'
+          })
+        }
+      }
+    })
+  })
+}
+
 export default {
   baseUrl,
   reqGet,
   reqPost,
   reqPut,
-  reqDelete
+  reqDelete,
+  downloadFile
 }

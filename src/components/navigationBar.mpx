@@ -56,6 +56,10 @@
       isCustomBack: {
         type: Boolean,
         value: false
+      },
+      canNavHome: {
+        type: Boolean,
+        value: true
       }
     },
     data: {
@@ -98,6 +102,7 @@
           this.triggerEvent('home', {}, {})
           return
         }
+        if (!this.canNavHome) return
         wx.switchTab({
           url: './locality'
         })

@@ -1,14 +1,22 @@
 <template>
-  <view class="skip" catchtap="skipLaunch">跳过{{counter}}</view>
+  <view wx:if="{{!needAgreePolicy}}" class="skip" catchtap="skipLaunch">跳过{{counter}}</view>
   <image class="launch_img" mode="aspectFill" src="../image/global/launch.jpg"></image>
+  <view wx:if="{{needAgreePolicy}}" class="launch_enter">
+    <button class="policy_button" catchtap="clickEnter">进入点迹</button>
+    <policyText id="policy_text" action='点击“进入点迹”' textColor='#fff' canClickColor='#ccc'/>
+  </view>
 </template>
 
 <script>
   import { createPage } from '@mpxjs/core'
+  import { storeUser } from '../stores/storeUser'
 
   createPage({
     data: {
       counter: 1
+    },
+    computed: {
+      ...storeUser.mapState(['needAgreePolicy'])
     },
     onLoad () {
       this.timer = setInterval(() => {
@@ -20,15 +28,22 @@
     },
     skipLaunch () {
       clearInterval(this.timer)
+      if (storeUser.state.needAgreePolicy) return
       wx.switchTab({
         url: './locality'
       })
+    },
+    clickEnter () {
+      wx.switchTab({
+        url: './locality'
+      })
+      this.selectComponent('#policy_text').agreePolicy()
     }
   })
 </script>
 
 <style>
-  page{
+  page {
     height: 100%;
   }
   .launch_img {
@@ -45,11 +60,27 @@
     color: #fff;
     opacity: 0.6;
   }
+  .launch_enter {
+    position: fixed;
+    left: 0;
+    bottom: 30%;
+    width: 750rpx;
+  }
+  .policy_button {
+    margin: 0rpx 200rpx 30rpx;
+    height: 90rpx;
+    line-height: 90rpx;
+
+    font-size: 40rpx;
+    color: #2ab3f3;
+  }
 </style>
 
 <script  type='application/json'>
   {
-    "usingComponents": {},
+    "usingComponents": {
+      "policyText": "../components/policyText"
+    },
     "navigationBarTitleText": "",
     "navigationStyle": "custom"
   }
