@@ -8,6 +8,8 @@
     isShowDialog:isShowDialog, isShowNoticeRedDot:isShowNoticeRedDot,
     noticeCount:noticeCount, followCount:followCount, followedCount:followedCount, signature:signature, headUrl:headUrl, nickname:nickname, genderImg:genderImg}}">
   </template>
+  <canvas id="cardCanvas" canvas-id="cardCanvas"></canvas>
+  <gallery isShow="{{isShowGallery}}" titleList="{{galleryTitleList}}" imageList="{{galleryImageList}}"  bindclose="closeGallery" />
   <tabbar selected="4" />
   <view class="bottomHolder" style="padding-bottom: {{tabBarBottom}}px;"/>
 </template>
@@ -38,7 +40,11 @@
       isShowNoticeRedDot: false,
       isShowDialog: false,
 
-      tabBarBottom: app.globalData.tabBarBottom
+      tabBarBottom: app.globalData.tabBarBottom,
+
+      isShowGallery: false,
+      galleryTitleList: [],
+      galleryImageList: []
     },
     computed: {
       ...storeMode.mapState(['darkMode']),
@@ -171,6 +177,16 @@
           }).exec()
         })
       })
+    },
+    closeGallery () {
+      this.isShowGallery = false
+    },
+    clickDownloadCard: function (e) {
+      common.createCardSingle(this.getRecord(e.currentTarget.dataset.index), (res) => {
+        this.isShowGallery = true
+        this.galleryTitleList = ['打卡']
+        this.galleryImageList = [res]
+      })
     }
   })
 
@@ -235,6 +251,15 @@
 
 <style>
   .container {}
+  #cardCanvas {
+    position: fixed;
+    left: 3000px;
+    top: 10px;
+    width: 600px;
+    height: 1000px;
+    background: #fff;
+    z-index: 0;
+  }
   @import '../utils/personalStyle.wxss'
 
 </style>
@@ -245,7 +270,8 @@
     "usingComponents": {
       "dialog": "../components/dialog",
       "navigationBar": "../components/navigationBar",
-      "tabbar": "../components/tabbar"
+      "tabbar": "../components/tabbar",
+      "gallery": "../components/gallery"
     }
   }
 </script>

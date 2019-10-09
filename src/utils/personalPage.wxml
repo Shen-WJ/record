@@ -23,6 +23,7 @@
         <button class="me_hd_notice me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="1">通知 {{noticeCount}}</button>
         <button class="me_hd_favorites me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="2">收藏</button>
         <button class="me_hd_settings me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="3">设置</button>
+        <button class="me_hd_follow me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="5">我的海报</button>
       </block>
       <block wx:if="{{pageType === 'others'}}">
         <button wx:if="{{isShowFollowBtn}}" class="me_hd_follow me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="4">{{isFollowed?'取消关注':'关注'}}</button>

@@ -1,0 +1,197 @@
+<template>
+  <view class='gallery_mask' wx:if='{{isShow}}' catchtouchmove='true' catchtap="clickMask" catchlongpress="true">
+    <scroll-view class="scroll-box" scroll-x scroll-with-animation
+      scroll-into-view="{{toCard}}"
+      bindscroll="bindScroll">
+        <block wx:for="{{titleList}}" wx:key="index">
+          <view wx:if="{{index === 0}}" class="card_holder" id="card_0" />
+          <view class="card-box">
+            <view class="maoDian" id="card_{{index+1}}" />
+            <text class="card_title" style="color:{{currentCard===index?'#fff':'#ccc'}};">{{titleList[index]}}</text>
+            <image class="card" animation="{{index<animations.length?animations[index]:''}}" src="{{imageList[index]}}" />
+          </view>
+          <view wx:if="{{index === 4}}" class="card_holder" />
+        </block>
+    </scroll-view>
+    <button class="gallery_save" catchtap="clickSave">保存至相册</button>
+    <button class="gallery_close" catchtap="clickClose">关闭</button>
+  </view>
+</template>
+
+<script>
+  import { createComponent } from '@mpxjs/core'
+
+  createComponent({
+    properties: {
+      isShow: {
+        type: Boolean,
+        value: true
+      },
+      titleList: {
+        type: Array,
+        value: []
+      },
+      imageList: {
+        type: Array,
+        value: []
+      }
+    },
+    data: {
+      toCard: 'card_0',
+      currentCard: 0,
+      animations: []
+    },
+    lifetimes: {
+      attached: function () {
+        this.animationScale()
+      }
+    },
+    methods: {
+      bindScroll: function (ev) {
+        if (this.scrollEndTimer) {
+          clearTimeout(this.scrollEndTimer)
+          this.scrollEndTimer = null
+        }
+
+        this.scrollEndTimer = setTimeout(() => {
+          clearTimeout(this.scrollEndTimer)
+
+          const cardNum = parseInt(ev.detail.scrollLeft*2 / 480 + 0.5)
+          const maxPage = this.titleList.length - 1
+
+          this.currentCard = cardNum < 0 ? 0 : (cardNum > maxPage ? maxPage : cardNum)
+          this.setData({
+            toCard: 'card_' + this.currentCard
+          })
+          this.animationScale()
+        }, 300)
+      },
+      animationScale () {
+        let aniExports = []
+        for (let i = 0; i < this.titleList.length; i++) {
+          let animation = wx.createAnimation({ timingFunction: 'ease', duration: 500 })
+          if (i === this.currentCard) {
+            animation.scale(1.1, 1.1).step()
+          } else {
+            animation.scale(1, 1).step()
+          }
+          aniExports.push(animation.export())
+        }
+        this.animations = aniExports
+      },
+      clickMask () {
+        this.clickClose()
+      },
+      clickSave () {
+        if (this.currentCard >= this.imageList.length) return
+        wx.saveImageToPhotosAlbum({
+          filePath: this.imageList[this.currentCard],
+          success(res) {
+            wx.showToast({
+              title: '保存成功',
+              icon: 'success'
+            })
+          }
+        })
+      },
+      clickClose () {
+        this.triggerEvent('close', {}, {})
+      },
+      true () {
+        // 占位的
+      }
+    }
+  })
+</script>
+
+<style>
+  .gallery_mask {
+    background-color: rgba(0, 0, 0, 0.7);
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10001;
+  }
+
+  .scroll-box {
+    white-space: nowrap;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 200rpx;
+    height: 800rpx;
+  }
+  .scroll-box view {
+    display: inline-block;
+  }
+  .card_holder {
+    width: 135rpx;
+  }
+  .card-box {
+    display: inline-block;
+
+    position: relative;
+    width: 480rpx;
+    height: 800rpx;
+  }
+  .maoDian {
+    position: absolute;
+    right: 135rpx;
+    top: 0;
+  }
+  .card_title {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    text-align: center;
+    font-size: 30rpx;
+    height: 40rpx;
+    line-height: 40rpx;
+  }
+  .card {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top:0;
+    margin: auto;
+    width: 390rpx;
+    height: 650rpx;
+  }
+  .gallery_save {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 1050rpx;
+    background-color: transparent;
+    border: 2rpx solid #fff;
+    height: 80rpx;
+    line-height: 80rpx;
+    font-size: 32rpx;
+    color: white;
+    margin: 0 200rpx;
+  }
+  .gallery_close {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 1150rpx;
+    background-color: transparent;
+    border: 2rpx solid #fff;
+    height: 80rpx;
+    line-height: 80rpx;
+    font-size: 32rpx;
+    color: white;
+    margin: 0 200rpx;
+  }
+</style>
+
+<script type='application/json' lang='json'>
+  {
+    "component": true
+  }
+</script>
+

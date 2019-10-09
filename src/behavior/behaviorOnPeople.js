@@ -81,7 +81,7 @@ export const behaviorOnPeople = Behavior({
       }
     },
 
-    // 个人信息，通知，收藏，设置，关注/取消关注
+    // 个人信息，通知，收藏，设置，关注/取消关注，生成海报
     clickToSome: function (e) {
       const type = parseInt(e.currentTarget.dataset.type)
       switch (type) {
@@ -151,6 +151,10 @@ export const behaviorOnPeople = Behavior({
           }
           break
         }
+        case 5: { // 生成海报
+          this.isShowGallery = true
+          break
+        }
       }
     },
 
@@ -167,7 +171,7 @@ export const behaviorOnPeople = Behavior({
       }, 1500)
     },
     animationOnHead (type) {
-      let exports = []
+      let aniExports = []
       if (type === 0) {
         for (let i = 0; i < elements.length; i++) {
           let animation = elements[i]
@@ -189,17 +193,17 @@ export const behaviorOnPeople = Behavior({
               break
             }
           }
-          exports.push(animation.export())
+          aniExports.push(animation.export())
         }
       } else {
         for (let i = 0; i < elements.length; i++) {
           let animation = elements[i]
           animation.left('325rpx').top('65rpx').step()
-          exports.push(animation.export())
+          aniExports.push(animation.export())
         }
         this.isAnimating = false
       }
-      this.animations = exports
+      this.animations = aniExports
     },
 
     // 点击是否授权后触发

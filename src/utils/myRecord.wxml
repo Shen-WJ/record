@@ -38,9 +38,8 @@
                 <image wx:else src="../image/icon/like0.png"></image>
                 <text>{{record.love}}</text>
               </view>
-              <view class="icons4_2" catchtap="clickFavorites" data-index="{{rcdIndex}}">
-                <image wx:if="{{record.isFavorited}}" src="../image/icon/favorites1.png"/>
-                <image wx:else src="../image/icon/favorites0.png"/>
+              <view class="icons4_2" catchtap="clickDownloadCard" data-index="{{rcdIndex}}">
+                <image src="../image/icon/download.png"/>
               </view>
               <button class="hided" open-type="share" catchtap="clickShare" id="hidedBtn{{record.recordId}}" data-index="{{rcdIndex}}" />
               <label for="hidedBtn{{record.recordId}}">

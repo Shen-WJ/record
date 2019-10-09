@@ -3,6 +3,7 @@ import { storeUser } from '../stores/storeUser'
 import { storeMode } from '../stores/storeCommon'
 import toMap from '../image/icon/toMap.png'
 import contentBoard from '../image/global/contentBoard.png'
+import card from '../image/global/card.jpg'
 
 const app = getApp()
 
@@ -301,52 +302,10 @@ function _createContentBoard (content, complete) {
   ctx.fillRect(0, 0, boardW, boardH)
   // logo
   ctx.drawImage(contentBoard, 0, 0, boardW, boardH)
-  // 商品名称
+  // 正文
   ctx.setFontSize(28)
   ctx.setFillStyle('#777777')
-  textHandle(content, 60, 60, boardW - 120, 36, true)
-
-  /**
-   * @function textHandle 绘制文本的换行处理
-   * @param text 在画布上输出的文本
-   * @param numX 绘制文本的左上角x坐标位置
-   * @param numY 绘制文本的左上角y坐标位置
-   * @param textWidth 文本宽度
-   * @param lineHeight 文本的行高
-   * @author Moss
-   */
-  function textHandle (text, numX, numY, textWidth, lineHeight, isAutoCenter = false) {
-    var chr = text.split('') // 将一个字符串分割成字符串数组
-    var temp = ''
-    var row = []
-    for (let a = 0; a < chr.length; a++) {
-      if (ctx.measureText(temp).width < textWidth) {
-        temp += chr[a]
-      } else {
-        a-- // 添加a--，防止字符丢失
-        row.push(temp)
-        temp = ''
-      }
-    }
-    row.push(temp)
-
-    // 如果数组长度大于2 则截取前两个
-    if (row.length > 6) {
-      row = row.slice(0, 6)
-      row.push('...[点击查看]')
-    }
-
-    if (isAutoCenter) { // 居中显示
-      if (row.length === 1) {
-        numX = (boardW - ctx.measureText(row[0]).width) * 0.5
-      }
-      let tempY = (boardH - row.length * lineHeight) * 0.5
-      numY = (tempY < numY ? numY : tempY) + 20 // 不知什么原因，字偏上，加10补足
-    }
-    for (let b = 0; b < row.length; b++) {
-      ctx.fillText(row[b], numX, numY + b * lineHeight)
-    }
-  }
+  _textHandle(ctx, content, 60, 60, boardW - 120, 36, 6, '...[点击查看]', true, boardW, boardH)
 
   // 完成
   ctx.draw()
@@ -365,6 +324,157 @@ function _createContentBoard (content, complete) {
   }, 100)
 }
 
+function _createCardSingle (record, complete) {
+  wx.showLoading({
+    title: '',
+    mask: true
+  })
+  let finishDownloads = []
+  let imgPath = []
+
+  // todo 配置域名
+  finishDownloads[0] = false
+  wx.getImageInfo({
+    src: storeUser.state.headUrl,
+    complete:(res) => {
+      finishDownloads[0] = true
+      if (res.statusCode === 200) {
+        console.log(res)
+        imgPath[0] = res.tempFilePath
+      }
+      startDrawCard()
+    }
+  })
+  if (record.imageList.length > 0) {
+    for (let i = 0; i < record.imageList.length; i++) {
+      if (i > 2) break
+      finishDownloads[i+1] = true
+      wx.getImageInfo({
+        src: record.imageList[i],
+        complete:(res) => {
+          console.log(res)
+          finishDownloads[i+1] = true
+          // if (res.statusCode === 200) {
+            imgPath[i+1] = res.path
+            startDrawCard()
+          // }
+        }
+      })
+    }
+
+  } else {
+    startDrawCard()
+  }
+  function startDrawCard() {
+    let countDownloads = 0
+    for (let i = 0; i < finishDownloads.length; i++) {
+      countDownloads += (finishDownloads[i] ? 1 : 0)
+    }
+    if (countDownloads < finishDownloads.length) return
+
+    let context = wx.createCanvasContext('cardCanvas')
+    context.drawImage(card, 0, 0, 600, 1000)
+
+    if (imgPath[0]) {
+      context.save() // 先保存状态 已便于画完圆再用
+      context.beginPath() // 开始绘制
+      context.arc(100, 100, 20, 0, Math.PI * 2, false) // 先画个圆
+      context.clip() // 画了圆 再剪切  原始画布中剪切任意形状和尺寸。一旦剪切了某个区域，则所有之后的绘图都会被限制在被剪切的区域内
+      context.drawImage(imgPath[0], 80, 80, 40, 40) // 推进去图片
+      context.restore() //恢复之前保存的绘图上下文 恢复之前保存的绘图上下午即状态 可以继续绘制
+    }
+    for (let i = 1; i < imgPath.length; i++) {
+      if (imgPath[i]) {
+        context.save()
+        context.translate(460, 280 + 120 * i)
+        context.rotate((Math.random() * 30) * Math.PI / 180)
+        context.drawImage(imgPath[i], 0, 0, 100, 100)
+        context.restore()
+      }
+    }
+
+    context.setFontSize(30)
+    context.setFillStyle('#e98809')
+    let date = new Date(record.time)
+    let dateStr = date.getFullYear() + '年' + (date.getMonth() + 1) + '月' + date.getDate() + '日'
+    _textHandle(context, '◤' + dateStr + '◢', 80, 360, 800, 44, 1, '')
+    
+    if (record.location.length > 0) {
+      context.setFontSize(20)
+      context.setFillStyle('#2ab3f3')
+      _textHandle(context, '★' + record.location, 80, 430, 260, 44, 2, '')
+    }
+    if (record.content.length > 0) {
+      context.setFontSize(18)
+      context.setFillStyle('#888')
+      _textHandle(context, '⚓︎' + record.content, 80, 560, 260, 44, 4, '')
+    }
+    context.draw()
+
+    let timer = setTimeout(() => {
+      clearTimeout(timer)
+      wx.canvasToTempFilePath({
+        canvasId: 'cardCanvas',
+        fail: err => {
+          console.log('cardCanvas err:', err)
+        },
+        success: res => {
+          complete(res.tempFilePath)
+          wx.hideLoading()
+        }
+      })
+    }, 300)
+  }
+}
+
+/**
+ * @function _textHandle 绘制文本的换行处理
+ * @param ctx 画布上下文
+ * @param text 在画布上输出的文本
+ * @param numX 绘制文本的左上角x坐标位置
+ * @param numY 绘制文本的左上角y坐标位置
+ * @param textWidth 文本宽度
+ * @param lineHeight 文本的行高
+ * @param maxLine 最多多少行，默认6行
+ * @param breakStr 文末截断字符，默认'...'
+ * @param isAutoCenter 是否xy轴都居中，默认不居中
+ * @param boardW 写字板的宽度，居中时需要用，默认500px
+ * @param boardH 写字板的高度，居中时需要用，默认400px
+ * @author Moss
+ */
+function _textHandle (ctx, text, numX, numY, textWidth, lineHeight, maxLine = 6, breakStr = '...', isAutoCenter = false, boardW = 500, boardH = 400) {
+  var chr = text.split('') // 将一个字符串分割成字符串数组
+  var temp = ''
+  var row = []
+  for (let a = 0; a < chr.length; a++) {
+    if (ctx.measureText(temp).width < textWidth) {
+      temp += chr[a]
+    } else {
+      a-- // 添加a--，防止字符丢失
+      row.push(temp)
+      temp = ''
+    }
+  }
+  row.push(temp)
+
+  // 如果数组长度大于maxLine 则截取
+  if (row.length > maxLine) {
+    row = row.slice(0, maxLine)
+    row.push(breakStr)
+  }
+
+  if (isAutoCenter) { // 居中显示
+    if (row.length === 1) {
+      numX = (boardW - ctx.measureText(row[0]).width) * 0.5
+    }
+    let tempY = (boardH - row.length * lineHeight) * 0.5
+    numY = (tempY < numY ? numY : tempY) + 20 // 不知什么原因，字偏上，加10补足
+  }
+  for (let b = 0; b < row.length; b++) {
+    ctx.fillText(row[b], numX, numY + b * lineHeight)
+  }
+}
+
 export const getKilometerDistance = _getKilometerDistance
 export const getKmDistanceFromPoi = _getKmDistanceFromPoi
 export const getDistanceToMe = _getDistanceToMe
@@ -380,3 +490,4 @@ export const clickLike = _clickLike
 export const clickFavorites = _clickFavorites
 export const changeStatus = _changeStatus
 export const createContentBoard = _createContentBoard
+export const createCardSingle = _createCardSingle

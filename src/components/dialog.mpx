@@ -67,7 +67,7 @@
     data: {
     },
     computed: {
-      ...storeMode.mapState(['darkMode', 'opacity'])
+      ...storeMode.mapState(['darkMode'])
     },
     methods: {
       close: function () {
