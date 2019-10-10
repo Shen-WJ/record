@@ -2,13 +2,15 @@
   <view class='gallery_mask' wx:if='{{isShow}}' catchtouchmove='true' catchtap="clickMask" catchlongpress="true">
     <scroll-view class="scroll-box" scroll-x scroll-with-animation
       scroll-into-view="{{toCard}}"
+      lower-threshold="135"
+      bindscrolltolower="{{scrollToLower}}"
       bindscroll="bindScroll">
         <block wx:for="{{titleList}}" wx:key="index">
           <view wx:if="{{index === 0}}" class="card_holder" id="card_0" />
           <view class="card-box">
             <view class="maoDian" id="card_{{index+1}}" />
             <text class="card_title" style="color:{{currentCard===index?'#fff':'#ccc'}};">{{titleList[index]}}</text>
-            <image class="card" animation="{{index<animations.length?animations[index]:''}}" src="{{imageList[index]}}" />
+            <image class="card" catchtap="clickCard" animation="{{index<animations.length?animations[index]:''}}" src="{{imageList[index]}}" />
           </view>
           <view wx:if="{{index === 4}}" class="card_holder" />
         </block>
@@ -56,7 +58,7 @@
         this.scrollEndTimer = setTimeout(() => {
           clearTimeout(this.scrollEndTimer)
 
-          const cardNum = parseInt(ev.detail.scrollLeft*2 / 480 + 0.5)
+          const cardNum = parseInt(ev.detail.scrollLeft * 2 / 480 + 0.5)
           const maxPage = this.titleList.length - 1
 
           this.currentCard = cardNum < 0 ? 0 : (cardNum > maxPage ? maxPage : cardNum)
@@ -86,7 +88,7 @@
         if (this.currentCard >= this.imageList.length) return
         wx.saveImageToPhotosAlbum({
           filePath: this.imageList[this.currentCard],
-          success(res) {
+          success: (res) => {
             wx.showToast({
               title: '保存成功',
               icon: 'success'
@@ -96,6 +98,9 @@
       },
       clickClose () {
         this.triggerEvent('close', {}, {})
+      },
+      clickCard () {
+        // 占位用，否则点击会触发clickMask
       },
       true () {
         // 占位的

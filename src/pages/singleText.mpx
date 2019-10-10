@@ -28,7 +28,7 @@
       </view>
       <view class="about_footer fontColorC0" style="bottom: {{tabBarBottom}}px;">
         <text>让附近离你更近
-        由两个初出茅庐的开发者前后累计耗时一周完成第一版开发</text>
+        两个初出茅庐的开发者的沥血之作</text>
       </view>
     </block>
   </view>

@@ -336,36 +336,39 @@ function _createCardSingle (record, complete) {
   finishDownloads[0] = false
   wx.getImageInfo({
     src: storeUser.state.headUrl,
-    complete:(res) => {
+    complete: (res) => {
       finishDownloads[0] = true
-      if (res.statusCode === 200) {
-        console.log(res)
-        imgPath[0] = res.tempFilePath
-      }
+      console.log(res)
+      imgPath[0] = res
       startDrawCard()
     }
   })
   if (record.imageList.length > 0) {
     for (let i = 0; i < record.imageList.length; i++) {
       if (i > 2) break
-      finishDownloads[i+1] = true
+      finishDownloads[i + 1] = true
       wx.getImageInfo({
         src: record.imageList[i],
-        complete:(res) => {
+        complete: (res) => {
           console.log(res)
-          finishDownloads[i+1] = true
-          // if (res.statusCode === 200) {
-            imgPath[i+1] = res.path
-            startDrawCard()
-          // }
+          finishDownloads[i + 1] = true
+          if (res.width > res.height) {
+            res.height = 100 * (res.height / res.width)
+            res.width = 100
+          } else {
+            res.width = 100 * (res.width / res.height)
+            res.height = 100
+          }
+          imgPath[i + 1] = res
+          startDrawCard()
         }
       })
     }
-
   } else {
     startDrawCard()
   }
-  function startDrawCard() {
+
+  function startDrawCard () {
     let countDownloads = 0
     for (let i = 0; i < finishDownloads.length; i++) {
       countDownloads += (finishDownloads[i] ? 1 : 0)
@@ -375,20 +378,24 @@ function _createCardSingle (record, complete) {
     let context = wx.createCanvasContext('cardCanvas')
     context.drawImage(card, 0, 0, 600, 1000)
 
-    if (imgPath[0]) {
+    if (imgPath[0].path) {
       context.save() // 先保存状态 已便于画完圆再用
       context.beginPath() // 开始绘制
-      context.arc(100, 100, 20, 0, Math.PI * 2, false) // 先画个圆
+      context.arc(100, 750, 30, 0, Math.PI * 2, false) // 先画个圆
       context.clip() // 画了圆 再剪切  原始画布中剪切任意形状和尺寸。一旦剪切了某个区域，则所有之后的绘图都会被限制在被剪切的区域内
-      context.drawImage(imgPath[0], 80, 80, 40, 40) // 推进去图片
-      context.restore() //恢复之前保存的绘图上下文 恢复之前保存的绘图上下午即状态 可以继续绘制
+      context.drawImage(imgPath[0].path, 70, 720, 60, 60) // 推进去图片
+      context.restore() // 恢复之前保存的绘图上下文 恢复之前保存的绘图上下午即状态 可以继续绘制
     }
+    context.setFontSize(24)
+    context.setFillStyle('#333')
+    _textHandle(context, storeUser.state.nickname, 140, 750, 160, 30, 1, '')
+
     for (let i = 1; i < imgPath.length; i++) {
-      if (imgPath[i]) {
+      if (imgPath[i].path) {
         context.save()
         context.translate(460, 280 + 120 * i)
-        context.rotate((Math.random() * 30) * Math.PI / 180)
-        context.drawImage(imgPath[i], 0, 0, 100, 100)
+        context.rotate(((Math.random() - 0.5) * 60) * Math.PI / 180) // 在-0.5至0.5随机，转角在-30°至30°随机
+        context.drawImage(imgPath[i].path, 0, 0, imgPath[i].width, imgPath[i].height)
         context.restore()
       }
     }
@@ -398,16 +405,16 @@ function _createCardSingle (record, complete) {
     let date = new Date(record.time)
     let dateStr = date.getFullYear() + '年' + (date.getMonth() + 1) + '月' + date.getDate() + '日'
     _textHandle(context, '◤' + dateStr + '◢', 80, 360, 800, 44, 1, '')
-    
+
     if (record.location.length > 0) {
       context.setFontSize(20)
       context.setFillStyle('#2ab3f3')
-      _textHandle(context, '★' + record.location, 80, 430, 260, 44, 2, '')
+      _textHandle(context, '⊙' + record.location, 80, 430, 260, 44, 2, '')
     }
     if (record.content.length > 0) {
       context.setFontSize(18)
-      context.setFillStyle('#888')
-      _textHandle(context, '⚓︎' + record.content, 80, 560, 260, 44, 4, '')
+      context.setFillStyle('#666')
+      _textHandle(context, '◆' + record.content, 80, 560, 260, 44, 4, '')
     }
     context.draw()
 
@@ -423,7 +430,7 @@ function _createCardSingle (record, complete) {
           wx.hideLoading()
         }
       })
-    }, 300)
+    }, 500)
   }
 }
 
@@ -447,6 +454,12 @@ function _textHandle (ctx, text, numX, numY, textWidth, lineHeight, maxLine = 6,
   var temp = ''
   var row = []
   for (let a = 0; a < chr.length; a++) {
+    if (chr[a] === '\n') {
+      console.log('has a return char')
+      row.push(temp)
+      temp = ''
+      continue
+    }
     if (ctx.measureText(temp).width < textWidth) {
       temp += chr[a]
     } else {
@@ -463,15 +476,17 @@ function _textHandle (ctx, text, numX, numY, textWidth, lineHeight, maxLine = 6,
     row.push(breakStr)
   }
 
-  if (isAutoCenter) { // 居中显示
-    if (row.length === 1) {
-      numX = (boardW - ctx.measureText(row[0]).width) * 0.5
-    }
-    let tempY = (boardH - row.length * lineHeight) * 0.5
-    numY = (tempY < numY ? numY : tempY) + 20 // 不知什么原因，字偏上，加10补足
+  let tempX = numX
+  let tempY = numY
+  if (isAutoCenter) {
+    tempY = (boardH - row.length * lineHeight) * 0.5 + lineHeight * 0.5 // 行间距可能影响了文字的y值，此处额外补半个行间距
+    tempY = (tempY < numY ? numY : tempY)
   }
   for (let b = 0; b < row.length; b++) {
-    ctx.fillText(row[b], numX, numY + b * lineHeight)
+    if (isAutoCenter) { // 居中显示
+      tempX = (boardW - ctx.measureText(row[b]).width) * 0.5
+    }
+    ctx.fillText(row[b], tempX, tempY + b * lineHeight)
   }
 }
 
