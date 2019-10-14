@@ -373,7 +373,7 @@ function _createCardSingle (record, complete) {
     for (let i = 0; i < finishDownloads.length; i++) {
       countDownloads += (finishDownloads[i] ? 1 : 0)
     }
-    if (countDownloads < finishDownloads.length){
+    if (countDownloads < finishDownloads.length) {
       console.log('startDrawCard not start')
       return
     }

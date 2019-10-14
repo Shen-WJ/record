@@ -216,7 +216,6 @@
         }
       })
 
-      // 
       this.fsm.rmdir({
         dirPath: releaseDir,
         recursive: true,
