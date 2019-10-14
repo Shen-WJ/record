@@ -31,7 +31,7 @@
       },
       titleList: {
         type: Array,
-        value: []
+        value: ['']
       },
       imageList: {
         type: Array,
@@ -42,11 +42,6 @@
       toCard: 'card_0',
       currentCard: 0,
       animations: []
-    },
-    lifetimes: {
-      attached: function () {
-        this.animationScale()
-      }
     },
     methods: {
       bindScroll: function (ev) {
@@ -68,9 +63,11 @@
           this.animationScale()
         }, 300)
       },
+      // 此函数被外部（me）调用，修改请考虑外部
       animationScale () {
         let aniExports = []
         for (let i = 0; i < this.titleList.length; i++) {
+          console.log('animationScale', i)
           let animation = wx.createAnimation({ timingFunction: 'ease', duration: 500 })
           if (i === this.currentCard) {
             animation.scale(1.1, 1.1).step()
@@ -100,7 +97,10 @@
         this.triggerEvent('close', {}, {})
       },
       clickCard () {
-        // 占位用，否则点击会触发clickMask
+        wx.previewImage({
+          current: this.imageList[this.currentCard],
+          urls: this.imageList
+        })
       },
       true () {
         // 占位的

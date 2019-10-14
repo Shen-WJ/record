@@ -24,9 +24,7 @@ export const behaviorOnPeople = Behavior({
           wx.navigateBack({
             delta: 1,
             fail: (res) => {
-              wx.switchTab({
-                url: './locality'
-              })
+              common.navToHomePage()
             }
           })
           return
@@ -74,8 +72,8 @@ export const behaviorOnPeople = Behavior({
         }
       } else {
         return {
-          title: '了解身边的过去，记录过去的身边',
-          path: '/pages/locality',
+          title: '点迹，让附近离你更近。',
+          path: '/pages/launch',
           imageUrl: logo1
         }
       }

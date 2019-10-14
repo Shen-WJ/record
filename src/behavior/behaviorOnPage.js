@@ -38,8 +38,8 @@ export const behaviorOnPage = Behavior({
         }
       } else {
         return {
-          title: '了解身边的过去，记录过去的身边',
-          path: '/pages/locality',
+          title: '点迹，让附近离你更近。',
+          path: '/pages/launch',
           imageUrl: logo1
         }
       }

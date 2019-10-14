@@ -346,7 +346,7 @@ function _createCardSingle (record, complete) {
   if (record.imageList.length > 0) {
     for (let i = 0; i < record.imageList.length; i++) {
       if (i > 2) break
-      finishDownloads[i + 1] = true
+      finishDownloads[i + 1] = false
       wx.getImageInfo({
         src: record.imageList[i],
         complete: (res) => {
@@ -373,8 +373,11 @@ function _createCardSingle (record, complete) {
     for (let i = 0; i < finishDownloads.length; i++) {
       countDownloads += (finishDownloads[i] ? 1 : 0)
     }
-    if (countDownloads < finishDownloads.length) return
-
+    if (countDownloads < finishDownloads.length){
+      console.log('startDrawCard not start')
+      return
+    }
+    console.log('startDrawCard&countDownloads: ', countDownloads)
     let context = wx.createCanvasContext('cardCanvas')
     context.drawImage(card, 0, 0, 600, 1000)
 
@@ -390,12 +393,17 @@ function _createCardSingle (record, complete) {
     context.setFillStyle('#333')
     _textHandle(context, storeUser.state.nickname, 140, 750, 160, 30, 1, '')
 
+    const halfLineWidth = 2.5 // 线条两侧宽度
     for (let i = 1; i < imgPath.length; i++) {
-      if (imgPath[i].path) {
+      if (!_isEmpty(imgPath[i].path)) {
         context.save()
         context.translate(460, 280 + 120 * i)
         context.rotate(((Math.random() - 0.5) * 60) * Math.PI / 180) // 在-0.5至0.5随机，转角在-30°至30°随机
-        context.drawImage(imgPath[i].path, 0, 0, imgPath[i].width, imgPath[i].height)
+        context.rect(0, 0, imgPath[i].width + halfLineWidth * 2, imgPath[i].height + halfLineWidth * 2)
+        context.setLineWidth(halfLineWidth * 2)
+        context.setStrokeStyle('#ccc')
+        context.stroke()
+        context.drawImage(imgPath[i].path, halfLineWidth, halfLineWidth, imgPath[i].width, imgPath[i].height)
         context.restore()
       }
     }
@@ -490,6 +498,18 @@ function _textHandle (ctx, text, numX, numY, textWidth, lineHeight, maxLine = 6,
   }
 }
 
+function _navToHomePage (isRelaunch = false) {
+  if (isRelaunch) {
+    wx.reLaunch({
+      url: './find'
+    })
+  } else {
+    wx.switchTab({
+      url: './find'
+    })
+  }
+}
+
 export const getKilometerDistance = _getKilometerDistance
 export const getKmDistanceFromPoi = _getKmDistanceFromPoi
 export const getDistanceToMe = _getDistanceToMe
@@ -506,3 +526,4 @@ export const clickFavorites = _clickFavorites
 export const changeStatus = _changeStatus
 export const createContentBoard = _createContentBoard
 export const createCardSingle = _createCardSingle
+export const navToHomePage = _navToHomePage

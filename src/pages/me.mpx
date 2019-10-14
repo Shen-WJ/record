@@ -9,7 +9,7 @@
     noticeCount:noticeCount, followCount:followCount, followedCount:followedCount, signature:signature, headUrl:headUrl, nickname:nickname, genderImg:genderImg}}">
   </template>
   <canvas id="cardCanvas" canvas-id="cardCanvas"></canvas>
-  <gallery isShow="{{isShowGallery}}" titleList="{{galleryTitleList}}" imageList="{{galleryImageList}}"  bindclose="closeGallery" />
+  <gallery id="gallery" isShow="{{isShowGallery}}" titleList="{{galleryTitleList}}" imageList="{{galleryImageList}}"  bindclose="closeGallery" />
   <tabbar selected="4" />
   <view class="bottomHolder" style="padding-bottom: {{tabBarBottom}}px;"/>
 </template>
@@ -186,6 +186,7 @@
         this.isShowGallery = true
         this.galleryTitleList = ['打卡']
         this.galleryImageList = [res]
+        this.selectComponent('#gallery').animationScale()
       })
     }
   })

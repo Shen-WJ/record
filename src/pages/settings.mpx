@@ -62,6 +62,8 @@
   import { storeMode } from '../stores/storeCommon'
   import { behaviorOnPage } from '../behavior/behaviorOnPage'
 
+  const common = require('../utils/common.js')
+
   createPage({
     behaviors: [behaviorOnPage],
     data: {
@@ -126,11 +128,15 @@
             count: 1,
             success: (res) => {
               console.log(res.tempFilePaths[0])
-              storeMode.commit('updateCoverImg', {
-                imgUrl: res.tempFilePaths[0]
-              })
-              wx.reLaunch({
-                url: './locality'
+              wx.saveFile({
+                tempFilePath: res.tempFilePaths[0],
+                success: res => {
+                  console.log(res.savedFilePath)
+                  storeMode.commit('updateCoverImg', {
+                    imgUrl: res.savedFilePath
+                  })
+                  common.navToHomePage(true)
+                }
               })
             }
           })

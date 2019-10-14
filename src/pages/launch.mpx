@@ -10,7 +10,7 @@
 <script>
   import { createPage } from '@mpxjs/core'
   import { storeUser } from '../stores/storeUser'
-
+  const common = require('../utils/common.js')
   createPage({
     data: {
       counter: 1
@@ -29,14 +29,10 @@
     skipLaunch () {
       clearInterval(this.timer)
       if (storeUser.state.needAgreePolicy) return
-      wx.switchTab({
-        url: './locality'
-      })
+      common.navToHomePage()
     },
     clickEnter () {
-      wx.switchTab({
-        url: './locality'
-      })
+      common.navToHomePage()
       this.selectComponent('#policy_text').agreePolicy()
     }
   })

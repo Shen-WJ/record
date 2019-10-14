@@ -21,6 +21,7 @@
   import { storeMode } from '../stores/storeCommon'
   import { storeUser } from '../stores/storeUser'
   import { behaviorOnPage } from '../behavior/behaviorOnPage'
+  const common = require('../utils/common.js')
 
   createPage({
     behaviors: [behaviorOnPage],
@@ -178,9 +179,7 @@
       wx.navigateBack({
         delta: 1,
         fail: (res) => {
-          wx.switchTab({
-            url: './locality'
-          })
+          common.navToHomePage()
         }
       })
     }

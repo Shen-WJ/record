@@ -26,7 +26,7 @@
 <script>
   import { createComponent } from '@mpxjs/core'
   import { storeMode } from '../stores/storeCommon'
-
+  const common = require('../utils/common.js')
   const app = getApp()
   createComponent({
     options: {
@@ -103,9 +103,7 @@
           return
         }
         if (!this.canNavHome) return
-        wx.switchTab({
-          url: './locality'
-        })
+        common.navToHomePage()
       }
     }
   })

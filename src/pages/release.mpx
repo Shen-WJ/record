@@ -73,8 +73,8 @@
   const strReleaseLocationDigit = 'release_locationDigit'
   const strReleaseLocationGPS = 'release_locationGPS'
   const strReleaseContentText = 'release_contentText'
-  const strReleaseImageList = 'release_ImageList'
   const allowedDistance = 20 // 单位km
+  const releaseDir = `${wx.env.USER_DATA_PATH}/releaseImgs`
 
   createPage({
     behaviors: [behaviorOnPage],
@@ -130,10 +130,17 @@
         this.contentTextCount = text.length
       }
 
-      const list = wx.getStorageSync(strReleaseImageList)
-      if (list) {
-        this.imageList = list
-      }
+      this.fsm = wx.getFileSystemManager()
+      this.fsm.mkdir({
+        dirPath: releaseDir,
+        recursive:true,
+        complete: res => {
+          let imgs = this.fsm.readdirSync(releaseDir).sort()
+          for (let i in imgs) {
+            this.imageList.push(`${releaseDir}/${imgs[i]}`)
+          }
+        }
+      })
     },
 
     onShow: function () {
@@ -184,10 +191,8 @@
           data = this.contentText
           break
         }
-        case 3: {
-          key = strReleaseImageList
-          data = this.imageList
-          break
+        default: {
+          return
         }
       }
       wx.setStorageSync(key, data)
@@ -197,7 +202,6 @@
       wx.removeStorageSync(strReleaseLocationName)
       wx.removeStorageSync(strReleaseLocationDigit)
       wx.removeStorageSync(strReleaseContentText)
-      wx.removeStorageSync(strReleaseImageList)
     },
 
     clickBtnClear: function (e) {
@@ -210,6 +214,12 @@
           this.locationDigit = { latitude: res.latitude, longitude: res.longitude }
           this.locationGPS = common.formatLocation(res.longitude, res.latitude)
         }
+      })
+
+      // 
+      this.fsm.rmdir({
+        dirPath: releaseDir,
+        recursive: true
       })
 
       this.locationName = ''
@@ -410,28 +420,34 @@
     },
 
     chooseImage () {
-      var imgs = this.imageList
-      if (imgListLength - imgs.length > 0) {
+      const imgCount = this.imageList.length
+      if (imgListLength - imgCount > 0) {
         wx.chooseImage({
           sourceType: ['camera', 'album'],
           sizeType: ['compressed'],
-          count: (imgListLength - imgs.length),
+          count: (imgListLength - imgCount),
           success: (res) => {
             console.log(res)
-            for (let i in res.tempFiles) {
-              let item = res.tempFiles[i]
+            // 为了不重名
+            const fileName = imgCount > 0 ? parseInt(this.imageList[imgCount - 1].split('/').slice(-1)) : 0
+            for (let i = imgCount; i < res.tempFiles.length + imgCount; i++) {
+              let item = res.tempFiles[i - imgCount]
               if (item.size > 1000000) { // 大于1M则过滤并提示
                 wx.showToast({
                   title: '有些图片太大，已被过滤',
                   icon: 'none'
                 })
               } else {
-                imgs.push(item.path)
+                this.fsm.saveFile({
+                  tempFilePath: item.path,
+                  filePath: `${releaseDir}/${(fileName + i)}`,
+                  success: res => {
+                    console.log(res.savedFilePath)
+                    this.imageList.splice(i, 1, res.savedFilePath)
+                  }
+                })
               }
             }
-            this.imageList = imgs
-
-            this.autoSave(3)
           }
         })
       } else {
@@ -452,14 +468,15 @@
     },
 
     removeImg (e) {
-      console.log(e)
-      // let imgs = this.imageList
-      // imgs.splice(e.currentTarget.dataset.index, 1)
-      // this.setData({
-      //   imageList: imgs
-      // })
-      this.imageList.splice(e.currentTarget.dataset.index, 1)
-      this.autoSave(3)
+      const index = parseInt(e.currentTarget.dataset.index)
+      // unlink处理非saved文件夹下的文件
+      this.fsm.unlink({
+        filePath: this.imageList[index],
+        complete: res => {
+          console.log(res)
+        }
+      })
+      this.imageList.splice(index, 1)
     },
 
     changeAnonymous: function (e) {
