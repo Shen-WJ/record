@@ -41,8 +41,8 @@
     </view>
     <view class="private_choose {{darkMode?'fontColorW2':'fontColorB2'}}">
       <text>给后来者也看看吧？</text>
-      <picker class="private_choose_picker" mode="multiSelector" range="{{privateType}}" range-key="text" bindchange="changePrivateType" bindcolumnchange="columnchange" bindcancel="cancelChange" bindtap="clickPicker">
-        <text>{{privateType[0][privateTypeIndex].text}}</text>
+      <picker class="private_choose_picker" mode="selector" range="{{privateType}}" range-key="text" value="{{privateTypeIndex}}" bindchange="changePrivateType">
+        <text>{{privateType[privateTypeIndex].text}}</text>
         <image src="../image/icon/arrow_right.png" />
       </picker>
     </view>
@@ -86,7 +86,7 @@
       locationGPS: '',
       imageList: [],
       privateTypeIndex: 0,
-      privateType: [[{ text: '公开', value: 1 }, { text: '私密', value: 0 }]],
+      privateType: [{ text: '公开', value: 1 }, { text: '私密', value: 0 }],
       isAnonymous: 0,
 
       loactionNameLength: loactionNameLength,
@@ -107,8 +107,6 @@
 
     onLoad: function (options) {
       wx.canIUse('hideTabBar') && wx.hideTabBar()
-
-      this.privateTypeIndexTemp = 0
 
       const name = wx.getStorageSync(strReleaseLocationName)
       if (name) {
@@ -303,11 +301,13 @@
         let imgs = this.imageList
         let waitingCount = imgs.length
         for (let i = 0; i < imgs.length; i++) {
+          console.log(imgs[i])
           wx.uploadFile({
             url: net.baseUrl + 'upload',
             filePath: imgs[i],
             name: 'file',
-            complete: res => {
+            success: res => {
+              console.log(res)
               let jsonData = common.strToJson(res.data)
 
               if (jsonData.code === 0) {
@@ -367,7 +367,7 @@
         lng: this.locationDigit.longitude,
         lat: this.locationDigit.latitude,
         isAnonymous: this.isAnonymous,
-        isPublic: this.privateType[0][this.privateTypeIndex].value
+        isPublic: this.privateType[this.privateTypeIndex].value
       }
 
       net.reqPost({
@@ -433,8 +433,6 @@
           count: (imgListLength - imgCount),
           success: (res) => {
             console.log(res)
-            // 为了不重名
-            const fileName = imgCount > 0 ? parseInt(this.imageList[imgCount - 1].split('/').slice(-1)) : 0
             for (let i = imgCount; i < res.tempFiles.length + imgCount; i++) {
               let item = res.tempFiles[i - imgCount]
               if (item.size > 1000000) { // 大于1M则过滤并提示
@@ -443,9 +441,18 @@
                   icon: 'none'
                 })
               } else {
+                // 为了不重名
+                let fileNum = 0
+                if (imgCount > 0) {
+                  const lastFileName = this.imageList[imgCount - 1].split('/').slice(-1)[0]
+                  console.log(lastFileName)
+                  fileNum = parseInt(lastFileName.split('.')[0]) + i
+                }
+                // 为了上传
+                const houzhui = item.path.split('.').slice(-1)
                 this.fsm.saveFile({
                   tempFilePath: item.path,
-                  filePath: `${releaseDir}/${(fileName + i)}`,
+                  filePath: `${releaseDir}/${fileNum}.${houzhui}`,
                   complete: res => {
                     console.log(res)
                     this.imageList.splice(i, 1, res.savedFilePath)
@@ -491,20 +498,7 @@
     changePrivateType: function (e) {
       console.log(e)
 
-      this.privateTypeIndex = e.detail.value[0]
-    },
-    columnchange: function (e) {
       this.privateTypeIndex = e.detail.value
-    },
-    // 恢复当前状态
-    cancelChange: function (e) {
-      console.log(e)
-      this.privateTypeIndex = this.privateTypeIndexTemp
-    },
-    // 保存当前状态
-    clickPicker: function (e) {
-      console.log(e)
-      this.privateTypeIndexTemp = this.privateTypeIndex
     },
 
     authorizeUserInfo (e) {
