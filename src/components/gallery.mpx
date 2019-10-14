@@ -94,6 +94,14 @@
         })
       },
       clickClose () {
+        for (let i = 0; i < this.imageList.length; i++) {
+          wx.getFileSystemManager().unlink({
+            filePath: this.imageList[i],
+            complete: res => {
+              console.log(res)
+            }
+          })
+        }
         this.triggerEvent('close', {}, {})
       },
       clickCard () {
