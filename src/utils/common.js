@@ -401,7 +401,7 @@ function _createCardSingle (record, complete) {
         context.rotate(((Math.random() - 0.5) * 60) * Math.PI / 180) // 在-0.5至0.5随机，转角在-30°至30°随机
         context.rect(0, 0, imgPath[i].width + halfLineWidth * 2, imgPath[i].height + halfLineWidth * 2)
         context.setLineWidth(halfLineWidth * 2)
-        context.setStrokeStyle('#ccc')
+        context.setStrokeStyle('#ddd')
         context.stroke()
         context.drawImage(imgPath[i].path, halfLineWidth, halfLineWidth, imgPath[i].width, imgPath[i].height)
         context.restore()
