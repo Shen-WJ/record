@@ -133,7 +133,7 @@
       this.fsm = wx.getFileSystemManager()
       this.fsm.mkdir({
         dirPath: releaseDir,
-        recursive:true,
+        recursive: true,
         complete: res => {
           let imgs = this.fsm.readdirSync(releaseDir).sort()
           for (let i in imgs) {
@@ -219,7 +219,13 @@
       // 
       this.fsm.rmdir({
         dirPath: releaseDir,
-        recursive: true
+        recursive: true,
+        complete: res => {
+          this.fsm.mkdir({
+            dirPath: releaseDir,
+            recursive: true
+          })
+        }
       })
 
       this.locationName = ''
@@ -441,8 +447,8 @@
                 this.fsm.saveFile({
                   tempFilePath: item.path,
                   filePath: `${releaseDir}/${(fileName + i)}`,
-                  success: res => {
-                    console.log(res.savedFilePath)
+                  complete: res => {
+                    console.log(res)
                     this.imageList.splice(i, 1, res.savedFilePath)
                   }
                 })
