@@ -57,11 +57,6 @@
           this.getRequest(true)
         }
       })
-
-      var timer = setInterval(() => {
-        common.getLocation()
-        console.log('timer(', timer, ') fire!!!', ++count)
-      }, 30000)
     },
 
     onShow: function () {
@@ -103,15 +98,13 @@
         }
 
         let records = isRefresh ? [] : this.recordList[0]
+        records = records.concat(common.getRecordListFrom(data.data.list))
+        this.httpsData = data.data
+        this.recordList.splice(0, 1, records)
 
         if (!data.data.hasNextPage) {
           this.getHotList()
         }
-        if (data.data.total > 0) {
-          records = records.concat(common.getRecordListFrom(data.data.list))
-          this.httpsData = data.data
-        }
-        this.recordList.splice(0, 1, records)
       })
     },
     getHotList: function () {

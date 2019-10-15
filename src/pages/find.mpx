@@ -75,6 +75,11 @@
           this.getRequest(true)
         }
       })
+
+      var timer = setInterval(() => {
+        common.getLocation()
+        console.log('timer(', timer, ') fire!!!', ++count)
+      }, 30000)
     },
 
     onShow: function () {
@@ -114,17 +119,30 @@
         }
 
         let records = isRefresh ? [] : this.recordList[0]
+        records = records.concat(common.getRecordListFrom(data.data.list))
+        this.httpsData = data.data
+        this.recordList.splice(0, 1, records)
 
-        if (data.data.total > 0) {
-          records = records.concat(common.getRecordListFrom(data.data.list))
-          this.httpsData = data.data
-        } else if (!this.hasFirstAutoChange && (this.distanceIndex !== 5 || this.sortIndex !== 2)) { // 无数据则选择全网最新，仅执行一次
+        if (data.data.total > 0) { // 用户看到过数据就不要走自动的流程了
+          this.autoChangeStep = 'doNotAutoChange'
+        } else if (!this.autoChangeStep && (this.distanceIndex !== 5 || this.sortIndex !== 2)) { // 无数据则选择全网最新，仅第一次展示执行
           this.distanceIndex = 5
           this.sortIndex = 2
-          this.hasFirstAutoChange = true
+          this.autoChangeStep = 'autoChanged'
           this.getRequest(true)
         }
-        this.recordList.splice(0, 1, records)
+        if (this.autoChangeStep && this.autoChangeStep === 'autoChanged') { // 执行完成，给提示
+          const timer = setTimeout(() => {
+            clearTimeout(timer)
+            wx.showToast({
+              title: `您所选范围暂无内容\n已为您改为[${this.distanceType[5].text}-${this.sortType[2].text}]`,
+              icon: 'none',
+              duration: 3000
+            })
+          }, 100)
+
+          this.autoChangeStep = 'toastShowed'
+        }
       })
     },
 

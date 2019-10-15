@@ -46,7 +46,6 @@
         }
 
         let records = isRefresh ? [] : this.recordList[0]
-
         records = records.concat(common.getRecordListFrom(data.data.list))
         this.httpsData = data.data
         this.recordList.splice(0, 1, records)
