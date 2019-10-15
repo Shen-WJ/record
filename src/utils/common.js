@@ -421,7 +421,7 @@ function _createCardSingle (record, complete) {
     if (record.content.length > 0) {
       context.setFontSize(18)
       context.setFillStyle('#666')
-      _textHandle(context, '◆' + record.content, 80, 560, 260, 44, 4, '')
+      _textHandle(context, '◆' + record.content, 80, 560, 260, 44, 4, '···')
     }
     context.draw()
 
@@ -480,7 +480,17 @@ function _textHandle (ctx, text, numX, numY, textWidth, lineHeight, maxLine = 6,
   // 如果数组长度大于maxLine 则截取
   if (row.length > maxLine) {
     row = row.slice(0, maxLine)
-    row.push(breakStr)
+    if (breakStr.length > 0) {
+      let lastItem = row.pop()
+      const strLength = lastItem.length
+      for (let i = 0; i < strLength; i++) {
+        if (ctx.measureText(lastItem.slice(0, strLength - i - 1) + breakStr).width <= textWidth) {
+          lastItem = lastItem.slice(0, strLength - i - 1) + breakStr
+          break
+        }
+      }
+      row.push(lastItem)
+    }
   }
 
   let tempX = numX
