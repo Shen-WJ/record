@@ -393,16 +393,15 @@ function _createCardSingle (record, complete) {
     context.setFillStyle('#333')
     _textHandle(context, storeUser.state.nickname, 140, 750, 160, 30, 1, '')
 
-    const halfLineWidth = 2.5 // 线条两侧宽度
+    const halfLineWidth = 2 // 线条两侧宽度
     for (let i = 1; i < imgPath.length; i++) {
+      context.setLineWidth(halfLineWidth * 2)
+      context.setStrokeStyle('#ddd')
       if (!_isEmpty(imgPath[i].path)) {
         context.save()
         context.translate(460, 280 + 120 * i)
         context.rotate(((Math.random() - 0.5) * 60) * Math.PI / 180) // 在-0.5至0.5随机，转角在-30°至30°随机
-        context.rect(0, 0, imgPath[i].width + halfLineWidth * 2, imgPath[i].height + halfLineWidth * 2)
-        context.setLineWidth(halfLineWidth * 2)
-        context.setStrokeStyle('#ddd')
-        context.stroke()
+        context.strokeRect(0, 0, imgPath[i].width + halfLineWidth * 2, imgPath[i].height + halfLineWidth * 2)
         context.drawImage(imgPath[i].path, halfLineWidth, halfLineWidth, imgPath[i].width, imgPath[i].height)
         context.restore()
       }
