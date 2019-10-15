@@ -32,7 +32,6 @@
   const common = require('../utils/common.js')
   const app = getApp()
 
-  var count = 0
   createPage({
     behaviors: [behaviorOnRecord, behaviorOnPage],
     data: {

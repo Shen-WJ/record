@@ -78,7 +78,7 @@
 
       var timer = setInterval(() => {
         common.getLocation()
-        console.log('timer(', timer, ') fire!!!', ++count)
+        console.log('timer(', timer, ') fire!!!')
       }, 30000)
     },
 
