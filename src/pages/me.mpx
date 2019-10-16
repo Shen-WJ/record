@@ -182,7 +182,15 @@
       this.isShowGallery = false
     },
     clickDownloadCard: function (e) {
-      common.createCardSingle(this.getRecord(e.currentTarget.dataset.index), (res) => {
+      const record = this.getRecord(e.currentTarget.dataset.index)
+      if (record.isPublic === 0) {
+        wx.showToast({
+          title: '私密的点迹不可生成海报哦~',
+          icon: 'none'
+        })
+        return
+      }
+      common.createCardSingle(record, (res) => {
         this.isShowGallery = true
         this.galleryTitleList = ['打卡']
         this.galleryImageList = [res]

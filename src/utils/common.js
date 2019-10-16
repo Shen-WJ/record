@@ -60,13 +60,18 @@ function _timeToStr (time) {
   let nowTime = now.getTime()
   let difference = nowTime - time
   let diffHours = difference / 1000 / 3600
+  let diffMinutes = difference / 1000 / 60
   if (diffHours >= 24) {
     let date = new Date(time)
     return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()
   } else if (diffHours < 24 && diffHours >= 1) {
     return Math.floor(diffHours) + '小时前'
-  } else if (diffHours < 1) {
-    return Math.floor(difference / 1000 / 60) + '分钟前'
+  } else if (diffHours < 1 && diffMinutes >= 1) {
+    return Math.floor(diffMinutes) + '分钟前'
+  } else if (diffMinutes < 1) {
+    return '刚刚'
+  } else {
+    return '未知'
   }
 }
 
@@ -201,8 +206,8 @@ function _getLocation ({ success = function () { }, fail = function () { }, comp
       app.globalData.location = { longitude: gcj.longitude, latitude: gcj.latitude }
       success(gcj)
     },
-    fail: (res) => {
-      fail(res)
+    fail: (err) => {
+      fail(err)
     },
     complete: (res) => {
       complete(res)

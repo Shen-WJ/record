@@ -32,6 +32,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
 }
 .rmh_time {
   display: block;
@@ -193,9 +194,35 @@ display: none;
 }
 
 /* template myRecord */
+.rmh_left {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  flex-shrink: 0;
+}
+.rmh_status {
+  display: inline-block;
+  width: 30rpx;
+  height: 30rpx;
+  line-height: 30rpx;
+  text-align: center;
+  font-size: 18rpx;
+  margin-right: 5rpx;
+  color: white;
+  border-radius: 20%;
+}
 .rmh_location {
   font-size: 28rpx;
   color: #2ab3f3;
+  max-width: 420rpx;
+  text-overflow: -o-ellipsis-lastline;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all; 
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  align-content: center;
 }
 .position_icon_line {
   position: relative;
