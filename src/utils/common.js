@@ -337,6 +337,30 @@ function _createCardSingle (record, complete) {
   let finishDownloads = []
   let imgPath = []
 
+  let cardExist = true
+  // let cardExist = false
+  // const cardSingle = wx.getStorageSync('cardSingle') || ''
+  // wx.getFileInfo({
+  //   filePath: cardSingle,
+  //   success: info => {
+  //     console.log(info)
+  //     cardExist = true
+  //     startDrawCard()
+  //   },
+  //   fail: err => {
+  //     console.log(err)
+  //     net.downloadFile({
+  //       filePath: '',
+  //       isReadFile: false
+  //     }).then(data => { // todo 填写path
+  //       wx.setStorageSync('cardSingle', 'filepath')
+  //       cardSingle = ''
+  //       cardExist = true
+  //       startDrawCard()
+  //     })
+  //   }
+  // })
+
   // todo 配置域名
   finishDownloads[0] = false
   wx.getImageInfo({
@@ -378,12 +402,13 @@ function _createCardSingle (record, complete) {
     for (let i = 0; i < finishDownloads.length; i++) {
       countDownloads += (finishDownloads[i] ? 1 : 0)
     }
-    if (countDownloads < finishDownloads.length) {
+    if (countDownloads < finishDownloads.length || !cardExist) {
       console.log('startDrawCard not start')
       return
     }
     console.log('startDrawCard&countDownloads: ', countDownloads)
     let context = wx.createCanvasContext('cardCanvas')
+
     context.drawImage(card, 0, 0, 600, 1000)
 
     if (imgPath[0].path) {
