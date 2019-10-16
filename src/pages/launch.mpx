@@ -74,10 +74,9 @@
 
 <script  type='application/json'>
   {
+    "disableScroll": true,
     "usingComponents": {
       "policyText": "../components/policyText"
-    },
-    "navigationBarTitleText": "",
-    "navigationStyle": "custom"
+    }
   }
 </script>
