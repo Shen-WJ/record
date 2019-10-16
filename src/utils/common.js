@@ -3,7 +3,6 @@ import { storeUser } from '../stores/storeUser'
 import { storeMode } from '../stores/storeCommon'
 import toMap from '../image/icon/toMap.png'
 import contentBoard from '../image/global/contentBoard.png'
-import card from '../image/global/card.jpg'
 
 const app = getApp()
 
@@ -45,6 +44,7 @@ function _isEmpty (v) {
       for (var i in v) {
         return false
       }
+      if (v.length > 0) return false
       return true
   }
   return false
@@ -337,31 +337,30 @@ function _createCardSingle (record, complete) {
   let finishDownloads = []
   let imgPath = []
 
-  let cardExist = true
-  // let cardExist = false
-  // const cardSingle = wx.getStorageSync('cardSingle') || ''
-  // wx.getFileInfo({
-  //   filePath: cardSingle,
-  //   success: info => {
-  //     console.log(info)
-  //     cardExist = true
-  //     startDrawCard()
-  //   },
-  //   fail: err => {
-  //     console.log(err)
-  //     net.downloadFile({
-  //       filePath: '',
-  //       isReadFile: false
-  //     }).then(data => { // todo 填写path
-  //       wx.setStorageSync('cardSingle', 'filepath')
-  //       cardSingle = ''
-  //       cardExist = true
-  //       startDrawCard()
-  //     })
-  //   }
-  // })
+  let cardExist = false
+  let cardSingle = wx.getStorageSync('cardSingle') || ''
+  wx.getFileInfo({
+    filePath: cardSingle,
+    success: info => {
+      console.log(info)
+      cardExist = true
+      startDrawCard()
+    },
+    fail: err => {
+      console.log(err)
+      net.downloadFile({
+        filePath: 'https://record-image-1253413283.cos.ap-shanghai.myqcloud.com/poster.jpg',
+        isReadFile: false,
+        isShowLoading: false
+      }).then(tempFilePath => { // todo 填写path
+        wx.setStorageSync('cardSingle', tempFilePath)
+        cardSingle = tempFilePath
+        cardExist = true
+        startDrawCard()
+      })
+    }
+  })
 
-  // todo 配置域名
   finishDownloads[0] = false
   wx.getImageInfo({
     src: storeUser.state.headUrl,
@@ -403,13 +402,13 @@ function _createCardSingle (record, complete) {
       countDownloads += (finishDownloads[i] ? 1 : 0)
     }
     if (countDownloads < finishDownloads.length || !cardExist) {
-      console.log('startDrawCard not start')
+      console.log('startDrawCard rejected')
       return
     }
-    console.log('startDrawCard&countDownloads: ', countDownloads)
-    let context = wx.createCanvasContext('cardCanvas')
+    console.log('startDrawCard & countDownloads:', countDownloads)
 
-    context.drawImage(card, 0, 0, 600, 1000)
+    let context = wx.createCanvasContext('cardCanvas')
+    context.drawImage(cardSingle, 0, 0, 600, 1000)
 
     if (imgPath[0].path) {
       context.save() // 先保存状态 已便于画完圆再用

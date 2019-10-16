@@ -104,11 +104,10 @@ const http = ({ url = '', query = {}, body = {}, method = '', ...other } = {}) =
 }
 
 const getUrl = (url) => {
-  // 传头像时是URL，会误识别
-  // if (url.indexOf('://') === -1) {
-  //   url = baseUrl + url
-  // }
-  return baseUrl + url
+  if (url.indexOf('http') !== 0) {
+    url = baseUrl + url
+  }
+  return url
 }
 
 const reqGet = ({ url, query, body, ...other } = {}) => {
@@ -151,13 +150,22 @@ const reqDelete = ({ url, query, body, ...other } = {}) => {
   })
 }
 
-const downloadFile = ({ filePath = '', isReadFile = true, ...other }) => {
+const downloadFile = ({ filePath = '', isReadFile = true, isShowLoading = true, ...other }) => {
+  if (isShowLoading) {
+    wx.showLoading({
+      title: ''
+    })
+  }
+  const timeStart = Date.now()
+
   return new Promise((resolve, reject) => {
     wx.downloadFile({
       url: getUrl(filePath),
       ...other,
       complete: res => {
-        console.log(res)
+        if (isShowLoading) wx.hideLoading()
+        console.log(`\n-------------------------\n Download of ${filePath} | 耗时${Date.now() - timeStart}\nres:`, res, '\n-------------------------\n')
+
         if (res.statusCode >= 200 && res.statusCode < 300) {
           if (isReadFile) {
             wx.getFileSystemManager().readFile({

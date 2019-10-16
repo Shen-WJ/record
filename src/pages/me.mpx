@@ -262,7 +262,7 @@
   .container {}
   #cardCanvas {
     position: fixed;
-    left: 3000px;
+    left: 30000px;
     top: 10px;
     width: 600px;
     height: 1000px;
