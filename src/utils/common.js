@@ -120,9 +120,9 @@ function _getRecordListFrom (list, type = 0) {
     item.isFavorited = !_isEmpty(app.globalData.favoritesDic[item.recordId])
     item.timeStr = timeToStr(item.time)
 
-    if (!_isEmpty(app.globalData.location)) {
+    if (!_isEmpty(app.globalData.location) && app.globalData.location.latitude && app.globalData.location.longitude) {
       let kmNum = _getKilometerDistance(item.lat, item.lng, app.globalData.location.latitude, app.globalData.location.longitude)
-      item.distance = kmNum < 1 ? (kmNum * 1000).toFixed(1) + 'm' : kmNum.toFixed(2) + 'km'
+      item.distance = kmNum < 1 ? (kmNum * 1000).toFixed(0) + 'm' : kmNum.toFixed(2) + 'km'
     }
     item.locStr = _formatLocation(item.lng, item.lat)
     arr.push(item)
