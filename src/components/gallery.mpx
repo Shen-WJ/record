@@ -94,15 +94,6 @@
         })
       },
       clickClose () {
-        for (let i = 0; i < this.imageList.length; i++) {
-          // 理论上是删不掉的，微信不允许删除临时文件，unlink也不行
-          wx.getFileSystemManager().unlink({
-            filePath: this.imageList[i],
-            complete: res => {
-              console.log(res)
-            }
-          })
-        }
         this.triggerEvent('close', {}, {})
       },
       clickCard () {

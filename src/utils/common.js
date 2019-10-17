@@ -539,7 +539,7 @@ function _textHandle (ctx, text, numX, numY, textWidth, lineHeight, maxLine = 6,
 function _navToHomePage (isRelaunch = false) {
   if (isRelaunch) {
     wx.reLaunch({
-      url: './find'
+      url: './find' // to home
     })
   } else {
     wx.switchTab({

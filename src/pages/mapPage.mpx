@@ -27,8 +27,6 @@
       <cover-view wx:for="{{menu}}" wx:key="index" class="map_menu_select {{darkMode?'map_menu_borderB':'map_menu_borderW'}} {{index===selected?'selected':''}}" catchtap="clickMenu" data-index="{{index}}">{{index===selected?'■':'□'}}{{item}}</cover-view>
       <button class="map_menu_share" open-type="share">分享</button>
     </cover-view>
-    <!--<canvas canvas-id='canvasSave' class="canvas"></canvas>
-      保存图片 -->
   </view>
 </template>
 
@@ -460,31 +458,6 @@
     },
     clickMapTipClose () {
       this.isShowMapTip = false
-    },
-    saveImg (e) {
-      console.log(e)
-      var context = wx.createCanvasContext('canvasSave')
-      context.setStrokeStyle('#00ff00')
-      context.setLineWidth(5)
-      context.rect(0, 0, app.globalData.windowWidth, app.globalData.windowHeight)
-      context.stroke()
-      context.draw(false, res => {
-        wx.canvasToTempFilePath({
-          canvasId: 'canvasSave',
-          success: (res) => {
-            console.log(res)
-            wx.saveImageToPhotosAlbum({
-              filePath: res.tempFilePath,
-              success: (res) => {
-                console.log(res)
-              },
-              fail: (err) => {
-                console.log(err)
-              }
-            })
-          }
-        })
-      })
     }
   })
 </script>
@@ -495,21 +468,21 @@
     width: 750rpx;
   }
   .map_tip {
+    z-index: 1000;
     position: fixed;
-    left: 0;
+    left: 0rpx;
+    top: 66px;
     width: 750rpx;
     display: flex;
     justify-content: center;
     align-items: center;
   }
   .map_tip_content {
-    opacity: 0.8;
     font-size: 20rpx;
     padding: 3rpx 10rpx;
     border-radius: 20rpx;
   }
   .map_tip_close {
-    opacity: 0.8;
     font-size: 20rpx;
     font-weight: bold;
     padding: 3rpx 15rpx;
@@ -534,8 +507,9 @@
   .map_menu_select {
     display: inline-block;
     font-size: 22rpx;
-
     margin: 0rpx 5rpx 10rpx;
+    line-height: 1;
+    box-sizing: border-box;
   }
   .pickerDate {
     z-index: 1000;
@@ -571,7 +545,7 @@
 
   .map_menu_borderB {
     border-radius: 5rpx;
-    padding: 3rpx 7rpx;
+    padding: 5rpx 7rpx 3rpx;
     border: 2rpx solid #ccc;
   }
   .map_menu_borderW {
@@ -592,14 +566,6 @@
     line-height:96rpx;
     height: 96rpx;
     width: 102rpx;
-  }
-  .canvas {
-    position: fixed;
-    width: 750rpx;
-    height: 1000px;
-    top: 100%;
-    left: 100%;
-    overflow: hidden; 
   }
 </style>
 

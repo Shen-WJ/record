@@ -436,10 +436,13 @@
             for (let i = imgCount; i < res.tempFiles.length + imgCount; i++) {
               let item = res.tempFiles[i - imgCount]
               if (item.size > 1000000) { // 大于1M则过滤并提示
-                wx.showToast({
-                  title: '有些图片太大，已被过滤',
-                  icon: 'none'
-                })
+                let timer = setTimeout(() => {
+                  clearTimeout(timer)
+                  wx.showToast({
+                    title: '有些图片太大，已被过滤',
+                    icon: 'none'
+                  })
+                }, 500)
               } else {
                 // 为了不重名
                 let fileNum = 0
@@ -450,7 +453,7 @@
                 }
                 fileNum += i
                 // 为了上传
-                const houzhui = item.path.split('.').slice(-1)
+                const houzhui = item.path.split('.').slice(-1)[0]
                 this.fsm.saveFile({
                   tempFilePath: item.path,
                   filePath: `${releaseDir}/${fileNum}.${houzhui}`,
@@ -482,7 +485,7 @@
 
     removeImg (e) {
       const index = parseInt(e.currentTarget.dataset.index)
-      // unlink处理非saved文件夹下的文件
+      // unlink只能处理非saved的本地缓存文件夹下的文件，其他依旧删不掉（包括saved缓存文件和tmp临时文件）
       this.fsm.unlink({
         filePath: this.imageList[index],
         complete: res => {
