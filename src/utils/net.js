@@ -94,7 +94,7 @@ const http = ({ url = '', query = {}, body = {}, method = '', ...other } = {}) =
           console.log('!!! Request error, res statusCode: ', res.statusCode || 'none')
           reject(res)
           wx.showToast({
-            title: '网络出错：' + (res.statusCode || 'none'),
+            title: '网络出错，请重试',
             icon: 'none'
           })
         }
@@ -189,7 +189,7 @@ const downloadFile = ({ filePath = '', isReadFile = true, isShowLoading = true, 
           console.log('!!! Request error, res statusCode: ', res.statusCode || 'none')
           reject(res)
           wx.showToast({
-            title: '网络出错：' + (res.statusCode || 'none'),
+            title: '网络出错，请重试',
             icon: 'none'
           })
         }
