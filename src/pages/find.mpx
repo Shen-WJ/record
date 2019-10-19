@@ -55,7 +55,7 @@
     data: {
       recordList: [[], []],
       distanceType: distanceType,
-      distanceIndex: wx.getStorageSync('find_distanceIndex') || 3,
+      distanceIndex: wx.getStorageSync('find_distanceIndex') || 4,
       sortType: sortType,
       sortIndex: wx.getStorageSync('find_sortIndex') || 2,
       navH: app.globalData.navHeight,
