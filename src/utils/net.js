@@ -77,11 +77,13 @@ const http = ({ url = '', query = {}, body = {}, method = '', ...other } = {}) =
           if (res.data.code === 0) {
             resolve(res.data)
           } else if (res.data.code === 300) {
+            reject(res.data)
             wx.showToast({
               title: res.data.message || 'none',
               icon: 'none'
             })
           } else if (res.data.code === 500) {
+            reject(res.data)
             wx.showToast({
               title: '网络出错，请重试',
               icon: 'none'
