@@ -67,7 +67,7 @@
             let list = wx.getStorageSync('reportList')
             if (common.isEmpty(list[this.recordId])) {
               wx.showActionSheet({
-                itemList: ['黄赌毒暴骗', '侵犯隐私/人身攻击', '政治', '广告/垃圾信息', '其他'],
+                itemList: ['色情低俗', '侵犯隐私/人身攻击', '政治敏感', '广告/垃圾信息', '其他'],
                 success: res => {
                   wx.navigateTo({
                     url: './singleInput?pageType=report&recordId=' + this.recordId + '&reportType=' + res.tapIndex

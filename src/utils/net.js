@@ -3,7 +3,7 @@ import { storeUser } from '../stores/storeUser'
 const md5 = require('../utils/md5.js')
 const hexMD5From = md5.hexMD5From
 
-const baseUrl = 'https://chahuangli.cn/recordAllV2/'
+const baseUrl = 'https://pointlog.cn/recordAllV2/'
 const signWithStr = 'jilu666'
 let requestingList = {}
 
