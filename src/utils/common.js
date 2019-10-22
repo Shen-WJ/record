@@ -453,7 +453,7 @@ function _createCardSingle (record, complete) {
     }
 
     context.setFontSize(30)
-    context.setFillStyle('#e98809')
+    context.setFillStyle('#f5b609')
     let date = new Date(record.time)
     let dateStr = date.getFullYear() + '年' + (date.getMonth() + 1) + '月' + date.getDate() + '日'
     _textHandle(context, '◤' + dateStr + '◢', 80, 360, 800, 44, 1, '')
@@ -461,12 +461,12 @@ function _createCardSingle (record, complete) {
     if (record.location.length > 0) {
       context.setFontSize(20)
       context.setFillStyle('#2ab3f3')
-      _textHandle(context, '⊙' + record.location, 80, 430, 260, 44, 2, '')
+      _textHandle(context, record.location, 80, 430, 260, 44, 2, '')
     }
     if (record.content.length > 0) {
       context.setFontSize(18)
       context.setFillStyle('#666')
-      _textHandle(context, '◆' + record.content, 80, 560, 260, 44, 4, '···')
+      _textHandle(context, record.content, 80, 560, 260, 44, 4, '···')
     }
     context.draw()
 
