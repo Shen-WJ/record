@@ -98,10 +98,7 @@
         })
         return
       }
-      if (this.isRequseting) {
-        return
-      }
-      this.isRequseting = true
+
       switch (this.pageType) {
         case 'report': {
           net.reqPost({
@@ -116,7 +113,6 @@
             list[this.recordId.toString()] = 'r'
             wx.setStorageSync('reportList', list)
 
-            this.isRequseting = false
             this.contentText = ''
             wx.showToast({
               title: '已举报',
@@ -140,8 +136,11 @@
               nickName: this.contentText
             }
           }).then(data => {
-            this.isRequseting = false
             storeUser.commit('updateUserInfo', { nickname: this.contentText })
+            this.contentText = ''
+            wx.showToast({
+              duration: 1000
+            })
             wx.navigateBack({
               delta: 1
             })
@@ -155,8 +154,11 @@
               signature: this.contentText
             }
           }).then(data => {
-            this.isRequseting = false
             storeUser.commit('updateSignature', { signature: this.contentText })
+            this.contentText = ''
+            wx.showToast({
+              duration: 1000
+            })
             wx.navigateBack({
               delta: 1
             })

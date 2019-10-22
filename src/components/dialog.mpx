@@ -1,5 +1,5 @@
 <template>
-  <view class='dialog_mask' wx:if='{{isShow}}' catchtouchmove='true' catchtap="true" catchlongpress="true">
+  <view class='dialog_mask' style="z-index: {{zIndex}};" wx:if='{{isShow}}' catchtouchmove='true' catchtap="true" catchlongpress="true">
     <view class="dialog_modal {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
       <view class='dialog_title' style="border-bottom: 1rpx solid #{{darkMode?'333':'eee'}};" wx:if='{{title}}'>{{title}}</view>
       <view class='dialog_content'>{{content}}</view>
@@ -8,6 +8,7 @@
         <button wx:if="{{open_type === 'contact'}}" class='dialog_success' bindcontact='Success' open-type='{{open_type}}'>{{confirmText}}</button>
         <button wx:elif="{{open_type === 'getUserInfo'}}" class='dialog_success' bindgetuserinfo='Success' open-type='{{open_type}}'>{{confirmText}}</button>
         <button wx:elif="{{open_type === 'getPhoneNumber'}}" class='dialog_success' bindgetphonenumber='Success' open-type='{{open_type}}'>{{confirmText}}</button>
+        <button wx:elif="{{open_type === 'openSetting'}}" class='dialog_success' bindopensetting='Success' open-type='{{open_type}}'>{{confirmText}}</button>
         <button wx:else class='dialog_success' bindtap='Success' open-type='{{open_type}}'>{{confirmText}}</button>
       </view>
     </view>
@@ -60,6 +61,10 @@
       open_type: {
         type: String,
         value: ''
+      },
+      zIndex: {
+        type: Number,
+        value: 9000
       }
       // bindSuccess 在HTML使用该属性可将 使用页面 的函数绑定到确认按钮的事件当中去
       // bindCancel 在HTML使用该属性可将 使用页面 的函数绑定到取消按钮的事件当中去
@@ -104,7 +109,6 @@
     top: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 9000;
   }
   
   .dialog_modal {

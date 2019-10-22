@@ -19,6 +19,9 @@
     <template is="recordItem" data="{{record:item, rcdIndex:{section:0, row:row}, rcdType:1, darkMode:darkMode}}"/>
     </block>
 
+    <dialog isShow="{{isShowDialog}}" zIndex="10001" title='需要定位来获取附近内容'
+    content='点迹的众多内容服务都是基于位置信息提供的，没有定位将无法使用点迹的服务'
+    showCancel="{{false}}" confirmText="前往设置" open_type="openSetting" bindsuccess='backFromSetting'></dialog>
     <image class="smallMap themeMode" style="bottom: {{tabBarBottom}}px;" src="../image/icon/toMapPage.png" mode="aspectFit" catchtap="clickToMapPage"></image>
   </view>
   <tabbar selected="1" />
@@ -61,7 +64,8 @@
       navH: app.globalData.navHeight,
       pageLocation: {},
 
-      tabBarBottom: app.globalData.tabBarBottom
+      tabBarBottom: app.globalData.tabBarBottom,
+      isShowDialog: false
     },
     computed: {
       ...storeMode.mapState(['darkMode'])
@@ -73,6 +77,11 @@
       common.getLocation({
         success: (res) => {
           this.getRequest(true)
+        },
+        fail: (err) => {
+          if (err.customCode && err.customCode === '1001') {
+            this.isShowDialog = true
+          }
         }
       })
 
@@ -185,6 +194,26 @@
       wx.navigateTo({
         url: './mapPage?pageType=find'
       })
+    },
+
+    backFromSetting (e) {
+      console.log('backFromSetting', e)
+      let authSetting = e.detail.detail.authSetting
+      if (!authSetting['scope.userLocation']) {
+        this.isShowDialog = true
+      } else {
+        this.isShowDialog = false
+        common.getLocation({
+          success: (res) => {
+            this.getRequest(true)
+          },
+          fail: (err) => {
+            if (err.customCode && err.customCode === '1001') {
+              this.isShowDialog = true
+            }
+          }
+        })
+      }
     }
   })
 </script>
@@ -198,7 +227,7 @@
     height: 80rpx;
     position: fixed;
     margin-top: 0; 
-    z-index: 99999;
+    z-index: 100;
 
     opacity: 0.8;
     border-bottom: 1rpx solid #ccc;
@@ -252,7 +281,8 @@
     "enablePullDownRefresh": true,
     "usingComponents": {
       "navigationBar": "../components/navigationBar",
-      "tabbar": "../components/tabbar"
+      "tabbar": "../components/tabbar",
+      "dialog": "../components/dialog"
     }
   }
 </script>

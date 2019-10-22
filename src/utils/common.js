@@ -207,7 +207,23 @@ function _getLocation ({ success = function () { }, fail = function () { }, comp
       success(gcj)
     },
     fail: (err) => {
-      fail(err)
+      console.log(err)
+      // 被拒绝后只能通过button获取授权，wx.authorize和wx.openSetting都无用，需要button
+      wx.getSetting({
+        success: (res) => {
+          console.log(res)
+          if (!res.authSetting['scope.userLocation']) {
+            err.customCode = '1001'
+          } else {
+            wx.showToast({
+              title: '获取定位时发生了一些未知错误，请退出微信重试',
+              icon: 'none',
+              duration: 4000
+            })
+          }
+          fail(err)
+        }
+      })
     },
     complete: (res) => {
       complete(res)
