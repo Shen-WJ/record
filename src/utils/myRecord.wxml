@@ -12,7 +12,6 @@
         <!-- 头部，包括地点、时间等 -->
         <view class="rm_header">
           <view class="rmh_left">
-            <text wx:if="{{record.isAnonymous}}" class="rmh_status themeMode">匿</text>
             <image wx:if="{{record.isPublic === 0}}" class="rmh_status" src="../image/icon/lock.png" mode="aspectFit" />
             <text class="rmh_location" catchtap="clickToMap" data-index="{{rcdIndex}}">{{record.location}}</text>
             <text class="rmc_jin_wei">{{record.distance}}</text>

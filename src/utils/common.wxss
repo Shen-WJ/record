@@ -8,16 +8,7 @@
   height: 60rpx;
   border-radius: 50%;
 }
-.avator_anonymous {
-  width: 60rpx;
-  height: 60rpx;
-  border-radius: 50%;
-  text-align: center;
-  background-color: #2ab3f3;
-  line-height: 60rpx;
-  color: white;
-  font-size: 40rpx;
-}
+
 /* rm */
 .record_main{
   margin-left: 20rpx;

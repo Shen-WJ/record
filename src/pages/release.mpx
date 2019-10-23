@@ -35,10 +35,6 @@
       </view>
       </view>
     </view>
-    <view class="anonymous_choose {{darkMode?'fontColorW2':'fontColorB2'}}">
-      <text>匿名发布</text>
-      <switch class="switch" checked="{{isAnonymous}}" bindchange="changeAnonymous"></switch>
-    </view>
     <view class="private_choose {{darkMode?'fontColorW2':'fontColorB2'}}">
       <text>给后来者也看看吧？</text>
       <picker class="private_choose_picker" mode="selector" range="{{privateType}}" range-key="text" value="{{privateTypeIndex}}" bindchange="changePrivateType">
@@ -87,7 +83,6 @@
       imageList: [],
       privateTypeIndex: 0,
       privateType: [{ text: '公开', value: 1 }, { text: '私密', value: 0 }],
-      isAnonymous: 0,
 
       loactionNameLength: loactionNameLength,
       contentTextLength: contentTextLength,
@@ -230,7 +225,6 @@
       this.loactionNameCount = 0
       this.contentTextCount = 0
       this.imageList = []
-      this.isAnonymous = 0
       this.privateTypeIndex = 0
     },
 
@@ -366,7 +360,6 @@
         img9: imgUrls[8],
         lng: this.locationDigit.longitude,
         lat: this.locationDigit.latitude,
-        isAnonymous: this.isAnonymous,
         isPublic: this.privateType[this.privateTypeIndex].value
       }
 
@@ -493,10 +486,6 @@
         }
       })
       this.imageList.splice(index, 1)
-    },
-
-    changeAnonymous: function (e) {
-      this.isAnonymous = e.detail.value ? 1 : 0
     },
 
     changePrivateType: function (e) {
@@ -673,14 +662,6 @@
     width: 100%;
     height: 100%;
     opacity: 0;
-  }
-
-
-  .anonymous_choose{
-    padding: 30rpx 20rpx;
-  }
-  .anonymous_choose switch{
-    float: right;
   }
 
   .private_choose {

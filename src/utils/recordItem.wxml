@@ -9,8 +9,7 @@
   <view class="record_item" bindtap="clickToDetail" data-index="{{rcdIndex}}" data-type="{{rcdType}}">
     <!-- 头像 -->
     <view class="record_avatar" catchtap="clickToOtherPeople" data-index="{{rcdIndex}}">
-      <image wx:if="{{!record.isAnonymous}}"  class="user_avator" mode="aspectFill" src="{{record.headUrl}}"/>
-      <view wx:else class="avator_anonymous">匿</view>
+      <image class="user_avator" mode="aspectFill" src="{{record.headUrl}}"/>
     </view>
     <!-- record主体 -->
     <view class="record_main">

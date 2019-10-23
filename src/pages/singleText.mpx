@@ -12,7 +12,8 @@
     <block wx:elif="{{pageType == 'about'}}">
       <view class="about_content {{darkMode?'fontColorW2':'fontColorB2'}}">
         <image class="about_logo" src="../image/global/logo1.jpg" mode="aspectFill" />
-        <text>点迹  v1.1.0</text>
+        <text>点迹  v1.1.0
+        让附近离你更近</text>
       </view>
       <view class="cell1 about_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToPolicy" data-type="userAgreement">
         <text>用户使用协议</text>
@@ -27,7 +28,7 @@
         <image src="../image/icon/arrow_right.png" />
       </view>
       <view class="about_footer fontColorC0" style="bottom: {{tabBarBottom}}px;">
-        <text>让附近离你更近
+        <text>更多功能敬请期待APP版
         两个初出茅庐的开发者的沥血之作</text>
       </view>
     </block>

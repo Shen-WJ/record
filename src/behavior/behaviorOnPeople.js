@@ -20,7 +20,7 @@ export const behaviorOnPeople = Behavior({
     onLoad: function (option) {
       if (option.otherUserId) { // otherPeople
         this.otherUserId = parseInt(option.otherUserId)
-        if (this.otherUserId < 10000) { // userId不合法，如匿名
+        if (this.otherUserId < 10000) { // userId不合法
           wx.navigateBack({
             delta: 1,
             fail: (res) => {
@@ -228,36 +228,12 @@ export const behaviorOnPeople = Behavior({
       const index = e.currentTarget.dataset.index
       let record = this.getRecord(index)
       let sheet = []
-      const isAnonymous = record.isAnonymous
-      if (isAnonymous) {
-        sheet = ['取消匿名', '删除']
-      } else {
-        sheet = ['匿名', '删除']
-      }
+      sheet = ['生成海报', '删除']
       wx.showActionSheet({
         itemList: sheet,
         success: res => {
           if (res.tapIndex === 0) {
-            const status = isAnonymous ? 0 : 1
-            wx.showModal({
-              title: `确认${(isAnonymous ? '取消' : '')}匿名？`,
-              content: `点击以确认${(isAnonymous ? '取消' : '')}匿名`,
-              confirmText: isAnonymous ? '取消匿名' : '开启匿名',
-              confirmColor: '#d81e06',
-              success: (res) => {
-                if (res.confirm) {
-                  net.reqPut({
-                    url: 'record/anonymous/status',
-                    body: {
-                      recordId: record.recordId,
-                      status: status
-                    }
-                  }).then(data => {
-                    this.changeStatus(2, index)
-                  })
-                }
-              }
-            })
+            this.clickDownloadCard()
           } else if (res.tapIndex === 1) {
             wx.showModal({
               title: '确认删除？',
@@ -302,20 +278,14 @@ export const behaviorOnPeople = Behavior({
       this.recordList = records
     },
 
-    // 0点赞，1收藏，2匿名开关
+    // 0点赞，1收藏
     changeStatus: function (type, index) {
       let row = (typeof (index) === 'number') ? index : index.row
-      if (type === 2) {
-        let record = this.getRecord(row)
-        record.isAnonymous = !record.isAnonymous
-        this.changeRecord(row, record)
-      } else {
-        common.changeStatus({
-          type,
-          index: row,
-          that: this
-        })
-      }
+      common.changeStatus({
+        type,
+        index: row,
+        that: this
+      })
     },
 
     templateCatch: function () {

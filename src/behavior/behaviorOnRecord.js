@@ -10,7 +10,7 @@ export const behaviorOnRecord = Behavior({
     clickToOtherPeople (e) {
       const index = e.currentTarget.dataset.index
       const record = this.getRecord(index)
-      if (record.userId < 10000) { // userId不合法，如匿名
+      if (record.userId < 10000) { // userId不合法
         wx.showToast({
           title: '该用户无更多信息',
           icon: 'none'
