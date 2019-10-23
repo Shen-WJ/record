@@ -228,12 +228,12 @@ export const behaviorOnPeople = Behavior({
       const index = e.currentTarget.dataset.index
       let record = this.getRecord(index)
       let sheet = []
-      sheet = ['生成海报', '删除']
+      sheet = ['生成打卡海报', '删除']
       wx.showActionSheet({
         itemList: sheet,
         success: res => {
           if (res.tapIndex === 0) {
-            this.clickDownloadCard()
+            this.clickDownloadCard(e)
           } else if (res.tapIndex === 1) {
             wx.showModal({
               title: '确认删除？',
