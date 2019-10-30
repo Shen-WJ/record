@@ -12,7 +12,7 @@
             <text class="card_title" style="color:{{currentCard===index?'#fff':'#ccc'}};">{{titleList[index]}}</text>
             <image class="card" catchtap="clickCard" animation="{{index<animations.length?animations[index]:''}}" src="{{imageList[index]}}" />
           </view>
-          <view wx:if="{{index === 4}}" class="card_holder" />
+          <view wx:if="{{index === imageList.length-1}}" class="card_holder" />
         </block>
     </scroll-view>
     <button class="gallery_save" catchtap="clickSave">保存至相册</button>
@@ -128,10 +128,8 @@
     top: 200rpx;
     height: 800rpx;
   }
-  .scroll-box view {
-    display: inline-block;
-  }
   .card_holder {
+    display: inline-block;
     width: 135rpx;
   }
   .card-box {

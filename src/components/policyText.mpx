@@ -1,6 +1,6 @@
 <template>
   <view class="policy_view">
-    <view style="color:{{textColor}};">{{action}}即代表您同意《<view style="color:{{canClickColor}};" catchtap="clickToPolicy" data-index="0">用户使用协议</view>》及《<view style="color:{{canClickColor}};" catchtap="clickToPolicy" data-index="1">隐私政策</view>》</view>
+    <view class="policy_view_text" style="color:{{textColor}};">{{action}}即代表您同意《<view class="policy_view_text"  style="color:{{canClickColor}};" catchtap="clickToPolicy" data-index="0">用户使用协议</view>》及《<view style="color:{{canClickColor}};" catchtap="clickToPolicy" data-index="1">隐私政策</view>》</view>
   </view>
 </template>
 
@@ -57,7 +57,7 @@
     justify-content: center;
     align-items: center;
   }
-  .policy_view view {
+  .policy_view_text {
     display: inline;
     font-size: 22rpx;
     text-align: center;

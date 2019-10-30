@@ -4,40 +4,40 @@
   <view class="container">
     <view wx:if="{{pageType === 'settings'}}" class="table1">
       <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToSome" data-type="userInfo">
-        <text>修改个人信息</text>
+        <text class="settings_cell_title">修改个人信息</text>
         <image src="../image/icon/arrow_right.png" />
       </view>
       <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
-        <text>开启夜间模式<text class="sub_desc">  将重置透明度</text></text>
+        <text class="settings_cell_title">开启夜间模式<text class="settings_cell_desc">  将重置透明度</text></text>
         <switch class="switch" checked="{{darkMode}}" bindchange="clickToSome" data-type="mode"></switch>
       </view>
       <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToSome" data-type="chooseImg">
-        <text>自定义背景</text>
+        <text class="settings_cell_title">自定义背景</text>
         <image src="../image/icon/arrow_right.png" />
       </view>
       <button class="hided" open-type="feedback" id="feedbackBtn"/>
       <label for="feedbackBtn">
         <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
-          <text>建议与反馈</text>
+          <text class="settings_cell_title">建议与反馈</text>
           <image src="../image/icon/arrow_right.png" />
         </view>
       </label>
       <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToSome" data-type="about">
-        <text>关于</text>
+        <text class="settings_cell_title">关于</text>
         <image src="../image/icon/arrow_right.png" />
       </view>
     </view>
     <view wx:elif="{{pageType === 'bgImg'}}" class="table1">
       <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickBgImgOf" data-type="choose">
-        <text>选择背景<text class="sub_desc">  将重启小程序</text></text>
+        <text class="settings_cell_title">选择背景<text class="settings_cell_desc">  将重启小程序</text></text>
         <image src="../image/icon/arrow_right.png" />
       </view>
       <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickBgImgOf" data-type="clear">
-        <text>清空背景</text>
+        <text class="settings_cell_title">清空背景</text>
         <image src="../image/icon/arrow_right.png" />
       </view>
       <view class="cell1 settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
-        <text>主题皮肤</text>
+        <text class="settings_cell_title">主题皮肤</text>
         <view class="select_theme">
           <view class="select_item" style="border:2rpx solid #{{darkMode ? '2ab3f3': '888'}}" bindtap="selectTheme" data-index="0">
             <view class="select_icon" style="background-color: #{{darkMode ? '2ab3f3': '888'}};"></view>
@@ -50,7 +50,7 @@
         </view>
       </view>
       <view class="slider_cell settings_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
-        <text>透明度</text>
+        <text class="settings_cell_title">透明度</text>
         <slider class="slider_opacity" min="0" max="10" step="1" value="{{opacity*10}}" backgroundColor="{{darkMode?'#222':'#f6f6f6'}}" activeColor="#2ab3f3" block-color="{{darkMode?'#565656':'#fff'}}" show-value="{{true}}" bindchange="sliderChange"/>
       </view>
     </view>
@@ -179,7 +179,10 @@
     height: 40rpx;
     float: right;
   }
-  .sub_desc {
+  .settings_cell_title {
+    font-size: 32rpx;
+  }
+  .settings_cell_desc {
     font-size: 22rpx;
     color: #888;
   }
