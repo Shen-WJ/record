@@ -107,7 +107,7 @@
 
 <style>
   .container {}
-  @import '../utils/personalStyle.wxss'
+  @import '../utils/personalStyle.wxss';
 </style>
 
 <script  type='application/json' lang='json'>

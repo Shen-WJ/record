@@ -269,7 +269,7 @@
     background: #fff;
     z-index: 0;
   }
-  @import '../utils/personalStyle.wxss'
+  @import '../utils/personalStyle.wxss';
 
 </style>
 
