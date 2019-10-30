@@ -24,8 +24,7 @@
           <text class="rmc_jin_wei">{{record.locStr}}</text>
 
           <view class="rmc_text rmc_text_break {{darkMode?'fontColorW0 bgColorB1':'fontColorB0 bgColorW1'}}">
-            <text>{{record.content}}</text>
-            <!-- <text wx:if="{{record.hasMoreText}}" class="rmc_text_hasMore"> ...更多</text> -->
+            <text selectable="{{true}}">{{record.content}}</text>
           </view>        
           <view class="rmc_image">
             <block wx:for-items="{{record.imageList}}" wx:key="">
