@@ -230,7 +230,6 @@
       "scope.userLocation": {
         "desc": "获取定位信息"
       }
-    },
-    "sitemapLocation": "sitemap.json"
+    }
   }
 </script>

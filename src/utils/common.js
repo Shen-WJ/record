@@ -453,7 +453,7 @@ function _createCardSingle (record, complete) {
     }
 
     context.setFontSize(30)
-    context.setFillStyle('#f5b609')
+    context.setFillStyle('#f3aa2a')
     let date = new Date(record.time)
     let dateStr = date.getFullYear() + '年' + (date.getMonth() + 1) + '月' + date.getDate() + '日'
     _textHandle(context, '◤' + dateStr + '◢', 80, 360, 800, 44, 1, '')
