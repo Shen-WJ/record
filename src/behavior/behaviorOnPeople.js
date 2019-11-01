@@ -273,8 +273,9 @@ export const behaviorOnPeople = Behavior({
       })
     },
     deleteRecord: function (index) {
+      let row = (typeof (index) === 'number') ? index : index.row
       let records = this.recordList.slice(0)
-      records.splice(index, 1)
+      records.splice(row, 1)
       this.recordList = records
     },
 

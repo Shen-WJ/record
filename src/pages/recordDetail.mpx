@@ -15,6 +15,7 @@
   import { createPage } from '@mpxjs/core'
   import net from '../utils/net'
   import { storeMode } from '../stores/storeCommon'
+  import { storeUser } from '../stores/storeUser'
   import { behaviorOnRecord } from '../behavior/behaviorOnRecord'
   import { behaviorOnPage } from '../behavior/behaviorOnPage'
 
@@ -60,29 +61,72 @@
       })
     },
     clickMore: function (e) {
-      wx.showActionSheet({
-        itemList: ['举报'],
-        success: res => {
-          if (res.tapIndex === 0) {
-            let list = wx.getStorageSync('reportList')
-            if (common.isEmpty(list[this.recordId])) {
-              wx.showActionSheet({
-                itemList: ['色情低俗', '侵犯隐私/人身攻击', '政治敏感', '广告/垃圾信息', '其他'],
-                success: res => {
-                  wx.navigateTo({
-                    url: './singleInput?pageType=report&recordId=' + this.recordId + '&reportType=' + res.tapIndex
-                  })
+      if (this.record.userId === storeUser.state.userId) {
+        wx.showActionSheet({
+          itemList: ['删除'],
+          success: res => {
+            if (res.tapIndex === 0) {
+              wx.showModal({
+                title: '确认删除？',
+                content: '点击删除以删除此点迹',
+                confirmText: '删除',
+                confirmColor: '#d81e06',
+                success: (res) => {
+                  if (res.confirm) {
+                    net.reqDelete({
+                      url: 'record/info',
+                      query: {
+                        recordId: this.record.recordId
+                      }
+                    }).then(data => {
+                      const pages = getCurrentPages()
+                      let toSetPage = pages[pages.length - 2]
+                      if (typeof (toSetPage.deleteRecord) === 'function') {
+                        toSetPage.deleteRecord(this.oldIndex)
+                      }
+                      wx.showToast({
+                        title: '成功',
+                        complete: res => {
+                          const timer = setTimeout(() => {
+                            clearTimeout(timer)
+                            wx.navigateBack({
+                              delta: 1
+                            })
+                          }, 500)
+                        }
+                      })
+                    })
+                  }
                 }
-              })
-            } else {
-              wx.showToast({
-                title: '已举报过此内容',
-                icon: 'none'
               })
             }
           }
-        }
-      })
+        })
+      } else {
+        wx.showActionSheet({
+          itemList: ['举报'],
+          success: res => {
+            if (res.tapIndex === 0) {
+              let list = wx.getStorageSync('reportList')
+              if (common.isEmpty(list[this.recordId])) {
+                wx.showActionSheet({
+                  itemList: ['色情低俗', '侵犯隐私/人身攻击', '政治敏感', '广告/垃圾信息', '其他'],
+                  success: res => {
+                    wx.navigateTo({
+                      url: './singleInput?pageType=report&recordId=' + this.recordId + '&reportType=' + res.tapIndex
+                    })
+                  }
+                })
+              } else {
+                wx.showToast({
+                  title: '已举报过此内容',
+                  icon: 'none'
+                })
+              }
+            }
+          }
+        })
+      }
     },
 
     getRecord: function (index) {

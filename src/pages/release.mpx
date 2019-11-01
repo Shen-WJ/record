@@ -373,7 +373,15 @@
           app.globalData.isTabbarPageRefresh[key] = true
         }
         wx.showToast({
-          title: '成功'
+          title: '成功',
+          complete: res => {
+            const timer = setTimeout(() => {
+              clearTimeout(timer)
+              wx.switchTab({
+                url: './locality'
+              })
+            }, 1000)
+          }
         })
       }).catch(err => {
         console.log('Catch error: ', err)
