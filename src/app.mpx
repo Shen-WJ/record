@@ -183,9 +183,9 @@
     ],
     "window": {
       "backgroundTextStyle": "light",
-      "navigationBarBackgroundColor": "#2ab3f3",
-      "navigationBarTitleText": "点 迹",
-      "navigationBarTextStyle": "white",
+      "navigationBarBackgroundColor": "#ffffff",
+      "navigationBarTitleText": "点迹",
+      "navigationBarTextStyle": "black",
       "navigationStyle": "custom"
     },
     "tabBar": {
@@ -196,7 +196,7 @@
       "list": [
         {
           "pagePath": "pages/locality",
-          "text": "周围",
+          "text": "身边",
           "iconPath": "image/tabBar/home.png",
           "selectedIconPath": "image/tabBar/home1.png"
         },

@@ -10,7 +10,7 @@
     </view>
     <view class="release_content">
       <view class="location">
-        <input class="location_input {{darkMode?'fontColorW1':'fontColorB1'}}" value="{{locationName}}" bindinput="locationInput" maxlength="{{loactionNameLength}}" placeholder="这里，是哪里？(1~{{loactionNameLength}}字)" placeholder-style="{{darkMode?'color:#555;':'color:#aaa;'}}"/>
+        <input class="location_input {{darkMode?'fontColorW1':'fontColorB1'}}" focus="{{!isShowDialog}}" value="{{locationName}}" bindinput="locationInput" maxlength="{{loactionNameLength}}" placeholder="这里，是哪里？(1~{{loactionNameLength}}字)" placeholder-style="{{darkMode?'color:#555;':'color:#aaa;'}}"/>
         <image class="location_choose" mode="aspectFit" src="../image/icon/toMap.png" catchtap="chooseLocation" />
         <text class="location_text" catchtap="chooseLocation">地图选点</text>
       </view>

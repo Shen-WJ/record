@@ -42,7 +42,7 @@
       list: [
         {
           'pagePath': '../pages/locality',
-          'text': '周围'
+          'text': '身边'
         },
         {
           'pagePath': '../pages/find',
@@ -115,7 +115,8 @@
     border-radius: 50%;
     background-color: red;
     color: white;
-    font-size: 18rpx;
+    font-size: 20rpx;
+    font-weight: bold;
   }
   .tab-bar-item-image {
     width: 27px;
