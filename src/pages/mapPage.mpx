@@ -5,12 +5,12 @@
       showLocation="{{showLocation}}" latitude="{{firstLatitude}}" longitude="{{firstLongitude}}"
       enableScroll="{{enableScroll}}"
       markers="{{markers}}" polyline="{{polyline}}" includePoints="{{includePoints}}" circles="{{circles}}"
-      bindregionchange="regionChange">
-    </customMap>
+      bindregionchange="regionChange"></customMap>
     <cover-view wx:if="{{isShowMapTip}}" class="map_tip" style="top:{{navH}}px">
       <cover-view class="map_tip_content {{darkMode?'bgColorB0 fontColorW1':'bgColorW0 fontColorB1'}}">{{mapTip}}</cover-view>
       <cover-view class="map_tip_close {{darkMode?'bgColorB0 fontColorW1':'bgColorW0 fontColorB1'}}" catchtap='clickMapTipClose'>×</cover-view>
     </cover-view>
+    <image class="backToLoc" hidden="{{!isShowBackToLoc}}" catchtap="clickBackToLoc" src="../image/icon/backToLoc.png" mode="aspectFit" />
     <view class="pickerDate {{darkMode?'bgColorB0 fontColorW1':'bgColorW0 fontColorB1'}} {{isShowPickerDate?'pickerDate_show':''}}" style="bottom: {{tabBarBottom}}px;">
       <text>选择：从  </text>
       <picker class="{{darkMode?'map_menu_borderB':'map_menu_borderW'}}" mode="date" value="{{startDate}}" start="2019-01-01" end="2029-01-01" bindchange="changeDate" data-type="start">
@@ -63,6 +63,8 @@
       mapTip: '',
       isShowMapTip: true,
       navH: app.globalData.navHeight,
+
+      isShowBackToLoc: false,
 
       tabBarBottom: app.globalData.tabBarBottom
     },
@@ -381,6 +383,7 @@
       const change = e.detail
       if (change.type === 'end') {
         if (change.causedBy === 'drag' && this.pageType === 'find') { // 发现页拖拽
+          this.isShowBackToLoc = true
           wx.createMapContext(this.mapId, this.customMap).getCenterLocation({
             success: (ctrLoc) => {
               if (this.longitude !== ctrLoc.longitude || this.latitude !== ctrLoc.latitude) {
@@ -458,6 +461,13 @@
     },
     clickMapTipClose () {
       this.isShowMapTip = false
+    },
+    clickBackToLoc () {
+      wx.createMapContext(this.mapId, this.customMap).moveToLocation({
+        success: res => {
+          this.isShowBackToLoc = false
+        }
+      })
     }
   })
 </script>
@@ -487,6 +497,15 @@
     font-weight: bold;
     padding: 3rpx 15rpx;
     border-radius: 20rpx;
+  }
+
+  .backToLoc {
+    position: fixed;
+    left: 50rpx;
+    bottom: 100rpx;
+    width: 60rpx;
+    height: 60rpx;
+    z-index: 1000;
   }
 
   .map_menu {
