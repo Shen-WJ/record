@@ -4,7 +4,13 @@ import { storeMode } from '../stores/storeCommon'
 import toMap from '../image/icon/toMap.png'
 import contentBoard from '../image/global/contentBoard.png'
 
-const app = getApp()
+var app = getApp()
+function _appGetter () {
+  if (_isEmpty(app)) {
+    app = getApp()
+  }
+  return app
+}
 
 function _getKilometerDistance (lat1, lng1, lat2, lng2) {
   var radLat1 = lat1 * Math.PI / 180.0
@@ -23,7 +29,7 @@ function _getKmDistanceFromPoi (poi1 = {}, poi2 = {}) {
 }
 
 function _getDistanceToMe (lat, lng) {
-  return _getKilometerDistance(lat, lng, app.globalData.location.latitude, app.globalData.location.longitude)
+  return _getKilometerDistance(lat, lng, _appGetter().globalData.location.latitude, _appGetter().globalData.location.longitude)
 }
 
 function _isEmpty (v) {
@@ -116,12 +122,12 @@ function _getRecordListFrom (list, type = 0) {
     //   item.hasMoreText = false
     // }
 
-    item.isLiked = !_isEmpty(app.globalData.likesDic[item.recordId])
-    item.isFavorited = !_isEmpty(app.globalData.favoritesDic[item.recordId])
+    item.isLiked = !_isEmpty(_appGetter().globalData.likesDic[item.recordId])
+    item.isFavorited = !_isEmpty(_appGetter().globalData.favoritesDic[item.recordId])
     item.timeStr = timeToStr(item.time)
 
-    if (!_isEmpty(app.globalData.location) && app.globalData.location.latitude && app.globalData.location.longitude) {
-      let kmNum = _getKilometerDistance(item.lat, item.lng, app.globalData.location.latitude, app.globalData.location.longitude)
+    if (!_isEmpty(_appGetter().globalData.location) && _appGetter().globalData.location.latitude && _appGetter().globalData.location.longitude) {
+      let kmNum = _getKilometerDistance(item.lat, item.lng, _appGetter().globalData.location.latitude, _appGetter().globalData.location.longitude)
       item.distance = kmNum < 1 ? (kmNum * 1000).toFixed(0) + 'm' : kmNum.toFixed(2) + 'km'
     }
     item.locStr = _formatLocation(item.lng, item.lat)
@@ -180,22 +186,36 @@ function _formatRecordsOnMap ({ list = [], isNeedLine = false, isNeedInclude = f
   }
 }
 
-function _updateUserInfo ({ userInfo, success = function () { } }) {
+function _updateUserInfo ({ userInfo = {}, iv = '', encryptedData = '', success = function () { } }) {
   storeUser.commit('updateUserInfo', {
     sex: userInfo.gender,
     nickname: userInfo.nickName,
     headUrl: userInfo.avatarUrl
   })
   storeUser.commit('updateHasHadUserInfo', { hasHadUserInfo: true })
-  net.reqPut({
-    url: 'user/info',
-    body: {
-      headUrl: userInfo.avatarUrl,
-      nickname: userInfo.nickName,
-      sex: userInfo.gender
+  // 先登录获取sessionkey用于解密encryptedData
+  wx.login({
+    success: res => {
+      net.reqGet({
+        url: 'user/login',
+        query: {
+          code: res.code
+        }
+      }).then(data => {
+        net.reqPut({
+          url: 'user/info',
+          body: {
+            headUrl: userInfo.avatarUrl || '',
+            nickname: userInfo.nickName || '',
+            sex: userInfo.gender || '',
+            iv: iv || '',
+            encryptedData: encryptedData || ''
+          }
+        }).then(data => {
+          success(data)
+        })
+      })
     }
-  }).then(data => {
-    success(data)
   })
 }
 
@@ -203,7 +223,7 @@ function _getLocation ({ success = function () { }, fail = function () { }, comp
   wx.getLocation({
     type: 'gcj02', // gcj02是国内坐标，在国外时返回的应该就是wgs84坐标了
     success: (gcj) => {
-      app.globalData.location = { longitude: gcj.longitude, latitude: gcj.latitude }
+      _appGetter().globalData.location = { longitude: gcj.longitude, latitude: gcj.latitude }
       success(gcj)
     },
     fail: (err) => {
@@ -234,7 +254,7 @@ function _getLocation ({ success = function () { }, fail = function () { }, comp
 function _clickLike ({ index, that = {}, success = function () { } } = {}) {
   let record = that.getRecord(index)
 
-  const isLiked = !_isEmpty(app.globalData.likesDic[record.recordId])
+  const isLiked = !_isEmpty(_appGetter().globalData.likesDic[record.recordId])
   if (isLiked !== record.isLiked) { // 数据不一致，就让显示的数据改一下，无需网络请求
     _changeStatus({ type: 0, index, that })
   } else {
@@ -246,7 +266,7 @@ function _clickLike ({ index, that = {}, success = function () { } } = {}) {
         }
       }).then(data => {
         _changeStatus({ type: 0, index, that })
-        delete (app.globalData.likesDic[record.recordId.toString()])
+        delete (_appGetter().globalData.likesDic[record.recordId.toString()])
         success(data)
       })
     } else { // 点赞
@@ -257,7 +277,7 @@ function _clickLike ({ index, that = {}, success = function () { } } = {}) {
         }
       }).then(data => {
         _changeStatus({ type: 0, index, that })
-        app.globalData.likesDic[record.recordId.toString()] = 'l'
+        _appGetter().globalData.likesDic[record.recordId.toString()] = 'l'
         success(data)
       })
     }
@@ -267,7 +287,7 @@ function _clickLike ({ index, that = {}, success = function () { } } = {}) {
 function _clickFavorites ({ index, that = {}, success = function () { } } = {}) {
   let record = that.getRecord(index)
 
-  const isFavorited = !_isEmpty(app.globalData.favoritesDic[record.recordId])
+  const isFavorited = !_isEmpty(_appGetter().globalData.favoritesDic[record.recordId])
   if (isFavorited !== record.isFavorited) { // 数据不一致，就让显示的数据改一下，无需网络请求
     _changeStatus({ type: 1, index, that })
   } else {
@@ -279,7 +299,7 @@ function _clickFavorites ({ index, that = {}, success = function () { } } = {}) 
         }
       }).then(data => {
         _changeStatus({ type: 1, index, that })
-        delete (app.globalData.favoritesDic[record.recordId.toString()])
+        delete (_appGetter().globalData.favoritesDic[record.recordId.toString()])
         success(data)
       })
     } else { // 收藏
@@ -290,7 +310,7 @@ function _clickFavorites ({ index, that = {}, success = function () { } } = {}) 
         }
       }).then(data => {
         _changeStatus({ type: 1, index, that })
-        app.globalData.favoritesDic[record.recordId.toString()] = 'f'
+        _appGetter().globalData.favoritesDic[record.recordId.toString()] = 'f'
         success(data)
       })
     }

@@ -1,0 +1,113 @@
+<template>
+  <view class="top-wrap {{darkMode?'bgColorB0':'bgColorW0'}}" style="top:{{navH}}px;">
+    <navTab id="category"
+      tab-data="{{categoryMenu}}"
+      tab-cur="{{categoryCur}}"
+      size="{{80}}"
+      scroll="{{true}}"
+      bindchange="toggleCategory">
+    </navTab>
+  </view>
+
+  <swiper current="{{categoryCur}}" duration="{{duration}}" bindanimationfinish="swipeChange">
+    <swiper-item wx:for="{{categoryData}}" wx:key="{{index}}">
+      <scroll requesting="{{item.requesting}}"
+          end="{{item.end}}"
+          empty-show="{{item.emptyShow}}"
+          list-count="{{item.total}}"
+          top="{{80}}"
+          refresh-size="{{80}}"
+          bind:refresh="refresh"
+          bind:more="more">
+        <slot name="{{categoryMenu[index]}}"></slot>
+      </scroll>
+    </swiper-item>
+  </swiper>
+</template>
+
+<script>
+  import { createComponent } from '@mpxjs/core'
+  import { storeMode } from '../stores/storeCommon'
+  const app = getApp()
+
+  createComponent({
+    options: {
+      multipleSlots: true
+    },
+    properties: {
+      categoryMenu: {
+        type: Array,
+        value: []
+      },
+      categoryData: {
+        type: Array,
+        value: []
+      }
+    },
+    data: {
+      navH: app.globalData.navHeight,
+      duration: 300, // swiper-item 切换过渡时间
+      showPage: -1, // 控制列表空状态的显示时机
+      categoryCur: 0
+    },
+    computed: {
+      ...storeMode.mapState(['darkMode'])
+    },
+    methods: {
+      // 顶部tab切换事件
+      toggleCategory (e) {
+        this.setData({
+          duration: 0,
+          categoryCur: e.detail.index
+        })
+        this.triggerEvent('swipeTo', { categoryCur: e.detail.index }, {})
+      },
+      // 页面滑动切换事件
+      swipeChange (e) {
+        this.setData({
+          duration: 300,
+          categoryCur: e.detail.current
+        })
+        this.triggerEvent('swipeTo', { categoryCur: e.detail.current }, {})
+      },
+      // 刷新数据
+      refresh () {
+        this.triggerEvent('pullDownRefresh')
+      },
+      // 加载更多
+      more () {
+        this.triggerEvent('reachBottom')
+      }
+    }
+  })
+</script>
+
+<style>
+  .top-wrap {
+    position: fixed;
+    left: 0;
+    width: 100%;
+    z-index: 99;
+  }
+
+  swiper {
+    height: 100vh;
+  }
+  .bgColorB0 {
+    background-color: #000000;
+  }
+  .bgColorW0 {
+    background-color: #ffffff;
+  }
+</style>
+
+<script type='application/json' lang='json'>
+  {
+    "component": true,
+    "usingComponents": {
+      "navTab": "./navTab",
+      "scroll": "./scroll"
+    }
+  }
+</script>
+

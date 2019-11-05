@@ -9,7 +9,7 @@
   <view class="record_item" bindtap="clickToDetail" data-index="{{rcdIndex}}" data-type="{{rcdType}}">
     <!-- 头像 -->
     <view class="record_avatar" catchtap="clickToOtherPeople" data-index="{{rcdIndex}}">
-      <image class="user_avator" mode="aspectFill" src="{{record.headUrl}}"/>
+      <image class="user_avatar" mode="aspectFill" src="{{record.headUrl}}"/>
     </view>
     <!-- record主体 -->
     <view class="record_main">

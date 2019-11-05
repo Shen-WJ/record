@@ -217,7 +217,9 @@ export const behaviorOnPeople = Behavior({
           } else {
             this.isShowDialog = false
             common.updateUserInfo({
-              userInfo: e.detail.detail.userInfo
+              userInfo: e.detail.detail.userInfo,
+              iv: e.detail.detail.iv,
+              encryptedData: e.detail.detail.encryptedData
             })
           }
         }

@@ -1,71 +1,63 @@
 <template>
   <import src="../utils/recordItem.wxml"/>
   <import src="../utils/common.wxml"/>
+
   <navigationBar pageName="发现" showBackIcon="{{false}}"/>
-
-  <view class="container">
-    <view class="header {{darkMode?'bgColorB1':'bgColorW1'}}" style="top:{{navH}}px">
-      <picker class="picker_distance" range="{{distanceType}}" range-key="text" value="{{distanceIndex}}" bindchange="changeFilter" data-type="0">
-        <button class="picker_btn {{darkMode ? 'fontColorW2':'fontColorB2'}}">{{distanceType[distanceIndex].text}}</button>
-      </picker>
-      <picker class="picker_sort" range="{{sortType}}" range-key="text" value="{{sortIndex}}" bindchange="changeFilter" data-type="1">
-        <button class="picker_btn {{darkMode ? 'fontColorW2':'fontColorB2'}}">{{sortType[sortIndex].text}}</button>
-      </picker>
+  <swipeList categoryMenu="{{categoryMenu}}" categoryData="{{categoryData}}"
+    bind:swipeTo="swipeTo" bind:pullDownRefresh="pullDownRefresh" bind:reachBottom="reachBottom">
+    <view slot="{{categoryMenu[0]}}">
+      <findAll id="findAll" bind:changeRequestState="changeRequestState" />
     </view>
-    <view class="header_holder"></view>
+    <view slot="{{categoryMenu[1]}}" class="tab_box_imgFlow">
+      <template is="headerFilter" data="{{darkMode: darkMode, typeArr: [distanceType, sortType], indexArr: [distanceIndex, sortIndex]}}"/>
+    </view>
+  </swipeList>
 
-    <template is="emptyView" data="{{isShow: !recordList[0].length, type:0, textArr:['要不点击上方↖↗换个筛选条件试试？或者','去发布','分享给你的附近吧～0v0']}}"/>
-    <block wx:for="{{recordList[0]}}" wx:key="{{item.recordId}}" wx:for-index="row">
-    <template is="recordItem" data="{{record:item, rcdIndex:{section:0, row:row}, rcdType:1, darkMode:darkMode}}"/>
-    </block>
-
-    <dialog isShow="{{isShowDialog}}" zIndex="10001" title='需要定位来获取附近内容'
-    content='点迹的众多内容服务都是基于位置信息提供的，没有定位将无法使用点迹的服务'
-    showCancel="{{false}}" confirmText="前往设置" open_type="openSetting" bindsuccess='backFromSetting'></dialog>
-    <image class="smallMap themeMode" style="bottom: {{tabBarBottom}}px;" src="../image/icon/toMapPage.png" mode="aspectFit" catchtap="clickToMapPage"></image>
-  </view>
+  <image class="smallMap themeMode" style="bottom: {{tabBarBottom}}px;" src="../image/icon/toMapPage.png" mode="aspectFit" catchtap="clickToMapPage"></image>
+  <dialog isShow="{{isShowDialog}}" zIndex="10001" title='需要定位来获取附近内容'
+  content='点迹的众多内容服务都是基于位置信息提供的，没有定位将无法使用点迹的服务'
+  showCancel="{{false}}" confirmText="前往设置" open_type="openSetting" bindsuccess='backFromSetting' />
   <tabbar selected="1" />
-  <view class="bottomHolder" style="padding-bottom: {{tabBarBottom}}px;"/>
 </template>
 
 <script>
   import { createPage } from '@mpxjs/core'
-  import net from '../utils/net'
   import { storeMode } from '../stores/storeCommon'
-  import { behaviorOnRecord } from '../behavior/behaviorOnRecord'
-  import { behaviorOnPage } from '../behavior/behaviorOnPage'
+  import logo1 from '../image/global/logo1.jpg'
 
   const common = require('../utils/common.js')
-  const app = getApp()
-
-  const distanceType = [
-    { text: '1km内', distance: 1 },
-    { text: '5km内', distance: 5 },
-    { text: '10km内', distance: 10 },
-    { text: '20km内', distance: 20 },
-    { text: '40km内', distance: 40 },
-    { text: '全网', distance: -1 }
-  ]
-  const sortType = [
-    { text: '今日最热', type: 3 },
-    { text: '本周最热', type: 4 },
-    { text: '最新', type: 1 },
-    { text: '最早', type: 2 }
-  ]
 
   createPage({
-    behaviors: [behaviorOnRecord, behaviorOnPage],
     data: {
-      recordList: [[], []],
-      distanceType: distanceType,
-      distanceIndex: wx.getStorageSync('find_distanceIndex') || 4,
-      sortType: sortType,
-      sortIndex: wx.getStorageSync('find_sortIndex') || 2,
-      navH: app.globalData.navHeight,
-      pageLocation: {},
+      isShowDialog: false,
 
-      tabBarBottom: app.globalData.tabBarBottom,
-      isShowDialog: false
+      imgFlowList: [[], []],
+      categoryCur: 0,
+
+      categoryMenu: ['综合', '一图流刷刷刷', '失物认领'],
+      categoryData: [
+        {
+          name: '综合',
+          requesting: false, // 请求中，显示加载动画
+          end: false, // 已加载全部，不再触发上拉加载
+          emptyShow: false, // 是否展示空视图，find页面不需要
+          total: 0
+        },
+        {
+          name: '一图流刷刷刷',
+          requesting: false,
+          end: false,
+          emptyShow: false,
+          total: 0
+        },
+        {
+          name: '失物认领',
+          requesting: false,
+          end: false,
+          emptyShow: false,
+          total: 0
+        }
+      ]
     },
     computed: {
       ...storeMode.mapState(['darkMode'])
@@ -74,9 +66,13 @@
     onLoad: function () {
       wx.canIUse('hideTabBar') && wx.hideTabBar()
 
+      this.childPages = []
+      this.childPages.push(this.selectComponent('#findAll'))
+      this.childPages.push(this.selectComponent('#findImgFlow'))
+
       common.getLocation({
         success: (res) => {
-          this.getRequest(true)
+          this.childPages[0].getRequest(true)
         },
         fail: (err) => {
           if (err.customCode && err.customCode === '1001') {
@@ -92,103 +88,50 @@
     },
 
     onShow: function () {
-      // 非第一次请求才需要做比较
-      if (!common.isEmpty(this.pageLocation)) {
-        if (common.getDistanceToMe(this.pageLocation.latitude, this.pageLocation.longitude) > 1) {
-          // 定位离开了1km才强制刷新
-          app.globalData.isTabbarPageRefresh['find'] = true
-        }
-      }
-      // 查询有没有在其他页面的事件要求本页面更新
-      if (app.globalData.isTabbarPageRefresh['find']) {
-        wx.pageScrollTo({
-          scrollTop: 0,
-          duration: 0
-        })
-        this.getRequest(true)
-        app.globalData.isTabbarPageRefresh['find'] = false
-      }
     },
 
     onUnload: function () {
       clearTimeout(this.timer)
     },
-
-    getRequest: function (isRefresh) {
-      let pageNum = isRefresh ? 0 : this.httpsData.nextPage
-      this.pageLocation = { longitude: app.globalData.longitude, latitude: app.globalData.latitude }
-      net.reqGet({
-        url: 'record/list/filter',
-        query: {
-          pageNum: pageNum,
-          lng: app.globalData.location.longitude,
-          lat: app.globalData.location.latitude,
-          distance: distanceType[this.distanceIndex].distance,
-          type: sortType[this.sortIndex].type
-        }
-      }).then(data => {
-        if (isRefresh) {
-          wx.stopPullDownRefresh()
-        }
-
-        let records = isRefresh ? [] : this.recordList[0]
-        records = records.concat(common.getRecordListFrom(data.data.list))
-        this.httpsData = data.data
-        this.recordList.splice(0, 1, records)
-
-        if (data.data.total > 0) { // 用户看到过数据就不要走自动的流程了
-          this.autoChangeStep = 'doNotAutoChange'
-        } else if (!this.autoChangeStep && (this.distanceIndex !== 5 || this.sortIndex !== 2)) { // 无数据则选择全网最新，仅第一次展示执行
-          this.distanceIndex = 5
-          this.sortIndex = 2
-          this.autoChangeStep = 'autoChanged'
-          this.getRequest(true)
-        }
-        if (this.autoChangeStep && this.autoChangeStep === 'autoChanged') { // 执行完成，给提示
-          const timer = setTimeout(() => {
-            clearTimeout(timer)
-            wx.showToast({
-              title: `您所选范围暂无内容\n已为您改为[${this.distanceType[5].text}-${this.sortType[2].text}]`,
-              icon: 'none',
-              duration: 3000
-            })
-          }, 200)
-
-          this.autoChangeStep = 'toastShowed'
-        }
-      })
+    pullDownRefresh: function () {
+      const childP = this.childPages[this.categoryCur]
+      if (typeof childP.pullDownRefresh === 'function') {
+        childP.pullDownRefresh()
+      }
     },
-
-    changeFilter: function (e) {
-      const type = parseInt(e.target.dataset.type)
-      switch (type) {
-        case 0: {
-          this.distanceIndex = e.detail.value
-          wx.setStorageSync('find_distanceIndex', e.detail.value)
-          wx.pageScrollTo({
-            scrollTop: 0,
-            duration: 0
-          })
-          this.getRequest(true)
-          break
-        }
-        case 1: {
-          this.sortIndex = e.detail.value
-          wx.setStorageSync('find_sortIndex', e.detail.value)
-          wx.pageScrollTo({
-            scrollTop: 0,
-            duration: 0
-          })
-          this.getRequest(true)
-          break
+    reachBottom () {
+      const childP = this.childPages[this.categoryCur]
+      if (typeof childP.reachBottom === 'function') {
+        childP.reachBottom()
+      }
+    },
+    onShareAppMessage: function (res) {
+      const childP = this.childPages[this.categoryCur]
+      if (typeof childP.shareAppMessage === 'function') {
+        return childP.shareAppMessage(res)
+      } else {
+        return {
+          title: '点迹，让附近离你更近。',
+          path: '/pages/launch',
+          imageUrl: logo1
         }
       }
     },
-
-    clickToSwitch: function () {
-      wx.switchTab({
-        url: './release'
-      })
+    swipeTo (e) {
+      console.log(e)
+      this.categoryCur = parseInt(e.detail.categoryCur)
+      // if (this.categoryCur === 1 && this.imgFlowList.length <= 0) {
+      //   this.getRequest(true)
+      // }
+      // this.tabWaitTimer = setInterval(() => {
+      //   common.getLocation()
+      //   console.log('timer(', this.timer, ') fire!!!')
+      // }, 30000)
+    },
+    changeRequestState (e) {
+      console.log('changeRequestState', e)
+      this.categoryData[this.categoryCur] = { ...this.categoryData[this.categoryCur], ...e.detail }
+      console.log(this.categoryData)
     },
     clickToMapPage: function () {
       wx.navigateTo({
@@ -220,67 +163,16 @@
 
 <style >
 
-  .container {} 
-
-  .header{
-    width: 100%;
-    height: 80rpx;
-    position: fixed;
-    margin-top: 0; 
-    z-index: 100;
-
-    opacity: 0.8;
-    border-bottom: 1rpx solid #ccc;
-  }
-
-  .header_holder{
-    width: 100%;
-    height: 80rpx;
-    background-color: transparent;
-  }
-
-  .picker_distance{
-    position: absolute;
-    top: 0;
-    left: 100rpx;
-
-    width: 160rpx;
-    height: 60rpx;
-  }
-
-  .picker_sort{
-    position: absolute;
-    top: 0;
-    left: 500rpx;
-
-    width: 160rpx;
-    height: 60rpx;
-  }
-
-  .picker_btn {
-    width: 160rpx;
-    height: 60rpx;
-    padding: 0rpx;
-    text-align: center;
-    line-height: 50rpx;
-
-    font-size: 28rpx;
-    background-color: transparent;
-
-    border-top-left-radius: 0rpx;
-    border-top-right-radius: 0rpx;
-    border-bottom-left-radius: 20rpx;
-    border-bottom-right-radius: 20rpx;
-
-    border-bottom: 1px solid #bbb;
-  }
 </style>
 
 <script  type='application/json'>
   {
-    "enablePullDownRefresh": true,
+    "disableScroll": true,
     "usingComponents": {
       "navigationBar": "../components/navigationBar",
+      "swipeList": "../components/swipeList",
+      "findAll": "../components/findAll",
+      "findImgFlow": "../components/findImgFlow",
       "tabbar": "../components/tabbar",
       "dialog": "../components/dialog"
     }

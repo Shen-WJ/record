@@ -2,8 +2,6 @@
   <view class='gallery_mask' wx:if='{{isShow}}' catchtouchmove='true' catchtap="clickMask" catchlongpress="true">
     <scroll-view class="scroll-box" scroll-x scroll-with-animation
       scroll-into-view="{{toCard}}"
-      lower-threshold="135"
-      bindscrolltolower="{{scrollToLower}}"
       bindscroll="bindScroll">
         <block wx:for="{{titleList}}" wx:key="index">
           <view wx:if="{{index === 0}}" class="card_holder" id="card_0" />

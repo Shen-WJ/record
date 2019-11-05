@@ -510,7 +510,11 @@
             this.isShowDialog = true
           } else {
             this.isShowDialog = false
-            common.updateUserInfo({ userInfo: e.detail.detail.userInfo })
+            common.updateUserInfo({
+              userInfo: e.detail.detail.userInfo,
+              iv: e.detail.detail.iv,
+              encryptedData: e.detail.detail.encryptedData
+            })
           }
         }
       })

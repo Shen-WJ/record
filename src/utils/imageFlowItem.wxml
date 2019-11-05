@@ -1,0 +1,32 @@
+<!-- 
+  iFItem 图片流对象
+  iFIndex 对象所处的index
+ -->
+<template name="imageFlowItem">
+  <view class="imageFlowItem">
+    <view class="iFHead">
+      <view class="iFHead_avatar_name">
+        <image src="{{iFItem.headUrl}}" />
+        <text>{{iFItem.nickname}}</text>
+      </view>
+      <view class="iFhead_time"></view>
+    </view>
+    <view class="iFBody">
+      <swiper indicator-dots="{{true}}" autoplay="{{false}}" interval="{{5000}}" duration="{{500}}">
+        <block wx:for="{{iFItem.imageList}}" wx:key="index">
+          <swiper-item>
+            <image class="swiper-image" src="{{item}}" mode="aspectFit" />
+          </swiper-item>
+        </block>
+      </swiper>
+    </view>
+    <view class="iFActions">
+      <view class="iFActions_left"></view>
+      <view class="iFActions_right"></view>
+    </view>
+    <view class="iFText">
+      <text class="iFText_location" catchtap="clickToMap" data-index="{{iFIndex}}">{{iFItem.location}}<text class="iFText_distance">{{iFItem.distance}}</text></text>
+      <text class="iFText_content">{{iFItem.content}}</text>
+    </view>
+  </view>
+</template>

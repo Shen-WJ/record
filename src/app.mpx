@@ -2,6 +2,7 @@
   import { storeUser } from './stores/storeUser'
   import { storeMode, storeNotice } from './stores/storeCommon'
   import net from './utils/net'
+  const common = require('./utils/common.js')
 
   const getData = function (that) {
     net.reqGet({
@@ -28,7 +29,6 @@
       url: 'user/auth'
     }).then(data => {
       let auth = data.data
-      delete (auth['userId'])
       storeUser.commit('updateUserAuth', { userAuth: auth })
       console.log('authRelease? ', storeUser.getters.authRelease)
     })
@@ -87,8 +87,10 @@
       storeMode.commit('updateCoverImg', { imgUrl: (wx.getStorageSync('coverImg') || '') })
       storeMode.commit('updateOpacity', { opacity: (wx.getStorageSync('opacity') || 1) })
 
+      const hasUnionId = wx.getStorageSync('hasUnionId') || false
+
       // 用户静默登录
-      if (storeUser.state.userId < 10000 || storeUser.state.userCode === '') {
+      if (storeUser.state.userId < 10000 || storeUser.state.userCode === '' || !hasUnionId) {
         wx.login({
           success: res => {
             // 发送 res.code 到后台换取 openId, sessionKey, unionId
@@ -104,7 +106,22 @@
 
               storeUser.commit('updateUserId', { userId: data.data.userId })
               storeUser.commit('updateUserCode', { userCode: data.data.code })
+
               getData(this)
+
+              wx.setStorageSync('hasUnionId', data.data.hasUnionId)
+              if (!data.data.hasUnionId && storeUser.state.hasHadUserInfo) { // 老用户没unionId
+                wx.getUserInfo({
+                  withCredentials: true,
+                  success: res => {
+                    console.log('getUserInfo', res)
+                    common.updateUserInfo({
+                      iv: res.iv,
+                      encryptedData: res.encryptedData
+                    })
+                  }
+                })
+              }
             })
           }
         })

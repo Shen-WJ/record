@@ -70,6 +70,12 @@ export const storeUser = createStore({
   },
   getters: {
     authRelease (state) {
+      if (!state.userAuth['1001']) {
+        return {
+          canRelease: true,
+          leftTime: ''
+        }
+      }
       let time = (state.userAuth['1001'] - (new Date()).getTime()) / 1000
       let leftTime = time > 3600 ? (time / 3600).toFixed(1) + '小时' : (time / 60).toFixed(1) + '分钟'
       return {
