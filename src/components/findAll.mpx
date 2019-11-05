@@ -33,6 +33,8 @@
     { text: '最新', type: 1 },
     { text: '最早', type: 2 }
   ]
+  const findDistanceIndex = 'find_distanceIndex'
+  const findSortIndex = 'find_sortIndex'
   createComponent({
     behaviors: [behaviorOnRecord],
     options: {
@@ -43,9 +45,9 @@
     data: {
       recordList: [[], []],
       distanceType: distanceType,
-      distanceIndex: wx.getStorageSync('find_distanceIndex') || 4,
+      distanceIndex: wx.getStorageSync(findDistanceIndex) || 4,
       sortType: sortType,
-      sortIndex: wx.getStorageSync('find_sortIndex') || 2,
+      sortIndex: wx.getStorageSync(findSortIndex) || 2,
       pageLocation: {}
     },
     computed: {
@@ -161,13 +163,18 @@
           }
         })
       },
+      swipeToHere: function () {
+        if (!this.recordList[0] || this.recordList[0].length <= 0) {
+          this.getRequest(true)
+        }
+      },
 
       changeFilter: function (e) {
         const type = parseInt(e.target.dataset.type)
         switch (type) {
           case 0: {
             this.distanceIndex = e.detail.value
-            wx.setStorageSync('find_distanceIndex', e.detail.value)
+            wx.setStorageSync(findDistanceIndex, e.detail.value)
             wx.pageScrollTo({
               scrollTop: 0,
               duration: 0
@@ -177,7 +184,7 @@
           }
           case 1: {
             this.sortIndex = e.detail.value
-            wx.setStorageSync('find_sortIndex', e.detail.value)
+            wx.setStorageSync(findSortIndex, e.detail.value)
             wx.pageScrollTo({
               scrollTop: 0,
               duration: 0

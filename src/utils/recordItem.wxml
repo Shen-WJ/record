@@ -28,7 +28,7 @@
         </view>
         <view class="rmc_image">
           <block wx:for-items="{{record.imageList}}" wx:key="">
-            <image lazy-load="true" mode="aspectFill" src="{{item}}" data-src="{{item}}" data-index="{{rcdIndex}}" catchtap="previewImage" />
+            <image lazy-load="{{true}}" mode="aspectFill" src="{{item}}" data-src="{{item}}" data-index="{{rcdIndex}}" catchtap="previewImage" />
 
           </block>
         </view>

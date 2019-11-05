@@ -196,25 +196,19 @@ function _updateUserInfo ({ userInfo = {}, iv = '', encryptedData = '', success 
   // 先登录获取sessionkey用于解密encryptedData
   wx.login({
     success: res => {
-      net.reqGet({
-        url: 'user/login',
-        query: {
-          code: res.code
-        }
-      }).then(data => {
-        net.reqPut({
-          url: 'user/info',
-          body: {
-            headUrl: userInfo.avatarUrl || '',
-            nickname: userInfo.nickName || '',
-            sex: userInfo.gender || '',
-            iv: iv || '',
-            encryptedData: encryptedData || ''
-          }
-        }).then(data => {
-          success(data)
-        })
-      })
+      // console.log('login: ', res.code, iv, '\n\n\n', encryptedData)
+      // net.reqPut({
+      //   url: 'user/info',
+      //   body: {
+      //     headUrl: userInfo.avatarUrl || '',
+      //     nickname: userInfo.nickName || '',
+      //     sex: userInfo.gender || '',
+      //     iv: iv || '',
+      //     encryptedData: encryptedData || ''
+      //   }
+      // }).then(data => {
+      //   success(data)
+      // })
     }
   })
 }

@@ -8,30 +8,30 @@
     <view slot="{{categoryMenu[0]}}">
       <findAll id="findAll" bind:changeRequestState="changeRequestState" />
     </view>
-    <view slot="{{categoryMenu[1]}}" class="tab_box_imgFlow">
-      <template is="headerFilter" data="{{darkMode: darkMode, typeArr: [distanceType, sortType], indexArr: [distanceIndex, sortIndex]}}"/>
+    <view slot="{{categoryMenu[1]}}">
+      <findImgFlow id="findImgFlow" bind:changeRequestState="changeRequestState" />
     </view>
   </swipeList>
 
   <image class="smallMap themeMode" style="bottom: {{tabBarBottom}}px;" src="../image/icon/toMapPage.png" mode="aspectFit" catchtap="clickToMapPage"></image>
   <dialog isShow="{{isShowDialog}}" zIndex="10001" title='需要定位来获取附近内容'
-  content='点迹的众多内容服务都是基于位置信息提供的，没有定位将无法使用点迹的服务'
-  showCancel="{{false}}" confirmText="前往设置" open_type="openSetting" bindsuccess='backFromSetting' />
+    content='点迹的众多内容服务都是基于位置信息提供的，没有定位将无法使用点迹的服务'
+    showCancel="{{false}}" confirmText="前往设置" open_type="openSetting" bindsuccess='backFromSetting' />
   <tabbar selected="1" />
 </template>
 
 <script>
   import { createPage } from '@mpxjs/core'
-  import { storeMode } from '../stores/storeCommon'
   import logo1 from '../image/global/logo1.jpg'
 
   const common = require('../utils/common.js')
+  const app = getApp()
 
   createPage({
     data: {
+      tabBarBottom: app.globalData.tabBarBottom,
       isShowDialog: false,
 
-      imgFlowList: [[], []],
       categoryCur: 0,
 
       categoryMenu: ['综合', '一图流刷刷刷', '失物认领'],
@@ -58,9 +58,6 @@
           total: 0
         }
       ]
-    },
-    computed: {
-      ...storeMode.mapState(['darkMode'])
     },
 
     onLoad: function () {
@@ -120,18 +117,13 @@
     swipeTo (e) {
       console.log(e)
       this.categoryCur = parseInt(e.detail.categoryCur)
-      // if (this.categoryCur === 1 && this.imgFlowList.length <= 0) {
-      //   this.getRequest(true)
-      // }
-      // this.tabWaitTimer = setInterval(() => {
-      //   common.getLocation()
-      //   console.log('timer(', this.timer, ') fire!!!')
-      // }, 30000)
+      const childP = this.childPages[this.categoryCur]
+      if (typeof childP.swipeToHere === 'function') {
+        childP.swipeToHere()
+      }
     },
     changeRequestState (e) {
-      console.log('changeRequestState', e)
       this.categoryData[this.categoryCur] = { ...this.categoryData[this.categoryCur], ...e.detail }
-      console.log(this.categoryData)
     },
     clickToMapPage: function () {
       wx.navigateTo({

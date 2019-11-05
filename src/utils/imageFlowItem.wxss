@@ -1,17 +1,84 @@
-.iFText_location {
-  font-size: 24rpx;
-  color: #2ab3f3;
+.imageFlowItem {
+  width: 750rpx;
 }
-.iFText_distance {
-  font-size: 20rpx;
+
+.iFHead {
+  margin: 10rpx 20rpx 0rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.iFHead_avatar_name {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+
+  font-size: 28rpx;
+}
+.iFHead_avatar_name image {
+  margin: 10rpx 20rpx 10rpx 0rpx;
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+}
+.iFhead_time {
+  font-size: 18rpx;
   color: #999;
-  padding-left: 5rpx;
 }
-.iFText_content {
-  display: block;
-  margin: 10rpx 0 15rpx;
-  padding: 0 5rpx;
-  opacity: 0.7;
+
+.iFBody {
+  width: 100%;
+}
+.iFBody_swiper {
+  width: 100%;
+}
+.iFBody_swiperItem_Img {
+  width: 100%;
+  height: 100%;
+}
+
+.iFActions {
+  margin: 20rpx 20rpx 0rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.iFActions_left {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+}
+.iFActions_right {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+}
+.iFActions_img {
+  margin: 10rpx;
+  height: 50rpx;
+  width: 50rpx;
+}
+.iFActions_box {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  height: 70rpx;
+}
+
+.iFText {
+  margin: 0rpx 30rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid #888;
+}
+.iFText_loc_dis {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+}
+.iFText_location {
+  font-size: 28rpx;
+  color: #2ab3f3;
+  max-width: 90%;
 
   text-overflow: -o-ellipsis-lastline;
   overflow: hidden;
@@ -22,3 +89,26 @@
   -webkit-box-orient: vertical;
   align-content: center;
 }
+.iFText_distance {
+  display: inline;
+  font-size: 22rpx;
+  color: #999;
+  padding-left: 5rpx;
+}
+.iFText_content {
+  display: block;
+  margin: 10rpx 0 15rpx;
+  padding: 0 5rpx;
+  opacity: 0.7;
+  font-size: 30rpx;
+
+  text-overflow: -o-ellipsis-lastline;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all; 
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  align-content: center;
+}
+

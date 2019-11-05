@@ -1,28 +1,195 @@
 <template>
-  <view class='container'>
+  <import src="../utils/imageFlowItem.wxml"/>
+  <import src="../utils/common.wxml"/>
 
+  <view class="tab_box_ImgFlow">
+    <template is="headerFilter" data="{{darkMode: darkMode, typeArr: [distanceType, sortType], indexArr: [distanceIndex, sortIndex]}}"/>
+    <template is="emptyView" data="{{isShow: !recordList[0].length, type:0, textArr:['要不点击上方↖↗换个筛选条件试试？或者','去发布','分享给你的附近吧～0v0']}}"/>
+    <template wx:for="{{recordList[0]}}" wx:key="{{item.recordId}}" wx:for-index="row" is="imageFlowItem" data="{{record:item, rcdIndex:{section:0, row:row}, darkMode:darkMode}}"/>
   </view>
 </template>
 
 <script>
   import { createComponent } from '@mpxjs/core'
+  import net from '../utils/net'
+  import { storeMode } from '../stores/storeCommon'
+  import { behaviorOnRecord } from '../behavior/behaviorOnRecord'
+  import logo1 from '../image/global/logo1.jpg'
+  import contentBoardHolder from '../image/global/contentBoardHolder.png'
+
+  const common = require('../utils/common.js')
+  const app = getApp()
+  const distanceType = [
+    { text: '1km内', distance: 1 },
+    { text: '5km内', distance: 5 },
+    { text: '10km内', distance: 10 },
+    { text: '20km内', distance: 20 },
+    { text: '40km内', distance: 40 },
+    { text: '全网', distance: -1 }
+  ]
+  const sortType = [
+    { text: '今日最热', type: 3 },
+    { text: '本周最热', type: 4 },
+    { text: '最新', type: 1 },
+    { text: '最早', type: 2 }
+  ]
+  const findIFDistanceIndex = 'findIF_distanceIndex'
+  const findIFSortIndex = 'findIF_sortIndex'
   createComponent({
+    behaviors: [behaviorOnRecord],
+    options: {
+      styleIsolation: 'shared'
+    },
     properties: {
     },
     data: {
+      recordList: [[], []],
+      distanceType: distanceType,
+      distanceIndex: wx.getStorageSync(findIFDistanceIndex) || 4,
+      sortType: sortType,
+      sortIndex: wx.getStorageSync(findIFSortIndex) || 2,
+      pageLocation: {}
+    },
+    computed: {
+      ...storeMode.mapState(['darkMode'])
     },
     pageShow () {
       // 所在页面显示之后就会执行一次
       console.log('page show')
     },
     methods: {
+      pullDownRefresh: function () {
+        if (typeof this.getRequest === 'function') {
+          this.getRequest(true)
+        }
+      },
+      reachBottom: function () {
+        if (typeof this.getRequest === 'function') {
+          if (!common.isEmpty(this.httpsData) && this.httpsData.hasNextPage) {
+            this.getRequest(false)
+          }
+        }
+      },
+      shareAppMessage: function (res) {
+        if (res.from === 'button') {
+          const record = this.getRecord(res.target.dataset.index)
+          const title = common.isEmpty(record.content) ? (record.nickname + '在' + record.location + '说') : record.content
+          if (record.img1) {
+            return {
+              title: title,
+              path: '/pages/recordDetail?recordId=' + record.recordId,
+              imageUrl: record.img1
+            }
+          } else {
+            return {
+              title: title,
+              path: '/pages/recordDetail?recordId=' + record.recordId,
+              imageUrl: this.contentBoardSrc || contentBoardHolder
+            }
+          }
+        } else {
+          return {
+            title: '点迹，让附近离你更近。',
+            path: '/pages/launch',
+            imageUrl: logo1
+          }
+        }
+      },
+      getRequest: function (isRefresh) {
+        this.triggerEvent('changeRequestState', {
+          requesting: true
+        }, {})
+        let pageNum = isRefresh ? 0 : this.httpsData.nextPage
+        // todo 确定是否要修改pageLocation的逻辑
+        this.pageLocation = { longitude: app.globalData.longitude, latitude: app.globalData.latitude }
+        net.reqGet({
+          url: 'record/image/filter',
+          query: {
+            pageNum: pageNum,
+            lng: app.globalData.location.longitude,
+            lat: app.globalData.location.latitude,
+            distance: distanceType[this.distanceIndex].distance,
+            type: sortType[this.sortIndex].type
+          }
+        }).then(data => {
+          if (isRefresh) {
+            wx.stopPullDownRefresh()
+          }
 
+          let records = isRefresh ? [] : this.recordList[0]
+          records = records.concat(common.getRecordListFrom(data.data.list))
+          this.httpsData = data.data
+          this.recordList.splice(0, 1, records)
+
+          this.triggerEvent('changeRequestState', {
+            requesting: false,
+            end: !data.data.hasNextPage,
+            total: this.recordList[0].length
+          }, {})
+
+          if (data.data.total > 0) { // 用户看到过数据就不要走自动的流程了
+            this.autoChangeStep = 'doNotAutoChange'
+          } else if (!this.autoChangeStep && (this.distanceIndex !== 5 || this.sortIndex !== 2)) { // 无数据则选择全网最新，仅第一次展示执行
+            this.distanceIndex = 5
+            this.sortIndex = 2
+            this.autoChangeStep = 'autoChanged'
+            this.getRequest(true)
+          }
+          if (this.autoChangeStep && this.autoChangeStep === 'autoChanged') { // 执行完成，给提示
+            const timer = setTimeout(() => {
+              clearTimeout(timer)
+              wx.showToast({
+                title: `您所选范围暂无内容\n已为您改为[${this.distanceType[5].text}-${this.sortType[2].text}]`,
+                icon: 'none',
+                duration: 3000
+              })
+            }, 200)
+            this.autoChangeStep = 'toastShowed'
+          }
+        })
+      },
+      swipeToHere: function () {
+        if (!this.recordList[0] || this.recordList[0].length <= 0) {
+          this.getRequest(true)
+        }
+      },
+
+      changeFilter: function (e) {
+        const type = parseInt(e.target.dataset.type)
+        switch (type) {
+          case 0: {
+            this.distanceIndex = e.detail.value
+            wx.setStorageSync(findIFDistanceIndex, e.detail.value)
+            wx.pageScrollTo({
+              scrollTop: 0,
+              duration: 0
+            })
+            this.getRequest(true)
+            break
+          }
+          case 1: {
+            this.sortIndex = e.detail.value
+            wx.setStorageSync(findIFSortIndex, e.detail.value)
+            wx.pageScrollTo({
+              scrollTop: 0,
+              duration: 0
+            })
+            this.getRequest(true)
+            break
+          }
+        }
+      },
+      clickToSwitch: function () {
+        wx.switchTab({
+          url: './release'
+        })
+      }
     }
   })
 </script>
 
 <style>
-  .container {} 
+  @import '../utils/imageFlowItem.wxss';
 </style>
 
 <script type='application/json' lang='json'>

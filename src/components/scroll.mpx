@@ -14,7 +14,7 @@
         class="scroll__view"
         style="padding-bottom: {{bottomSize}}rpx;padding-top: {{top}}rpx;"
         scroll-y="{{refreshStatus == 1}}"
-        lower-threshold="{{100}}"
+        lower-threshold="750rpx"
         bindscrolltolower="more">
         <view id="refresh"
             class="scroll__refresh {{successShow ? 'scroll__refresh--hidden' : ''}}"
