@@ -109,10 +109,12 @@
     position: absolute;
     top: 5rpx;
     right: 20rpx;
-    width: 36rpx;
-    height: 36rpx;
-    line-height: 36rpx;
-    border-radius: 50%;
+    box-sizing: border-box;
+    padding: 0 8rpx;
+    min-width: 30rpx;
+    height: 30rpx;
+    line-height: 30rpx;
+    border-radius: 30rpx;
     background-color: red;
     color: white;
     font-size: 20rpx;

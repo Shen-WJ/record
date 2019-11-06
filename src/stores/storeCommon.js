@@ -29,7 +29,7 @@ export const storeMode = createStore({
 
     chooseBlackTheme (state, { isOpen = false }) {
       // 开启黑色/白色主题的背景图样式
-      // 透明度为0时，等同于开启夜间模式openDarkMode
+      // 透明度为1时，等同于开启夜间模式openDarkMode
       wx.setStorageSync('darkMode', isOpen)
       state.darkMode = isOpen
     },
@@ -118,6 +118,9 @@ export const storeNotice = createStore({
   },
   mutations: {
     updateRedDots (state, { redDots = [0, 0, 0, 0, 0] }) {
+      for (let i in redDots) {
+        if (redDots[i] > 99) redDots.splice(i, 1, '99+')
+      }
       state.redDots = redDots
     }
   }

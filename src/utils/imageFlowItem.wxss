@@ -16,7 +16,7 @@
   font-size: 28rpx;
 }
 .iFHead_avatar_name image {
-  margin: 10rpx 20rpx 10rpx 0rpx;
+  margin: 20rpx 20rpx 20rpx 0rpx;
   width: 60rpx;
   height: 60rpx;
   border-radius: 50%;
@@ -98,7 +98,6 @@
 .iFText_content {
   display: block;
   margin: 10rpx 0 15rpx;
-  padding: 0 5rpx;
   opacity: 0.7;
   font-size: 30rpx;
 

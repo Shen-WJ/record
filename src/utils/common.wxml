@@ -16,12 +16,12 @@
 </template>
 
 <template name="headerFilter">
-  <view class="headerFilter">
+  <view class="headerFilter {{darkMode ? 'bgColorB0 fontColorW1':'bgColorW0 fontColorB1'}}">
     <block wx:for="{{typeArr}}" wx:key="index" wx:for-item="typeItem">
       <picker range="{{typeItem}}" range-key="text" value="{{indexArr[index]}}" bindchange="changeFilter" data-type="{{index}}">
         <view class="headerFilter_picker_btn">
-          <view class="{{darkMode ? 'fontColorW2':'fontColorB2'}}">{{typeItem[indexArr[index]].text}}</view>
-          <image src="../image/icon/arrow_right.png" />
+          <view class="">{{typeItem[indexArr[index]].text}}</view>
+          <image src="../image/icon/arrow_right.png" mode="aspectFit" />
         </view>
       </picker>
     </block>

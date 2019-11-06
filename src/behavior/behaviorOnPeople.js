@@ -2,7 +2,7 @@ import logo1 from '../image/global/logo1.jpg'
 import contentBoardHolder from '../image/global/contentBoardHolder.png'
 import { behaviorOnRecord } from '../behavior/behaviorOnRecord'
 import { storeUser } from '../stores/storeUser'
-import { storeNotice } from '../stores/storeCommon'
+import { storeMode, storeNotice } from '../stores/storeCommon'
 import net from '../utils/net'
 
 const common = require('../utils/common.js')
@@ -202,6 +202,16 @@ export const behaviorOnPeople = Behavior({
         this.isAnimating = false
       }
       this.animations = aniExports
+    },
+    pressToChangeLamp () {
+      wx.showActionSheet({
+        itemList: ['这里是彩蛋！点击下方↓', storeMode.state.darkMode ? '开灯' : '关灯'],
+        success: res => {
+          if (res.tapIndex === 1) {
+            storeMode.commit('chooseBlackTheme', { isOpen: !storeMode.state.darkMode })
+          }
+        }
+      })
     },
 
     // 点击是否授权后触发

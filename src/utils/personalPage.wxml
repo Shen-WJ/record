@@ -2,7 +2,7 @@
 <import src="./myRecord.wxml"/>
 
 <template name="personalPage">
-  <view class="me_hd" bindtap="clickHead">
+  <view class="me_hd" bindtap="clickHead" catchlongpress="pressToChangeLamp">
     <image class="me_hd_bg_img {{darkMode?'darkMode':'themeMode'}}" mode="aspectFill">
       <image class="me_hd_photo" mode="aspectFit" src="{{headUrl}}" catchtap="clickToSome" data-type="0" data-position="head"></image>
       <view class="me_hd_name me_hd_flex_group">

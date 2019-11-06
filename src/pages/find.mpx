@@ -34,7 +34,7 @@
 
       categoryCur: 0,
 
-      categoryMenu: ['综合', '一图流刷刷刷', '失物认领'],
+      categoryMenu: ['综合', 'PicFlow', '校园卡'],
       categoryData: [
         {
           name: '综合',
@@ -44,14 +44,14 @@
           total: 0
         },
         {
-          name: '一图流刷刷刷',
+          name: 'PicFlow',
           requesting: false,
           end: false,
           emptyShow: false,
           total: 0
         },
         {
-          name: '失物认领',
+          name: '校园卡',
           requesting: false,
           end: false,
           emptyShow: false,

@@ -1,6 +1,7 @@
 <template>
   <view class="top-wrap {{darkMode?'bgColorB0':'bgColorW0'}}" style="top:{{navH}}px;">
     <navTab id="category"
+      separateColor="{{darkMode?'333333':'e3e3e3'}}"
       tab-data="{{categoryMenu}}"
       tab-cur="{{categoryCur}}"
       size="{{80}}"

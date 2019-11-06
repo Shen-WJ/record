@@ -2,7 +2,7 @@
   <scroll-view scroll-x
         scroll-with-animation
         scroll-left="{{scrollLeft}}">
-    <view class="tabs {{scroll ? 'tabs--scroll' : ''}}" style="height: {{size}}rpx">
+    <view class="tabs {{scroll ? 'tabs--scroll' : ''}}" style="height: {{size}}rpx; border-bottom: 1rpx solid #{{separateColor}};">
       <view class="tabs__item {{index === tabCur ? 'tabs__item--cur': ''}}"
           style="height: {{size}}rpx;line-height: {{size}}rpx"
           wx:for="{{tabData}}"
@@ -42,8 +42,12 @@
       // tab高度
       size: {
         type: Number,
-        value: 90,
+        value: 80,
         observer: 'sizeChange'
+      },
+      separateColor: {
+        type: String,
+        value: 'e3e3e3'
       }
     },
     data: {
@@ -149,7 +153,7 @@
   }
   .tabs {
     position: relative;
-    height: 90rpx;
+    height: 80rpx;
     color: #999999;
     display: flex;
   }
@@ -168,8 +172,8 @@
   .tabs__item {
     flex: 1;
     text-align: center;
-    height: 90rpx;
-    line-height: 90rpx;
+    height: 80rpx;
+    line-height: 80rpx;
     padding: 0 30rpx;
     box-sizing: border-box;
     transition: color 0.3s ease-in-out;
@@ -183,7 +187,7 @@
   .tabs__line {
     position: absolute;
     left: 0;
-    bottom: 0;
+    bottom: 10rpx;
     background-color: #2ab3f3;
     height: 4rpx;
     width: 0rpx;

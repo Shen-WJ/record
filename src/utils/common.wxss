@@ -286,7 +286,7 @@ display: none;
   color: #000;
 }
 .fontColorB1 {
-  color: #555;
+  color: #444;
 }
 .fontColorB2 {
   color: #777;
@@ -345,6 +345,7 @@ display: none;
   display: flex;
   justify-content: center;
   align-items: center;
+  opacity: 0.8;
 }
 .headerFilter_picker_btn {
   width: 160rpx;

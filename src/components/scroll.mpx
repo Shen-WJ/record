@@ -5,7 +5,6 @@
       style="height: calc({{movableAreaH}}px + {{refreshSize}}rpx)"
       bind:change="change"
       bind:touchend="touchend"
-      friction="{{4}}"
       direction="vertical"
       out-of-bounds="{{true}}"
       disabled="{{refreshStatus >= 3}}"
@@ -103,7 +102,7 @@
       // 下拉刷新的高度，决定了movable-view向上收起的高度，即刷新出来的图标的高度
       refreshSize: {
         type: Number,
-        value: 90,
+        value: 80,
         observer: 'refreshChange'
       },
       // 底部高度
@@ -121,7 +120,7 @@
       successShow: false, // 显示success
       successTran: false, // 过度success
       refreshStatus: 0, // 1: 下拉刷新, 2: 松开刷新, 3: 加载中, 4: 加载完成
-      move: -45, // movable-view 偏移量
+      move: -40, // movable-view 偏移量
       scrollTop: 0
     },
     methods: {
@@ -157,11 +156,15 @@
         if (refreshStatus === 2) {
           wx.vibrateShort()
           this.refreshStatus = 3
-          this.move = 0
+          this.setData({
+            move: 0
+          })
           this.mode = 'refresh'
           this.triggerEvent('refresh')
         } else if (refreshStatus === 1) {
-          this.move = this.scrollHeight1
+          this.setData({
+            move: this.scrollHeight1
+          })
         }
       },
       /**
@@ -183,24 +186,33 @@
 
         if (oldVal === true && newVal === false) {
           this.refreshStatus = 4
-          this.move = this.scrollHeight2
+          this.setData({
+            move: this.scrollHeight2
+          })
           setTimeout(() => {
             this.successShow = true
             setTimeout(() => {
               this.successTran = true
-              this.move = this.scrollHeight1
+              this.setData({
+                move: this.scrollHeight1
+              })
               setTimeout(() => {
                 this.refreshStatus = 1
                 this.successShow = false
                 this.successTran = false
-                this.move = this.scrollHeight1
+                // 此处必须用setData，否则不刷新
+                this.setData({
+                  move: this.scrollHeight1
+                })
               }, 350)
             }, 1000)
           }, 650)
         } else {
           if (this.refreshStatus !== 3) {
             this.refreshStatus = 3
-            this.move = 0
+            this.setData({
+              move: 0
+            })
           }
         }
       },
@@ -227,7 +239,9 @@
         query.exec(function (res) {
           this.scrollHeight1 = -res[0].height // refresh view 高度负值
           this.scrollHeight2 = res[1].height - res[0].height // refresh view - success view 高度负值
-          this.move = -res[0].height
+          this.setData({
+            move: -res[0].height
+          })
         }.bind(this))
       }
     },
@@ -244,7 +258,7 @@
 
   .scroll {
     width: 100%;
-    height: calc(100vh + 90rpx);
+    height: calc(100vh + 80rpx);
   }
   .scroll__view {
     height: 100%;
@@ -297,7 +311,7 @@
     transition: opacity 0.3s linear;
   }
   .scroll__refresh {
-    height: 90rpx;
+    height: 80rpx;
     padding: 20rpx 0;
     box-sizing: border-box;
   }
