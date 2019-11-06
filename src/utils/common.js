@@ -158,11 +158,12 @@ function _formatRecordsOnMap ({ list = [], isNeedLine = false, isNeedInclude = f
       iconPath: item.headUrl || toMap,
       width: '25px',
       height: '25px',
-      label: {
-        content: '   ' + item.location,
-        color: '#2ab3f3',
-        fontSize: 14
-      },
+      // 放弃在地图上显示地名，太乱了
+      // label: {
+      //   content: '   ' + item.location,
+      //   color: '#2ab3f3',
+      //   fontSize: 14
+      // },
       callout: {
         content: callout,
         color: color,
