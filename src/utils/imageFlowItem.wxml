@@ -12,14 +12,14 @@
       <view class="iFhead_time">{{record.timeStr}}</view>
     </view>
     <view class="iFBody">
-      <swiper class="iFBody_swiper" style="height: 1000rpx;" indicator-dots="{{true}}" circular="{{true}}" duration="{{500}}">
+      <swiper class="iFBody_swiper" style="height: 1000rpx;" indicator-dots="{{true}}" duration="{{500}}">
         <swiper-item wx:for="{{record.imageList}}" wx:key="index" class="iFBody_swiperItem">
           <image lazy-load="{{true}}" class="iFBody_swiperItem_Img" src="{{item}}" mode="aspectFill"  data-src="{{item}}" data-index="{{rcdIndex}}" catchtap="previewImage"/>
         </swiper-item>
       </swiper>
     </view>
     <view class="iFActions">
-      <view class="iFActions_left">
+      <view class="iFActions_left" catchtap="blankTap">
         <view class="iFActions_box" catchtap="clickLike" data-index="{{rcdIndex}}">
           <image wx:if="{{record.isLiked}}" class="iFActions_img" src="../image/icon/like1.png"></image>
           <image wx:else class="iFActions_img" src="../image/icon/like0.png"></image>
@@ -28,10 +28,11 @@
 
         <button hidden="{{true}}" open-type="share" catchtap="clickShare" id="hidedBtn{{record.recordId}}" data-index="{{rcdIndex}}" />
         <label class="iFActions_box" for="hidedBtn{{record.recordId}}">
+          <!-- 此处catchtap="clickShare"只是为了阻止事件冒泡到clickToDetail -->
           <image class="iFActions_img" src="../image/icon/share.png" />
         </label>
       </view>
-      <view class="iFActions_right">
+      <view class="iFActions_right" catchtap="blankTap">
         <view class="iFActions_box" catchtap="clickFavorites" data-index="{{rcdIndex}}" >
           <image wx:if="{{record.isFavorited}}" class="iFActions_img" src="../image/icon/favorites1.png"/>
           <image wx:else class="iFActions_img" src="../image/icon/favorites0.png"/>

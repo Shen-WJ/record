@@ -98,6 +98,9 @@ export const behaviorOnRecord = Behavior({
         index,
         that: this
       })
+    },
+    blankTap () {
+      // 只是为了占位阻止冒泡点击事件
     }
   }
 })
