@@ -114,7 +114,6 @@
                 wx.getUserInfo({
                   withCredentials: true,
                   success: res => {
-                    console.log('getUserInfo', res)
                     common.updateUserInfo({
                       iv: res.iv,
                       encryptedData: res.encryptedData
@@ -156,6 +155,8 @@
       favoritesDic: {},
       location: {},
 
+      routeOfRelease: '../pages/find',
+
       isTabbarPageRefresh: {
         'locality': false,
         'find': false,
@@ -196,7 +197,8 @@
       "./pages/singleText",
       "./pages/settings",
       "./pages/mapPage",
-      "./pages/otherPeople"
+      "./pages/otherPeople",
+      "./pages/releaseMulti"
     ],
     "window": {
       "backgroundTextStyle": "light",

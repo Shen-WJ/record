@@ -1,6 +1,9 @@
 <template>
   <view class="policy_view">
-    <view class="policy_view_text" style="color:{{textColor}};">{{action}}即代表您同意《<view class="policy_view_text"  style="color:{{canClickColor}};" catchtap="clickToPolicy" data-index="0">用户使用协议</view>》及《<view style="color:{{canClickColor}};" catchtap="clickToPolicy" data-index="1">隐私政策</view>》</view>
+    <view class="policy_view_text" style="color:{{textColor}};">{{action}}即代表您同意《
+      <view class="policy_view_text" style="color:{{canClickColor}};" catchtap="clickToPolicy" data-index="0">用户使用协议</view>》及《
+      <view class="policy_view_text"  style="color:{{canClickColor}};" catchtap="clickToPolicy" data-index="1">隐私政策</view>》
+    </view>
   </view>
 </template>
 

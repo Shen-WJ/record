@@ -180,9 +180,7 @@
         }
       },
       clickToSwitch: function () {
-        wx.switchTab({
-          url: './release'
-        })
+        common.switchToRelease('../pages/find')
       }
     }
   })

@@ -60,6 +60,10 @@
       canNavHome: {
         type: Boolean,
         value: true
+      },
+      customNavBack: {
+        type: String,
+        value: ''
       }
     },
     data: {

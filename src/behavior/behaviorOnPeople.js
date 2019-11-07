@@ -18,6 +18,8 @@ export const behaviorOnPeople = Behavior({
   behaviors: [behaviorOnRecord],
   methods: {
     onLoad: function (option) {
+      this.clickHead()
+
       if (option.otherUserId) { // otherPeople
         this.otherUserId = parseInt(option.otherUserId)
         if (this.otherUserId < 10000) { // userId不合法
@@ -271,9 +273,7 @@ export const behaviorOnPeople = Behavior({
     },
 
     clickToSwitch: function () {
-      wx.switchTab({
-        url: './release'
-      })
+      common.switchToRelease('../pages/me')
     },
 
     getRecord: function (index) {

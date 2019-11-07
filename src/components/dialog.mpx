@@ -2,13 +2,15 @@
   <view class='dialog_mask' style="z-index: {{zIndex}};" wx:if='{{isShow}}' catchtouchmove='true' catchtap="true" catchlongpress="true">
     <view class="dialog_modal {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}">
       <view class='dialog_title' style="border-bottom: 1rpx solid #{{darkMode?'333':'eee'}};" wx:if='{{title}}'>{{title}}</view>
-      <view class='dialog_content'>{{content}}</view>
+      <view wx:if="{{content.length>0}}" class='dialog_content'>{{content}}</view>
+      <view wx:else class='dialog_customContent'><slot></slot></view>
       <view wx:if={{showAllBtn}} class='dialog_btns' style="border-top: 1rpx solid #{{darkMode?'333':'eee'}};">
         <button class='dialog_cancel' style="border-right: 1rpx solid #{{darkMode?'333':'eee'}};" bindtap='Cancel' wx:if='{{showCancel}}'>{{cancelText}}</button>
         <button wx:if="{{open_type === 'contact'}}" class='dialog_success' bindcontact='Success' open-type='{{open_type}}'>{{confirmText}}</button>
         <button wx:elif="{{open_type === 'getUserInfo'}}" class='dialog_success' bindgetuserinfo='Success' open-type='{{open_type}}'>{{confirmText}}</button>
         <button wx:elif="{{open_type === 'getPhoneNumber'}}" class='dialog_success' bindgetphonenumber='Success' open-type='{{open_type}}'>{{confirmText}}</button>
         <button wx:elif="{{open_type === 'openSetting'}}" class='dialog_success' bindopensetting='Success' open-type='{{open_type}}'>{{confirmText}}</button>
+        <button wx:elif="{{open_type === 'none'}}" class='dialog_success' bindtap='Success'>{{confirmText}}</button>
         <button wx:else class='dialog_success' bindtap='Success' open-type='{{open_type}}'>{{confirmText}}</button>
       </view>
     </view>

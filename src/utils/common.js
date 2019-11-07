@@ -579,6 +579,13 @@ function _navToHomePage (isRelaunch = false) {
   }
 }
 
+function _switchToRelease (route) {
+  _appGetter().globalData.routeOfRelease = route
+  wx.switchTab({
+    url: '../pages/release'
+  })
+}
+
 export const getKilometerDistance = _getKilometerDistance
 export const getKmDistanceFromPoi = _getKmDistanceFromPoi
 export const getDistanceToMe = _getDistanceToMe
@@ -596,3 +603,4 @@ export const changeStatus = _changeStatus
 export const createContentBoard = _createContentBoard
 export const createCardSingle = _createCardSingle
 export const navToHomePage = _navToHomePage
+export const switchToRelease = _switchToRelease

@@ -124,9 +124,7 @@
     clickToSwitch: function (e) {
       let type = parseInt(e.target.dataset.type)
       if (type === 0) {
-        wx.switchTab({
-          url: './release'
-        })
+        common.switchToRelease('../pages/locality')
       } else {
         wx.switchTab({
           url: './find'

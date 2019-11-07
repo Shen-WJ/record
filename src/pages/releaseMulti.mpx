@@ -1,0 +1,668 @@
+<template>
+  <navigationBar pageName="发布图文" showCoverImg="{{false}}"/>
+
+  <view class="container">
+    <wxs module="common" src="../utils/common.wxs"></wxs>
+
+    <view class="top_buttons">
+      <button class="btn_clear" hover-class="touch_btn" bindtap="clickBtnClear">清空</button>
+      <button class="btn_release" hover-class="touch_btn" bindtap="clickBtnRelease">发布</button>
+    </view>
+    <view class="release_content">
+      <view class="location">
+        <input class="location_input {{darkMode?'fontColorW1':'fontColorB1'}}" focus="{{true}}" value="{{locationName}}" bindinput="locationInput" maxlength="{{loactionNameLength}}" placeholder="这里，是哪里？(1~{{loactionNameLength}}字)" placeholder-style="{{darkMode?'color:#555;':'color:#aaa;'}}"/>
+        <image class="location_choose" mode="aspectFit" src="../image/icon/toMap.png" catchtap="chooseLocation" />
+        <text class="location_text" catchtap="chooseLocation">地图选点</text>
+      </view>
+      <view class="sub_text">
+        <text class="location_digit">{{locationGPS}}\t</text>
+        <text class="location_length_count">{{loactionNameCount}}/{{loactionNameLength}}</text>
+      </view>
+      <textarea class="text_area {{darkMode?'fontColorW1':'fontColorB1'}}" value="{{contentText}}" bindinput="textInput" maxlength="{{contentTextLength}}" placeholder="在这里，留下属于你的痕迹...(0~{{contentTextLength}}字)" placeholder-style="{{darkMode?'color:#555;':'color:#aaa;'}}"/>
+      <view class="sub_text">
+        <text class="text_length_count">{{contentTextCount}}/{{contentTextLength}}</text>
+      </view>  
+      <view class="img_area">
+      <view class="img_files">
+        <block wx:for="{{imageList}}" wx:for-item="image" wx:key="{{index}}">
+        <view class="img_file">
+          <image class="img" mode="aspectFill" src="{{image}}" data-src="{{image}}" bindtap="previewImage"><image class="img_remove" src="../image/icon/img_remove.png" catchtap="removeImg" data-index="{{index}}"/></image>
+        </view>
+        </block>
+      </view>
+      <view class="add_img_box">
+        <view class="add_img" bindtap="chooseImage"></view>
+      </view>
+      </view>
+    </view>
+    <view class="private_choose {{darkMode?'fontColorW2':'fontColorB2'}}">
+      <text>给后来者也看看吧？</text>
+      <picker class="private_choose_picker" mode="selector" range="{{privateType}}" range-key="text" value="{{privateTypeIndex}}" bindchange="changePrivateType">
+        <text>{{privateType[privateTypeIndex].text}}</text>
+        <image src="../image/icon/arrow_right.png" />
+      </picker>
+    </view>
+    <button class="bottom_btn" bindtap="clickBtnRelease">发布</button>
+    <policyText wx:if="{{needAgreePolicy}}" id="policy_text" action='点击“发布”' textColor="{{darkMode?'#ababab':'#777'}}" canClickColor='#2ab3f3'/>
+  </view>
+</template>
+
+<script>
+  import { createPage } from '@mpxjs/core'
+  import net from '../utils/net'
+  import { storeUser } from '../stores/storeUser'
+  import { storeMode } from '../stores/storeCommon'
+  import { behaviorOnPage } from '../behavior/behaviorOnPage'
+
+  const common = require('../utils/common.js')
+  const app = getApp()
+
+  const loactionNameLength = 25
+  const contentTextLength = 500
+  const imgListLength = 9
+  const strReleaseLocationName = 'release_locationName'
+  const strReleaseLocationDigit = 'release_locationDigit'
+  const strReleaseLocationGPS = 'release_locationGPS'
+  const strReleaseContentText = 'release_contentText'
+  const allowedDistance = 20 // 单位km
+  const releaseDir = `${wx.env.USER_DATA_PATH}/releaseImgs`
+
+  createPage({
+    behaviors: [behaviorOnPage],
+    data: {
+      locationName: '',
+      contentText: '',
+      loactionNameCount: 0,
+      contentTextCount: 0,
+      locationGPS: '',
+      imageList: [],
+      privateTypeIndex: 0,
+      privateType: [{ text: '公开', value: 1 }, { text: '私密', value: 0 }],
+
+      loactionNameLength: loactionNameLength,
+      contentTextLength: contentTextLength
+    },
+    computed: {
+      ...storeMode.mapState(['darkMode']),
+      ...storeUser.mapState(['needAgreePolicy'])
+    },
+
+    onLoad: function (options) {
+      const name = wx.getStorageSync(strReleaseLocationName)
+      if (name) {
+        this.locationName = name
+        this.loactionNameCount = name.length
+      }
+
+      const digit = wx.getStorageSync(strReleaseLocationDigit)
+      if (digit) {
+        this.locationDigit = digit
+        this.locationGPS = common.formatLocation(digit.longitude, digit.latitude)
+      } else {
+        this.locationDigit = {}
+      }
+
+      const text = wx.getStorageSync(strReleaseContentText)
+      if (text) {
+        this.contentText = text
+        this.contentTextCount = text.length
+      }
+
+      this.fsm = wx.getFileSystemManager()
+      this.fsm.mkdir({
+        dirPath: releaseDir,
+        recursive: true,
+        complete: res => {
+          let imgs = this.fsm.readdirSync(releaseDir).sort()
+          for (let i in imgs) {
+            this.imageList.push(`${releaseDir}/${imgs[i]}`)
+          }
+        }
+      })
+    },
+
+    onShow: function () {
+      // 若为空说明旧定位不用存，则刷新定位
+      if (common.isEmpty(this.locationName) && common.isEmpty(this.contentText) && common.isEmpty(this.imageList)) {
+        common.getLocation({
+          success: (res) => {
+            this.locationDigit = { latitude: res.latitude, longitude: res.longitude }
+            this.locationGPS = common.formatLocation(res.longitude, res.latitude)
+            this.autoSave(1)
+          }
+        })
+      }
+    },
+
+    // type:0:定位名，1，定位经纬度，2，内容文字，3，图片
+    autoSave: function (type) {
+      let key, data
+      switch (type) {
+        case 0: {
+          key = strReleaseLocationName
+          data = this.locationName
+          break
+        }
+        case 1: {
+          key = strReleaseLocationDigit
+          data = this.locationDigit
+          wx.setStorageSync(strReleaseLocationGPS, this.locationGPS)
+          break
+        }
+        case 2: {
+          key = strReleaseContentText
+          data = this.contentText
+          break
+        }
+        default: {
+          return
+        }
+      }
+      wx.setStorageSync(key, data)
+    },
+
+    clearSave: function () {
+      wx.removeStorageSync(strReleaseLocationName)
+      wx.removeStorageSync(strReleaseLocationDigit)
+      wx.removeStorageSync(strReleaseContentText)
+    },
+
+    clickBtnClear: function (e) {
+      console.log('clickBtnClear')
+
+      this.clearSave()
+
+      common.getLocation({
+        success: (res) => {
+          this.locationDigit = { latitude: res.latitude, longitude: res.longitude }
+          this.locationGPS = common.formatLocation(res.longitude, res.latitude)
+        }
+      })
+
+      this.fsm.rmdir({
+        dirPath: releaseDir,
+        recursive: true,
+        complete: res => {
+          this.fsm.mkdir({
+            dirPath: releaseDir,
+            recursive: true
+          })
+        }
+      })
+
+      this.locationName = ''
+      this.contentText = ''
+      this.loactionNameCount = 0
+      this.contentTextCount = 0
+      this.imageList = []
+      this.privateTypeIndex = 0
+    },
+
+    clickBtnRelease: function (e) {
+      console.log('clickBtnRelease')
+
+      if (common.isEmpty(this.locationName)) {
+        wx.showToast({
+          title: '一定要说清楚这是哪儿哦\nOvO',
+          icon: 'none'
+        })
+        return
+      } else if (common.isEmpty(this.contentText) && common.isEmpty(this.imageList)) {
+        wx.showToast({
+          title: '正文或图片，至少要有一个呐~',
+          icon: 'none'
+        })
+        return
+      }
+
+      // 同意用户协议
+      if (storeUser.state.needAgreePolicy) {
+        this.selectComponent('#policy_text').agreePolicy()
+      }
+
+      // 检查定位
+      let digitLoc = this.locationDigit
+      common.getLocation({
+        success: (res) => {
+          let resLoc = { latitude: res.latitude, longitude: res.longitude }
+          let distance = common.getKilometerDistance(digitLoc.latitude, digitLoc.longitude, resLoc.latitude, resLoc.longitude)
+          if (distance > allowedDistance) {
+            wx.showModal({
+              title: '初始定位与当前定位不符',
+              content: '你最初编辑文字/图片时暂存的定位与此刻所在的位置相差' + distance + 'km，是否使用此刻的定位？',
+              cancelText: '最初定位',
+              confirmText: '此刻定位',
+              showCancel: true,
+              success: (res) => {
+                if (res.confirm) { // 新定位为小程序获取的最新定位
+                  this.locationDigit = resLoc
+                  this.upLoadFiles()
+                } else if (res.cancel) {
+                  // 此为点击cancel“旧定位”，为了避免安卓的微信区分点击蒙层还是界面的取消按钮
+                  this.upLoadFiles()
+                }
+              }
+            })
+          } else {
+            this.upLoadFiles()
+          }
+        },
+        fail: function (res) {
+          this.upLoadFiles()
+        }
+      })
+    },
+    // 发布图片和文字
+    upLoadFiles: function () {
+      if (this.isRequesting) return
+      this.isRequesting = true
+      wx.showLoading({
+        title: ''
+      })
+      if (this.imageList.length > 0) { // 有图片，需要考虑异步处理
+        // 上传图片文件，获取URL列表
+        let imgUrls = []
+        let imgs = this.imageList
+        let waitingCount = imgs.length
+        for (let i = 0; i < imgs.length; i++) {
+          console.log(imgs[i])
+          wx.uploadFile({
+            url: net.baseUrl + 'upload',
+            filePath: imgs[i],
+            name: 'file',
+            success: res => {
+              console.log(res)
+              let jsonData = common.strToJson(res.data)
+
+              if (jsonData.code === 0) {
+                let url = jsonData.data
+
+                if (!common.isEmpty(url)) {
+                  imgUrls[i] = url
+                } else {
+                  imgUrls[i] = ''
+                }
+
+                waitingCount--
+                console.log('i:' + i + '\twait:' + waitingCount)
+                // 最后一个返回的图片url
+                if (waitingCount === 0) {
+                  console.log('the last one---i:' + i + '\twait:' + waitingCount)
+                  // 发布
+                  this.requestRelease(imgUrls)
+                }
+              } else {
+                this.isRequesting = false
+                wx.showToast({
+                  title: '上传图片失败，请重试',
+                  icon: 'none',
+                  duration: 2000
+                })
+              }
+            }
+          })
+        }
+      } else { // 无图直接上传
+        // 发布
+        this.requestRelease([])
+      }
+    },
+
+    requestRelease: function (imgUrls) {
+      // 剩余的URL用‘’填充
+      let count = imgListLength - imgUrls.length
+      while (count) {
+        imgUrls.push('')
+        count--
+      }
+
+      const param = {
+        location: this.locationName,
+        content: this.contentText,
+        img1: imgUrls[0],
+        img2: imgUrls[1],
+        img3: imgUrls[2],
+        img4: imgUrls[3],
+        img5: imgUrls[4],
+        img6: imgUrls[5],
+        img7: imgUrls[6],
+        img8: imgUrls[7],
+        img9: imgUrls[8],
+        lng: this.locationDigit.longitude,
+        lat: this.locationDigit.latitude,
+        isPublic: this.privateType[this.privateTypeIndex].value
+      }
+
+      net.reqPost({
+        url: 'record/info',
+        body: param
+      }).then(data => {
+        this.isRequesting = false
+        this.clickBtnClear()
+        for (let key in app.globalData.isTabbarPageRefresh) {
+          app.globalData.isTabbarPageRefresh[key] = true
+        }
+        wx.showToast({
+          title: '成功',
+          complete: res => {
+            const timer = setTimeout(() => {
+              clearTimeout(timer)
+              wx.switchTab({
+                url: './locality'
+              })
+            }, 1000)
+          }
+        })
+      }).catch(err => {
+        console.log('Catch error: ', err)
+        this.isRequesting = false
+      })
+    },
+
+    locationInput: function (e) {
+      this.locationName = e.detail.value
+      this.loactionNameCount = e.detail.value.length
+      this.autoSave(0)
+    },
+
+    chooseLocation: function (e) {
+      wx.chooseLocation({
+        success: choose => {
+          common.getLocation({
+            success: (res) => {
+              console.log(choose)
+              let distance = common.getKilometerDistance(choose.latitude, choose.longitude, res.latitude, res.longitude)
+              if (distance > allowedDistance) {
+                wx.showToast({
+                  title: '可不能选超过' + allowedDistance + 'km远的地方哦',
+                  icon: 'none',
+                  duration: 5000
+                })
+              } else {
+                this.locationName = choose.name
+                this.locationGPS = common.formatLocation(choose.longitude, choose.latitude)
+                this.locationDigit = { latitude: choose.latitude, longitude: choose.longitude }
+              }
+            }
+          })
+        }
+      })
+    },
+
+    textInput: function (e) {
+      this.contentText = e.detail.value
+      this.contentTextCount = e.detail.value.length
+      this.autoSave(2)
+    },
+
+    chooseImage () {
+      const imgCount = this.imageList.length
+      if (imgListLength - imgCount > 0) {
+        wx.chooseImage({
+          sourceType: ['camera', 'album'],
+          sizeType: ['compressed'],
+          count: (imgListLength - imgCount),
+          success: (res) => {
+            console.log(res)
+            for (let i = imgCount; i < res.tempFiles.length + imgCount; i++) {
+              let item = res.tempFiles[i - imgCount]
+              if (item.size > 1000000) { // 大于1M则过滤并提示
+                let timer = setTimeout(() => {
+                  clearTimeout(timer)
+                  wx.showToast({
+                    title: '有些图片太大，已被过滤',
+                    icon: 'none'
+                  })
+                }, 500)
+              } else {
+                // 为了不重名
+                let fileNum = 0
+                if (imgCount > 0) {
+                  const lastFileName = this.imageList[imgCount - 1].split('/').slice(-1)[0]
+                  console.log(lastFileName)
+                  fileNum = parseInt(lastFileName.split('.')[0])
+                }
+                fileNum += i
+                // 为了上传
+                const houzhui = item.path.split('.').slice(-1)[0]
+                this.fsm.saveFile({
+                  tempFilePath: item.path,
+                  filePath: `${releaseDir}/${fileNum}.${houzhui}`,
+                  complete: res => {
+                    console.log(res, i)
+                    this.imageList.splice(i, 1, res.savedFilePath)
+                  }
+                })
+              }
+            }
+          }
+        })
+      } else {
+        wx.showToast({
+          title: '图片上限9张,请删除后重选',
+          icon: 'none',
+          duration: 3000
+        })
+      }
+    },
+
+    previewImage (e) {
+      const current = e.target.dataset.src
+      wx.previewImage({
+        current,
+        urls: this.imageList
+      })
+    },
+
+    removeImg (e) {
+      const index = parseInt(e.currentTarget.dataset.index)
+      // unlink只能处理非saved的本地缓存文件夹下的文件，其他依旧删不掉（包括saved缓存文件和tmp临时文件）
+      this.fsm.unlink({
+        filePath: this.imageList[index],
+        complete: res => {
+          console.log(res)
+        }
+      })
+      this.imageList.splice(index, 1)
+    },
+
+    changePrivateType: function (e) {
+      console.log(e)
+
+      this.privateTypeIndex = e.detail.value
+    }
+  })
+</script>
+
+<style >
+  .container {} 
+  .top_buttons{
+    height: 70rpx;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .top_buttons button{
+    line-height: 60rpx;
+    height: 60rpx;
+    width: 160rpx;
+    padding: 0rpx;
+    border-radius: 30rpx;
+    background-color: transparent;
+    font-size: 30rpx;
+    text-align: center;
+  }
+  .btn_clear{
+    color: red;
+    position: absolute;
+    left: -30rpx;
+    top: 5rpx;
+    border:3rpx solid red;
+
+  }
+  .btn_release{
+    color: #2ab3f3;
+    position: absolute;
+    right: -30rpx;
+    top: 5rpx;
+    border:3rpx solid #2ab3f3;
+
+  }
+  .touch_btn{
+    color: white;
+    border-color: white;
+  }
+
+  .release_content {
+    margin: 0 10rpx;
+  }
+  .location {
+    display: flex;
+    align-items: center;
+
+    margin: 20rpx 15rpx 5rpx;
+  }
+  .location_input {
+    border-bottom: 1rpx solid #888;
+    flex-grow: 1;
+    margin-right: 20rpx;
+  }
+  .location_choose {
+    width: 50rpx;
+    height: 50rpx;
+  }
+  .location_text {
+    font-size: 30rpx;
+    color: #2ab3f3;
+  }
+  .sub_text {
+    margin: 5rpx 15rpx 5rpx;
+    height: 30rpx;
+    color: #888;
+    font-size: 26rpx;
+  }
+  .location_digit{
+    color: #aaa;
+    font-size: 24rpx;
+    float: left;
+  }
+  .location_length_count{
+    float: right;
+  }
+  .release_content .text_area {
+    box-sizing: border-box;
+    margin: 40rpx 15rpx 5rpx;
+    border: 1rpx solid #888;
+    border-radius: 4rpx;
+    padding: 5rpx 10rpx;
+    width: 700rpx;
+    height: 200rpx;
+  }
+  .text_length_count{
+    float: right;
+  }
+
+  .img_area {
+    margin: 5rpx 47rpx;
+    width: 636rpx;
+    overflow: hidden;
+  }
+  .img_area .img_file {
+    float: left;
+    margin: 5rpx 6rpx;
+  }
+  .img_area .img {
+    display: block;
+    position: relative;
+    width: 200rpx;
+    height: 200rpx;
+    border-radius: 5%;
+  }
+  .img_area .img_remove{
+    position: absolute;
+    height: 30rpx;
+    width: 30rpx;
+    right: 0rpx;
+    top: 0rpx;
+  }
+  .add_img_box {
+    float: left;
+    position: relative;
+    margin: 5rpx 6rpx;
+    width: 196rpx;
+    height: 196rpx;
+    border: 1px solid #888;
+  }
+  .add_img_box:before,
+  .add_img_box:after {
+    content: " ";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+    background-color: #888;
+  }
+  .add_img_box:before {
+    width: 4rpx;
+    height: 100rpx;
+  }
+  .add_img_box:after {
+    width: 100rpx;
+    height: 4rpx;
+  }
+  .add_img_box:active {
+    border-color: #d9d9d9;
+  }
+  .add_img_box:active:before,
+  .add_img_box:active:after {
+    background-color: #d9d9d9;
+  }
+  .add_img {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+  }
+
+  .private_choose {
+    padding: 30rpx 20rpx;
+  }
+  .private_choose_picker{
+    width: 120rpx;
+    float: right;
+  }
+  .private_choose_picker text{
+    color: #888;
+  }
+  .private_choose_picker image{
+    position: relative;
+    top: 50%;
+    width: 40rpx;
+    height: 40rpx;
+    float: right;
+  }
+  /* .wx-switch-input{width:40px !important;height:20px !important;}
+  .wx-switch-input::before{width:41px !important;height: 20px !important;}
+  .wx-switch-input::after{width: 18px !important;height: 18px !important;} */
+
+  .bottom_btn{
+    margin-top: 50rpx;
+    margin-bottom: 20rpx;
+    color: white;
+    background-color: #2ab3f3;
+    width: 90%;
+  }
+</style>
+
+<script  type='application/json'>
+  {
+    "usingComponents": {
+      "navigationBar": "../components/navigationBar",
+      "policyText": "../components/policyText"
+    }
+  }
+</script>

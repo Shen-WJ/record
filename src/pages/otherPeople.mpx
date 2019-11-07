@@ -52,7 +52,6 @@
       ...storeMode.mapState(['darkMode'])
     },
     onShow () {
-      this.clickHead()
     },
     getRequest: function (isRefresh) {
       if (isRefresh) {

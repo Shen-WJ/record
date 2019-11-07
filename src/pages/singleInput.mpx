@@ -1,5 +1,5 @@
 <template>
-  <navigationBar pageName="{{pageName}}" isCustomBack="{{isCustomBack}}" bindback="navBack" bindhomw="navBack"/>
+  <navigationBar pageName="{{pageName}}" isCustomBack="{{isCustomBack}}" bind:back="navBack" bind:home="navBack"/>
 
   <view class="container">
     <textarea wx:if="{{pageType === 'report' || pageType === 'signature'}}" class="report_area {{darkMode?'fontColorW1':'fontColorB1'}}" value="{{contentText}}" bindinput="textInput" maxlength="{{contentTextLength}}" placeholder="{{placeHolder}}" placeholder-style="{{darkMode?'color:#555;':'color:#aaa;'}}"/>

@@ -54,8 +54,6 @@
       }
     },
     onShow: function () {
-      this.clickHead()
-
       if (!storeUser.state.hasHadUserInfo) { // 无则判断授权
         wx.getSetting({
           success: (res) => {
