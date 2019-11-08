@@ -165,7 +165,7 @@
         })
       }
       if (this.categoryCur === 0) {
-        let pageNum = isRefresh ? 0 : this.httpsData.nextPage
+        let pageNum = isRefresh ? 0 : this.httpsData[0].nextPage
         net.reqGet({
           url: 'record/list/person',
           query: {
