@@ -38,6 +38,7 @@
 
 <script>
   import { createPage } from '@mpxjs/core'
+  import net from '../utils/net'
   import { storeUser } from '../stores/storeUser'
 
   const common = require('../utils/common.js')
@@ -102,6 +103,7 @@
             success: res => {
               this.circlesHide(true)
               this.isShowSign = true
+              this.locationDigit = app.globalData.location
               this.locationGPS = common.formatLocation(app.globalData.location.longitude, app.globalData.location.latitude)
             }
           })
@@ -191,6 +193,26 @@
       if (storeUser.state.needAgreePolicy) {
         this.selectComponent('#policy_text').agreePolicy()
       }
+
+      net.reqPost({
+        url: 'dailyRecord/info',
+        body: {
+          location: this.locationName,
+          lng: this.locationDigit.longitude,
+          lat: this.locationDigit.latitude
+        }
+      }).then(data => {
+        this.locationName = ''
+        this.locationGPS = ''
+        this.locationDigit = app.globalData.location
+        this.isShowSign = false
+        wx.showToast({
+          title: '成功',
+          complete: res => {
+            this.circlesHide(false)
+          }
+        })
+      })
     },
     clickCancelSign () {
       this.isShowSign = false
@@ -231,6 +253,9 @@
     z-index: 10001;
   }
   .release_box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     position: absolute;
     bottom: -180rpx;
     width: 180rpx;
@@ -239,6 +264,7 @@
   }
   .release_box text {
     display: block;
+    margin-top: 10rpx;
     height: 40rpx;
     line-height: 40rpx;
     color: white;
@@ -257,6 +283,9 @@
   }
   .circleMulti {
     background-color: white;
+  }
+  .circleStory {
+    background-color: #08f01c;
   }
   .circleSign {
     background-color: white;

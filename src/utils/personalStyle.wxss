@@ -1,4 +1,5 @@
 .me_hd_bg_img {
+  display: block;
   position: relative;
   width: 100%;
   height: 410rpx;

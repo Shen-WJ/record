@@ -19,6 +19,8 @@ export const behaviorOnPeople = Behavior({
   methods: {
     onLoad: function (option) {
       this.clickHead()
+      this.categoryCur = 0
+      this.httpsData = []
 
       if (option.otherUserId) { // otherPeople
         this.otherUserId = parseInt(option.otherUserId)
@@ -43,7 +45,7 @@ export const behaviorOnPeople = Behavior({
       this.getRequest(true)
     },
     onReachBottom: function () {
-      if (!common.isEmpty(this.httpsData) && this.httpsData.hasNextPage) {
+      if (!common.isEmpty(this.httpsData[this.categoryCur]) && this.httpsData[this.categoryCur].hasNextPage) {
         this.getRequest(false)
       }
     },

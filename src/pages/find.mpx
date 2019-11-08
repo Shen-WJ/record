@@ -32,8 +32,6 @@
       tabBarBottom: app.globalData.tabBarBottom,
       isShowDialog: false,
 
-      categoryCur: 0,
-
       categoryMenu: ['综合', 'PicFlow', '校园卡'],
       categoryData: [
         {
@@ -63,6 +61,7 @@
     onLoad: function () {
       wx.canIUse('hideTabBar') && wx.hideTabBar()
 
+      this.categoryCur = 0
       this.childPages = []
       this.childPages.push(this.selectComponent('#findAll'))
       this.childPages.push(this.selectComponent('#findImgFlow'))
@@ -129,6 +128,13 @@
       wx.navigateTo({
         url: './mapPage?pageType=find'
       })
+    },
+
+    changeStatus (type, index) {
+      const childP = this.childPages[this.categoryCur]
+      if (typeof childP.changeStatus === 'function') {
+        childP.changeStatus(type, index)
+      }
     },
 
     backFromSetting (e) {

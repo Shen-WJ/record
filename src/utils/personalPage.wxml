@@ -35,27 +35,33 @@
     </image>
   </view>
 
-  <view class="me_bd_memory">
-    <view class="position_icon_line">
-      <image class="me_bd_memory_icon" mode="aspectFit" src="../image/icon/circle.png" />
-      <view class="line2" style="height:10rpx;"></view>
+  <swipeList categoryMenu="{{categoryMenu}}" categoryData="{{categoryData}}" isTabFixed="{{isTabFixed}}"
+    bind:swipeTo="swipeTo" bind:pullDownRefresh="pullDownRefresh" bind:reachBottom="reachBottom">
+    <view slot="{{categoryMenu[0]}}">
+      <view class="me_bd_memory">
+        <view class="position_icon_line">
+          <image class="me_bd_memory_icon" mode="aspectFit" src="../image/icon/circle.png" />
+          <view class="line2" style="height:10rpx;"></view>
+        </view>
+        <text class="{{darkMode?'fontColorW1':'fontColorB1'}}">{{recordsTotal}}个地点的记忆</text>
+      </view>
+
+      <view class="me_template" wx:if="{{recordList.length<=0}}">
+        <template is="emptyView" data="{{isShow: !recordList.length, type:0, textArr:['以下是自定义的一些点迹模版，快','发布','自己的点迹吧～0v0\\n发布后以下内容会消失']}}"/>
+        <view class="me_template_bd">
+          <template is="myRecord" data="{{recordList:templateList, recordListH:recordListH, darkMode:darkMode, rcdType:0}}" />
+        </view>
+        <view class="me_template_bd_cover" style="height:{{templateListH}}px" catchtap="templateCatch"></view>
+        <template is="emptyView" data="{{isShow: !recordList.length, type:0, textArr:['以上是自定义的一些点迹模版，快','发布','自己的点迹吧～0v0\\n发布后以上内容会自动消失']}}"/>
+      </view>
+
+      <view class="me_bd" wx:if="{{recordList.length>0}}">
+        <template is="myRecord" data="{{recordList:recordList, recordListH:recordListH, darkMode:darkMode, rcdType:pageType==='me'?0:1}}" />
+      </view>
     </view>
-    <text class="{{darkMode?'fontColorW1':'fontColorB1'}}">{{recordsTotal}}个地点的记忆</text>
-  </view>
-
-  <view class="me_template" wx:if="{{recordList.length<=0}}">
-    <template is="emptyView" data="{{isShow: !recordList.length, type:0, textArr:['以下是自定义的一些点迹模版，快','发布','自己的点迹吧～0v0\\n发布后以下内容会消失']}}"/>
-    <view class="me_template_bd">
-      <template is="myRecord" data="{{recordList:templateList, recordListH:recordListH, darkMode:darkMode, rcdType:0}}" />
+    <view slot="{{categoryMenu[1]}}">
     </view>
-    <view class="me_template_bd_cover" style="height:{{templateListH}}px" catchtap="templateCatch"></view>
-    <template is="emptyView" data="{{isShow: !recordList.length, type:0, textArr:['以上是自定义的一些点迹模版，快','发布','自己的点迹吧～0v0\\n发布后以上内容会自动消失']}}"/>
-  </view>
-
-  <view class="me_bd" wx:if="{{recordList.length>0}}">
-    <template is="myRecord" data="{{recordList:recordList, recordListH:recordListH, darkMode:darkMode, rcdType:pageType==='me'?0:1}}" />
-  </view>
-
+  </swipeList>
   <dialog isShow="{{isShowDialog}}" title="{{pageType==='me'?'获取信息':'关注需要昵称/头像'}}" content="{{pageType==='me'?'个人页面的展示需要昵称和头像。之后可以点击头像/昵称进行修改。':'你还没有昵称头像，关注不了哦OvO～快去授权吧！'}}" showCancel="{{false}}" confirmText="去授权" open_type="getUserInfo" bindsuccess='authorizeUserInfo'></dialog>
   <image class="smallMap themeMode" style="bottom: {{tabBarBottom}}px;" src="../image/icon/toMapPage.png" mode="aspectFit" catchtap="clickToMapPage"></image>
 </template>

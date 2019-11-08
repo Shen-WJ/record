@@ -1,5 +1,5 @@
 <template>
-  <view class="top-wrap {{darkMode?'bgColorB0':'bgColorW0'}}" style="top:{{navH}}px;">
+  <view class="top-wrap {{isTabFixed?'tab-fixed':''}} {{darkMode?'bgColorB0':'bgColorW0'}}" style="top:{{navH}}px;">
     <navTab id="category"
       separateColor="{{darkMode?'333333':'e3e3e3'}}"
       tab-data="{{categoryMenu}}"
@@ -16,7 +16,7 @@
           end="{{item.end}}"
           empty-show="{{item.emptyShow}}"
           list-count="{{item.total}}"
-          top="{{80}}"
+          top="{{isTabFixed?80:0}}"
           refresh-size="{{80}}"
           bind:refresh="refresh"
           bind:more="more">
@@ -43,6 +43,10 @@
       categoryData: {
         type: Array,
         value: []
+      },
+      isTabFixed: {
+        type: Boolean,
+        value: true
       }
     },
     data: {
@@ -85,9 +89,11 @@
 
 <style>
   .top-wrap {
+    width: 100%;
+  }
+  .tab-fixed {
     position: fixed;
     left: 0;
-    width: 100%;
     z-index: 99;
   }
 

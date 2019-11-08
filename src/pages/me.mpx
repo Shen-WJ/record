@@ -3,10 +3,13 @@
 
   <navigationBar showBackIcon="{{false}}" showThemeBgColor="{{true}}"/>
   <template is="personalPage" data="{{pageType:pageType, darkMode:darkMode, tabBarBottom:tabBarBottom,
-    recordList:recordList, recordsTotal:recordsTotal, recordListH:recordListH, templateListH:templateListH, templateList:templateList,
+    categoryMenu:categoryMenu, categoryData:categoryData, isTabFixed:isTabFixed,
+    recordList:recordList, recordsTotal:recordsTotal, recordListH:recordListH,
+    templateListH:templateListH, templateList:templateList,
     animationsText:animationsText, animations:animations,
     isShowDialog:isShowDialog, isShowNoticeRedDot:isShowNoticeRedDot,
-    noticeCount:noticeCount, followCount:followCount, followedCount:followedCount, signature:signature, headUrl:headUrl, nickname:nickname, genderImg:genderImg}}">
+    noticeCount:noticeCount, followCount:followCount, followedCount:followedCount,
+    signature:signature, headUrl:headUrl, nickname:nickname, genderImg:genderImg}}">
   </template>
   <canvas id="cardCanvas" canvas-id="cardCanvas"></canvas>
   <gallery id="gallery" isShow="{{isShowGallery}}" titleList="{{galleryTitleList}}" imageList="{{galleryImageList}}"  bindclose="closeGallery" />
@@ -44,7 +47,26 @@
 
       isShowGallery: false,
       galleryTitleList: [],
-      galleryImageList: []
+      galleryImageList: [],
+
+      categoryMenu: ['点迹', '我的全世界'],
+      categoryData: [
+        {
+          name: '点迹',
+          requesting: false, // 请求中，显示加载动画
+          end: false, // 已加载全部，不再触发上拉加载
+          emptyShow: false, // 是否展示空视图，find页面不需要
+          total: 0
+        },
+        {
+          name: '我的全世界',
+          requesting: false,
+          end: false,
+          emptyShow: false,
+          total: 0
+        }
+      ],
+      isTabFixed: false
     },
     computed: {
       ...storeMode.mapState(['darkMode']),
@@ -142,39 +164,64 @@
           this.isShowNoticeRedDot = count > 0
         })
       }
-
-      let pageNum = isRefresh ? 0 : this.httpsData.nextPage
-      net.reqGet({
-        url: 'record/list/person',
-        query: {
-          pageNum: pageNum
-        }
-      }).then(data => {
-        if (isRefresh) {
-          wx.stopPullDownRefresh()
-          this.recordsTotal = data.data.total
-          if (data.data.total <= 0) {
-            this.creattemplateList()
-            return
+      if (this.categoryCur === 0) {
+        let pageNum = isRefresh ? 0 : this.httpsData.nextPage
+        net.reqGet({
+          url: 'record/list/person',
+          query: {
+            pageNum: pageNum
           }
-        }
-
-        let records = isRefresh ? [] : this.recordList
-        records = records.concat(common.getRecordListFrom(data.data.list))
-        this.httpsData = data.data
-        this.setData({
-          recordList: records
-        }, (res) => {
-          const query = wx.createSelectorQuery().in(this)
-          query.selectAll('.record_item').boundingClientRect((rect) => {
-            let recordsH = []
-            for (let i = 0; i < rect.length; i++) {
-              recordsH.push(rect[i].height - 30)
+        }).then(data => {
+          if (isRefresh) {
+            wx.stopPullDownRefresh()
+            this.recordsTotal = data.data.total
+            if (data.data.total <= 0) {
+              this.creattemplateList()
+              return
             }
-            this.recordListH = recordsH
-          }).exec()
+          }
+
+          let records = isRefresh ? [] : this.recordList
+          records = records.concat(common.getRecordListFrom(data.data.list))
+          this.httpsData[0] = data.data
+          this.setData({
+            recordList: records
+          }, (res) => {
+            const query = wx.createSelectorQuery().in(this)
+            query.selectAll('.record_item').boundingClientRect((rect) => {
+              let recordsH = []
+              for (let i = 0; i < rect.length; i++) {
+                recordsH.push(rect[i].height - 30)
+              }
+              this.recordListH = recordsH
+            }).exec()
+          })
         })
-      })
+        net.reqGet({
+          url: 'dailyRecord/info/listByPerson',
+          query: {
+            pageNum: 0
+          }
+        }).then(data => {
+        })
+      } else if (this.categoryCur === 1) {
+        let pageNum = isRefresh ? 0 : this.httpsData[1].nextPage
+        net.reqGet({
+          url: 'dailyRecord/info/listByPerson',
+          query: {
+            pageNum: pageNum
+          }
+        }).then(data => {
+        })
+      }
+    },
+    swipeTo (e) {
+      console.log(e)
+      this.categoryCur = parseInt(e.detail.categoryCur)
+      // const childP = this.childPages[this.categoryCur]
+      // if (typeof childP.swipeToHere === 'function') {
+      //   childP.swipeToHere()
+      // }
     },
     closeGallery () {
       this.isShowGallery = false
@@ -278,7 +325,8 @@
       "dialog": "../components/dialog",
       "navigationBar": "../components/navigationBar",
       "tabbar": "../components/tabbar",
-      "gallery": "../components/gallery"
+      "gallery": "../components/gallery",
+      "swipeList": "../components/swipeList"
     }
   }
 </script>
