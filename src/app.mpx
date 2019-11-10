@@ -2,7 +2,7 @@
   import { storeUser } from './stores/storeUser'
   import { storeMode, storeNotice } from './stores/storeCommon'
   import net from './utils/net'
-  const common = require('./utils/common.js')
+  // const common = require('./utils/common.js')
 
   const getData = function (that) {
     net.reqGet({
@@ -87,7 +87,7 @@
       storeMode.commit('updateCoverImg', { imgUrl: (wx.getStorageSync('coverImg') || '') })
       storeMode.commit('updateOpacity', { opacity: (wx.getStorageSync('opacity') || 1) })
 
-      const hasUnionId = wx.getStorageSync('hasUnionId') || false
+      // const hasUnionId = wx.getStorageSync('hasUnionId') || false
 
       // 用户静默登录
       // if (storeUser.state.userId < 10000 || storeUser.state.userCode === '' || !hasUnionId) {
