@@ -90,7 +90,8 @@
       const hasUnionId = wx.getStorageSync('hasUnionId') || false
 
       // 用户静默登录
-      if (storeUser.state.userId < 10000 || storeUser.state.userCode === '' || !hasUnionId) {
+      // if (storeUser.state.userId < 10000 || storeUser.state.userCode === '' || !hasUnionId) {
+      if (storeUser.state.userId < 10000 || storeUser.state.userCode === '') {
         wx.login({
           success: res => {
             // 发送 res.code 到后台换取 openId, sessionKey, unionId
@@ -110,17 +111,17 @@
               getData(this)
 
               wx.setStorageSync('hasUnionId', data.data.hasUnionId)
-              if (!data.data.hasUnionId && storeUser.state.hasHadUserInfo) { // 老用户没unionId
-                wx.getUserInfo({
-                  withCredentials: true,
-                  success: res => {
-                    common.updateUserInfo({
-                      iv: res.iv,
-                      encryptedData: res.encryptedData
-                    })
-                  }
-                })
-              }
+              // if (!data.data.hasUnionId && storeUser.state.hasHadUserInfo) { // 老用户没unionId
+              //   wx.getUserInfo({
+              //     withCredentials: true,
+              //     success: res => {
+              //       common.updateUserInfo({
+              //         iv: res.iv,
+              //         encryptedData: res.encryptedData
+              //       })
+              //     }
+              //   })
+              // }
             })
           }
         })
