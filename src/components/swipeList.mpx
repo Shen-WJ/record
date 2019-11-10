@@ -18,6 +18,8 @@
           list-count="{{item.total}}"
           top="{{isTabFixed?80:0}}"
           refresh-size="{{80}}"
+          bind:overRefresh="overRefresh"
+          bind:pullUpFromTop="pullUpFromTop"
           bind:refresh="refresh"
           bind:more="more">
         <slot name="{{categoryMenu[index]}}"></slot>
@@ -74,6 +76,12 @@
           categoryCur: e.detail.current
         })
         this.triggerEvent('swipeTo', { categoryCur: e.detail.current }, {})
+      },
+      overRefresh () {
+        this.triggerEvent('pullDownOverRefresh')
+      },
+      pullUpFromTop () {
+        this.triggerEvent('pullUpFromTop')
       },
       // 刷新数据
       refresh () {

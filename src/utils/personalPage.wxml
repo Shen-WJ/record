@@ -2,66 +2,81 @@
 <import src="./myRecord.wxml"/>
 
 <template name="personalPage">
-  <view class="me_hd" bindtap="clickHead" catchlongpress="pressToChangeLamp">
-    <image class="me_hd_bg_img {{darkMode?'darkMode':'themeMode'}}" mode="aspectFill">
-      <image class="me_hd_photo" mode="aspectFit" src="{{headUrl}}" catchtap="clickToSome" data-type="0" data-position="head"></image>
-      <view class="me_hd_name me_hd_flex_group">
-        <text class="me_hd_nameStr" catchtap="clickToSome" data-type="0">{{nickname}}</text>
-        <image class="me_hd_gender" src="{{genderImg}}" mode="aspectFit" catchtap="clickToSome" data-type="0"></image>
+  <view class="container {{darkMode?'fontColorW1':'fontColorB1'}}" animation="{{containerAni}}">
+    <view class="me_hd" bindtap="clickHead" catchlongpress="pressToChangeLamp">
+      <image class="me_hd_bg_img {{darkMode?'darkMode':'themeMode'}}" mode="aspectFill">
+        <image class="me_hd_photo" mode="aspectFit" src="{{headUrl}}" catchtap="clickToSome" data-type="0" data-position="head"></image>
+        <view class="me_hd_name me_hd_flex_group">
+          <text class="me_hd_nameStr" catchtap="clickToSome" data-type="0">{{nickname}}</text>
+          <image class="me_hd_gender" src="{{genderImg}}" mode="aspectFit" catchtap="clickToSome" data-type="0"></image>
+        </view>
+        <view class="me_hd_desc_follow me_hd_flex_group">
+          <text class="me_hd_desc_following">关注：{{followCount}}</text>
+          <view class="me_hd_desc_separate"/>
+          <text class="me_hd_desc_followed">粉丝：{{followedCount}}</text>
+        </view>
+        <view class="me_hd_signature me_hd_flex_group">
+          <text class="me_hd_desc_signature {{pageType === 'me'?'me_hd_desc_signature_gap':''}}" catchtap="clickToSome" data-type="0">{{signature}}</text>
+          <image wx:if="{{pageType === 'me'}}" class="me_hd_edit" src="../image/icon/edit.png" mode="aspectFit" catchtap="clickToSome" data-type="0"></image>
+        </view>
+        <block wx:if="{{pageType === 'me'}}">
+          <view class="me_hd_notice_redDot" wx:if="{{isShowNoticeRedDot}}"></view>
+          <button class="me_hd_notice me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="1">通知 {{noticeCount}}</button>
+          <button class="me_hd_favorites me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="2">收藏</button>
+          <button class="me_hd_settings me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="3">设置</button>
+          <!-- <button class="me_hd_follow me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="5">我的海报</button> -->
+        </block>
+        <block wx:if="{{pageType === 'others'}}">
+          <button wx:if="{{isShowFollowBtn}}" class="me_hd_follow me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="4">{{isFollowed?'取消关注':'关注'}}</button>
+          <button class="me_hd_share me_hd_btn" hover-class="me_hd_touch_btn" open-type="share" id="shareOtherPeople">分享</button>
+        </block>
+        <block wx:for="{{animations}}" wx:key="{{index}}">
+          <view class="me_hd_element me_hd_element{{index}}" animation="{{animations[index]}}">{{animationsText[index]}}</view>
+        </block>
+      </image>
+    </view>
+
+    <swipeList categoryMenu="{{categoryMenu}}" categoryData="{{categoryData}}" isTabFixed="{{isTabFixed}}"
+      bind:swipeTo="swipeTo" bind:pullDownOverRefresh="pullDownOverRefresh" bind:pullUpFromTop="pullUpFromTop"
+      bind:pullDownRefresh="pullDownRefresh" bind:reachBottom="reachBottom">
+      <view slot="{{categoryMenu[0]}}">
+        <view class="me_bd_memory">
+          <view class="position_icon_line">
+            <image class="me_bd_memory_icon" mode="aspectFit" src="../image/icon/circle.png" />
+            <view class="line2" style="height:10rpx;"></view>
+          </view>
+          <text>{{recordsTotal}}个地点的记忆</text>
+        </view>
+
+        <view class="me_template" wx:if="{{recordList.length<=0}}">
+          <template is="emptyView" data="{{isShow: !recordList.length, type:0, textArr:['以下是一些简单的点迹模版(他人不可见)，快','发布','自己的点迹吧～0v0\\n发布后以下内容会自动消失']}}"/>
+          <view class="me_template_bd">
+            <template is="myRecord" data="{{recordList:templateList, recordListH:recordListH, darkMode:darkMode, rcdType:0}}" />
+          </view>
+          <view class="me_template_bd_cover" style="height:{{templateListH}}px" catchtap="templateCatch"></view>
+          <template is="emptyView" data="{{isShow: !recordList.length, type:0, textArr:['以上是自定义的一些点迹模版，快','发布','自己的点迹吧～0v0\\n发布后以上内容会自动消失']}}"/>
+        </view>
+
+        <view class="me_bd" wx:if="{{recordList.length>0}}">
+          <template is="myRecord" data="{{recordList:recordList, recordListH:recordListH, darkMode:darkMode, rcdType:pageType==='me'?0:1}}" />
+        </view>
       </view>
-      <view class="me_hd_desc_follow me_hd_flex_group">
-        <text class="me_hd_desc_following">关注：{{followCount}}</text>
-        <view class="me_hd_desc_separate"/>
-        <text class="me_hd_desc_followed">粉丝：{{followedCount}}</text>
+      <view slot="{{categoryMenu[1]}}">
+        <view class="dailyRecord">
+          <view wx:for="{{dailyRecordList}}" wx:key="{{index}}" wx:for-item="dailyRecordItem"
+            class="dailyRecordItem" catch:longpress="pressDailyRecord" data-index="{{index}}">
+            <view class="dri_time">
+              <view class="dri_time_day">20</view>
+              <view class="dri_time_month">10月</view>
+              <view class="dri_time_year">2019年</view>
+            </view>
+            <view class="dri_loc" catch:tap="clickDailyRecord" data-index="{{index}}">{{dailyRecordItem.location}}</view>
+          </view>
+        </view>
+        <template wx:if="{{pageType === 'me'}}" is="emptyView" data="{{isShow: !dailyRecordList.length, type:0, textArr:['你在全世界留下的足迹都是弥足珍贵的，快去','打卡','发布吧～0v0']}}"/>
       </view>
-      <view class="me_hd_signature me_hd_flex_group">
-        <text class="me_hd_desc_signature {{pageType === 'me'?'me_hd_desc_signature_gap':''}}" catchtap="clickToSome" data-type="0">{{signature}}</text>
-        <image wx:if="{{pageType === 'me'}}" class="me_hd_edit" src="../image/icon/edit.png" mode="aspectFit" catchtap="clickToSome" data-type="0"></image>
-      </view>
-      <block wx:if="{{pageType === 'me'}}">
-        <view class="me_hd_notice_redDot" wx:if="{{isShowNoticeRedDot}}"></view>
-        <button class="me_hd_notice me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="1">通知 {{noticeCount}}</button>
-        <button class="me_hd_favorites me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="2">收藏</button>
-        <button class="me_hd_settings me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="3">设置</button>
-        <!-- <button class="me_hd_follow me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="5">我的海报</button> -->
-      </block>
-      <block wx:if="{{pageType === 'others'}}">
-        <button wx:if="{{isShowFollowBtn}}" class="me_hd_follow me_hd_btn" hover-class="me_hd_touch_btn" catchtap="clickToSome" data-type="4">{{isFollowed?'取消关注':'关注'}}</button>
-        <button class="me_hd_share me_hd_btn" hover-class="me_hd_touch_btn" open-type="share" id="shareOtherPeople">分享</button>
-      </block>
-      <block wx:for="{{animations}}" wx:key="{{index}}">
-        <view class="me_hd_element me_hd_element{{index}}" animation="{{animations[index]}}">{{animationsText[index]}}</view>
-      </block>
-    </image>
+    </swipeList>
+    <dialog isShow="{{isShowDialog}}" title="{{pageType==='me'?'获取信息':'关注需要昵称/头像'}}" content="{{pageType==='me'?'个人页面的展示需要昵称和头像。之后可以点击头像/昵称进行修改。':'你还没有昵称头像，关注不了哦OvO～快去授权吧！'}}" showCancel="{{false}}" confirmText="去授权" open_type="getUserInfo" bindsuccess='authorizeUserInfo'></dialog>
+    <image class="smallMap themeMode" style="bottom: {{tabBarBottom}}px;" src="../image/icon/toMapPage.png" mode="aspectFit" catchtap="clickToMapPage"></image>
   </view>
-
-  <swipeList categoryMenu="{{categoryMenu}}" categoryData="{{categoryData}}" isTabFixed="{{isTabFixed}}"
-    bind:swipeTo="swipeTo" bind:pullDownRefresh="pullDownRefresh" bind:reachBottom="reachBottom">
-    <view slot="{{categoryMenu[0]}}">
-      <view class="me_bd_memory">
-        <view class="position_icon_line">
-          <image class="me_bd_memory_icon" mode="aspectFit" src="../image/icon/circle.png" />
-          <view class="line2" style="height:10rpx;"></view>
-        </view>
-        <text class="{{darkMode?'fontColorW1':'fontColorB1'}}">{{recordsTotal}}个地点的记忆</text>
-      </view>
-
-      <view class="me_template" wx:if="{{recordList.length<=0}}">
-        <template is="emptyView" data="{{isShow: !recordList.length, type:0, textArr:['以下是自定义的一些点迹模版，快','发布','自己的点迹吧～0v0\\n发布后以下内容会消失']}}"/>
-        <view class="me_template_bd">
-          <template is="myRecord" data="{{recordList:templateList, recordListH:recordListH, darkMode:darkMode, rcdType:0}}" />
-        </view>
-        <view class="me_template_bd_cover" style="height:{{templateListH}}px" catchtap="templateCatch"></view>
-        <template is="emptyView" data="{{isShow: !recordList.length, type:0, textArr:['以上是自定义的一些点迹模版，快','发布','自己的点迹吧～0v0\\n发布后以上内容会自动消失']}}"/>
-      </view>
-
-      <view class="me_bd" wx:if="{{recordList.length>0}}">
-        <template is="myRecord" data="{{recordList:recordList, recordListH:recordListH, darkMode:darkMode, rcdType:pageType==='me'?0:1}}" />
-      </view>
-    </view>
-    <view slot="{{categoryMenu[1]}}">
-    </view>
-  </swipeList>
-  <dialog isShow="{{isShowDialog}}" title="{{pageType==='me'?'获取信息':'关注需要昵称/头像'}}" content="{{pageType==='me'?'个人页面的展示需要昵称和头像。之后可以点击头像/昵称进行修改。':'你还没有昵称头像，关注不了哦OvO～快去授权吧！'}}" showCancel="{{false}}" confirmText="去授权" open_type="getUserInfo" bindsuccess='authorizeUserInfo'></dialog>
-  <image class="smallMap themeMode" style="bottom: {{tabBarBottom}}px;" src="../image/icon/toMapPage.png" mode="aspectFit" catchtap="clickToMapPage"></image>
 </template>

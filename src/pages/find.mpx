@@ -122,7 +122,12 @@
       }
     },
     changeRequestState (e) {
-      this.categoryData[this.categoryCur] = { ...this.categoryData[this.categoryCur], ...e.detail }
+      this.$forceUpdate({
+        [`categoryData[${this.categoryCur}]`]: {
+          ...this.categoryData[this.categoryCur],
+          ...e.detail
+        }
+      })
     },
     clickToMapPage: function () {
       wx.navigateTo({

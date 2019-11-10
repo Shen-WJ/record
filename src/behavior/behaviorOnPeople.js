@@ -41,10 +41,10 @@ export const behaviorOnPeople = Behavior({
         this.getRequest(true)
       }
     },
-    onPullDownRefresh: function () {
+    pullDownRefresh: function () {
       this.getRequest(true)
     },
-    onReachBottom: function () {
+    reachBottom: function () {
       if (!common.isEmpty(this.httpsData[this.categoryCur]) && this.httpsData[this.categoryCur].hasNextPage) {
         this.getRequest(false)
       }
@@ -81,6 +81,53 @@ export const behaviorOnPeople = Behavior({
           imageUrl: logo1
         }
       }
+    },
+    swipeTo (e) {
+      this.categoryCur = parseInt(e.detail.categoryCur)
+      switch (this.categoryCur) {
+        case 0: {
+          break
+        }
+        case 1: {
+          if (this.dailyRecordList.length <= 0 && !this.httpsData[1]) {
+            this.getRequest(true)
+          }
+          break
+        }
+      }
+    },
+    pullDownOverRefresh () {
+      this.isTabFixed = false
+      let ani = wx.createAnimation({ timingFunction: 'ease', duration: 500 })
+      this.containerAni = ani.top('0rpx').step().export()
+      console.log('pullDownOverRefresh')
+    },
+    pullUpFromTop () {
+      this.isTabFixed = true
+      let ani = wx.createAnimation({ timingFunction: 'ease', duration: 500 })
+      this.containerAni = ani.top('-410rpx').step().export()
+      console.log('pullUpFromTop')
+    },
+    changeCategoryData (requesting, end, total, emptyShow) {
+      let aData = {}
+      if (typeof requesting === 'boolean') {
+        aData.requesting = requesting
+      }
+      if (typeof end === 'boolean') {
+        aData.end = end
+      }
+      if (typeof total === 'number') {
+        aData.total = total
+      }
+      if (typeof emptyShow === 'boolean') {
+        aData.emptyShow = emptyShow
+      }
+      this.$forceUpdate({
+        [`categoryData[${this.categoryCur}]`]: {
+          ...this.categoryData[this.categoryCur],
+          ...aData
+        }
+      })
     },
 
     // 个人信息，通知，收藏，设置，关注/取消关注，生成海报
@@ -282,7 +329,7 @@ export const behaviorOnPeople = Behavior({
       return this.recordList[index]
     },
     changeRecord: function (index, record) {
-      this.setData({
+      this.$forceUpdate({
         [`recordList[${index}]`]: record
       })
     },
@@ -309,6 +356,40 @@ export const behaviorOnPeople = Behavior({
     clickToMapPage: function () {
       wx.navigateTo({
         url: './mapPage?pageType=person&personType=' + this.pageType + '&otherUserId=' + (this.otherUserId || 0)
+      })
+    },
+
+    pressDailyRecord (e) {
+      const index = e.currentTarget.dataset.index
+      let dailyRecord = this.dailyRecordList[index]
+      wx.showActionSheet({
+        itemList: ['删除'],
+        itemColor: '#d81e06',
+        success: res => {
+          if (res.tapIndex === 0) {
+            net.reqDelete({
+              url: 'dailyRecord/info',
+              query: {
+                recordId: dailyRecord.recordId
+              }
+            }).then(data => {
+              let dailyRecords = this.dailyRecordList.slice(0)
+              dailyRecords.splice(index, 1)
+              this.dailyRecordList = dailyRecords
+              wx.showToast({
+                title: '已删除'
+              })
+            })
+          }
+        }
+      })
+    },
+    clickDailyRecord (e) {
+      const index = e.currentTarget.dataset.index
+      let dailyRecord = this.dailyRecordList[index]
+      wx.openLocation({
+        latitude: dailyRecord.lat,
+        longitude: dailyRecord.lng
       })
     }
   }

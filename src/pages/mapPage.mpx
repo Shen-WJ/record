@@ -359,9 +359,8 @@
     createMap () {
       if (!this.isMapHasShowed) {
         this.isMapHasShowed = true
-        this.setData({
-          isShowMap: true
-        }, res => {
+        this.isShowMap = true
+        this.$nextTick(() => {
           this.customMap = this.selectComponent('#customMap')
           // warning: 这里有个风险，可能includePoints与它产生冲突，期望是此处先执行然后是includePoints，理论也是如此
           wx.createMapContext(this.mapId, this.customMap).moveToLocation()

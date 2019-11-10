@@ -1,3 +1,7 @@
+.container {
+  position: relative;
+  top: 0rpx;
+}
 .me_hd_bg_img {
   display: block;
   position: relative;
@@ -190,4 +194,34 @@
   height: 6366rpx;
   width: 750rpx;
   background-color: transparent;
+}
+
+.dailyRecordItem {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  padding: 20rpx;
+  box-sizing: border-box;
+}
+.dri_time {
+  width: 150rpx;
+  flex-shrink: 0;
+}
+.dri_time_day {
+  display: inline-block;
+  font-weight: bold;
+  font-size: 32rpx;
+  margin: 0 5rpx 5rpx 0;
+}
+.dri_time_month {
+  display: inline-block;
+  font-weight: bold;
+  font-size: 24rpx;
+}
+.dri_time_year {
+  font-size: 22rpx;
+}
+.dri_loc {
+  font-size: 28rpx;
+  color: #2ab3f3;
 }

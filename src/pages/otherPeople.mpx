@@ -2,13 +2,15 @@
   <import src="../utils/personalPage.wxml"/>
 
   <navigationBar showThemeBgColor="{{true}}" pageName="{{otherNickname}}"/>
-  <template is="personalPage" data="{{pageType:pageType, darkMode:darkMode, tabBarBottom:tabBarBottom,
-    recordListH:recordListH, recordList:recordList, recordsTotal:recordsTotal,
-    animationsText:animationsText, animations:animations,
-    isShowDialog:isShowDialog, isFollowed:otherIsFollowed, isShowFollowBtn:isShowFollowBtn,
-    followCount:otherFollowCount, followedCount:otherFollowedCount,
-    signature:otherSignature, headUrl:otherHeadUrl, nickname:otherNickname, genderImg:genderImg}}">
-  </template>
+    <template is="personalPage" data="{{pageType:pageType, darkMode:darkMode, tabBarBottom:tabBarBottom,
+      categoryMenu:categoryMenu, categoryData:categoryData, isTabFixed:isTabFixed, containerAni:containerAni,
+      recordListH:recordListH, recordList:recordList, recordsTotal:recordsTotal,
+      dailyRecordList:dailyRecordList,
+      animationsText:animationsText, animations:animations,
+      isShowDialog:isShowDialog, isFollowed:otherIsFollowed, isShowFollowBtn:isShowFollowBtn,
+      followCount:otherFollowCount, followedCount:otherFollowedCount,
+      signature:otherSignature, headUrl:otherHeadUrl, nickname:otherNickname, genderImg:genderImg}}">
+    </template>
 </template>
 
 <script>
@@ -43,7 +45,26 @@
       isShowDialog: false,
       isShowFollowBtn: false,
 
-      tabBarBottom: app.globalData.tabBarBottom
+      tabBarBottom: app.globalData.tabBarBottom,
+      dailyRecordList: [],
+
+      categoryMenu: ['他的点迹', '他的全世界'],
+      categoryData: [
+        {
+          requesting: false, // 请求中，显示加载动画
+          end: false, // 已加载全部，不再触发上拉加载
+          emptyShow: false, // 是否展示空视图，find页面不需要
+          total: 0
+        },
+        {
+          requesting: false,
+          end: false,
+          emptyShow: false,
+          total: 0
+        }
+      ],
+      isTabFixed: false,
+      containerAni: {}
     },
     computed: {
       genderImg: function () {
@@ -54,7 +75,7 @@
     onShow () {
     },
     getRequest: function (isRefresh) {
-      if (isRefresh) {
+      if (isRefresh && this.categoryCur === 0) {
         net.reqGet({
           url: 'user/info/other',
           query: {
@@ -70,51 +91,67 @@
           this.otherIsFollowed = data.data.follow
         })
       }
+      this.changeCategoryData(true)
+      if (this.categoryCur === 0) {
+        let pageNum = isRefresh ? 0 : this.httpsData[0].nextPage
+        net.reqGet({
+          url: 'record/list/other',
+          query: {
+            otherUserId: this.otherUserId,
+            pageNum: pageNum
+          }
+        }).then(data => {
+          if (isRefresh) {
+            wx.stopPullDownRefresh()
+            this.recordsTotal = data.data.total
+          }
 
-      let pageNum = isRefresh ? 0 : this.httpsData.nextPage
-      net.reqGet({
-        url: 'record/list/other',
-        query: {
-          otherUserId: this.otherUserId,
-          pageNum: pageNum
-        }
-      }).then(data => {
-        if (isRefresh) {
-          wx.stopPullDownRefresh()
-          this.recordsTotal = data.data.total
-        }
-
-        let records = isRefresh ? [] : this.data.recordList
-        records = records.concat(common.getRecordListFrom(data.data.list))
-        this.httpsData = data.data
-        this.setData({
-          recordList: records
-        }, (res) => {
-          const query = wx.createSelectorQuery().in(this)
-          query.selectAll('.record_item').boundingClientRect((rect) => {
-            let recordsH = []
-            for (let i = 0; i < rect.length; i++) {
-              recordsH.push(rect[i].height - 30)
-            }
-            this.recordListH = recordsH
-          }).exec()
+          let records = isRefresh ? [] : this.data.recordList
+          records = records.concat(common.getRecordListFrom(data.data.list))
+          this.httpsData[0] = data.data
+          this.recordList = records
+          this.$nextTick(() => {
+            const query = wx.createSelectorQuery().in(this)
+            query.selectAll('.record_item').boundingClientRect((rect) => {
+              let recordsH = []
+              for (let i = 0; i < rect.length; i++) {
+                recordsH.push(rect[i].height - 30)
+              }
+              this.recordListH = recordsH
+            }).exec()
+          })
+          this.changeCategoryData(false, !data.data.hasNextPage, records.length)
         })
-      })
+      } else if (this.categoryCur === 1) {
+        let pageNum = isRefresh ? 0 : this.httpsData[1].nextPage
+        net.reqGet({
+          url: 'dailyRecord/info/listByOther',
+          query: {
+            otherUserId: this.otherUserId,
+            pageNum: pageNum
+          }
+        }).then(data => {
+          let dailyRecords = isRefresh ? [] : this.dailyRecordList
+          this.httpsData[1] = data.data
+          this.dailyRecordList = dailyRecords.concat(data.data.list)
+          this.changeCategoryData(false, !data.data.hasNextPage, data.data.total, data.data.total === 0)
+        })
+      }
     }
   })
 </script>
 
 <style>
-  .container {}
   @import '../utils/personalStyle.wxss';
 </style>
 
 <script  type='application/json' lang='json'>
   {
-    "enablePullDownRefresh": true,
+    "disableScroll": true,
     "usingComponents": {
       "dialog": "../components/dialog",
-      "navigationBar": "../components/navigationBar"
+      "navigationBar": "../components/navigationBar",
+      "swipeList": "../components/swipeList"
     }
   }
 </script>

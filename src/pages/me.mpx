@@ -3,9 +3,10 @@
 
   <navigationBar showBackIcon="{{false}}" showThemeBgColor="{{true}}"/>
   <template is="personalPage" data="{{pageType:pageType, darkMode:darkMode, tabBarBottom:tabBarBottom,
-    categoryMenu:categoryMenu, categoryData:categoryData, isTabFixed:isTabFixed,
+    categoryMenu:categoryMenu, categoryData:categoryData, isTabFixed:isTabFixed, containerAni:containerAni,
     recordList:recordList, recordsTotal:recordsTotal, recordListH:recordListH,
     templateListH:templateListH, templateList:templateList,
+    dailyRecordList:dailyRecordList,
     animationsText:animationsText, animations:animations,
     isShowDialog:isShowDialog, isShowNoticeRedDot:isShowNoticeRedDot,
     noticeCount:noticeCount, followCount:followCount, followedCount:followedCount,
@@ -49,24 +50,25 @@
       galleryTitleList: [],
       galleryImageList: [],
 
-      categoryMenu: ['点迹', '我的全世界'],
+      dailyRecordList: [],
+
+      categoryMenu: ['我的点迹', '我的全世界'],
       categoryData: [
         {
-          name: '点迹',
           requesting: false, // 请求中，显示加载动画
           end: false, // 已加载全部，不再触发上拉加载
           emptyShow: false, // 是否展示空视图，find页面不需要
           total: 0
         },
         {
-          name: '我的全世界',
           requesting: false,
           end: false,
           emptyShow: false,
           total: 0
         }
       ],
-      isTabFixed: false
+      isTabFixed: false,
+      containerAni: {}
     },
     computed: {
       ...storeMode.mapState(['darkMode']),
@@ -100,41 +102,9 @@
         app.globalData.isTabbarPageRefresh['me'] = false
       }
     },
-    creattemplateList: function () {
-      let templateList = []
-      for (let i in templates) {
-        templateList.push({
-          content: templates[i].content,
-          location: templates[i].location,
-          distance: ' 1314km',
-          isLiked: true,
-          isFavorited: false,
-          locStr: 'N:5°20′ E:13°14′',
-          love: 666,
-          timeStr: '以前'
-        })
-      }
-      this.setData({
-        templateList: templateList
-      }, (res) => {
-        const query = wx.createSelectorQuery().in(this)
-        // 计算各个cell高度来确定线条长度
-        query.selectAll('.record_item').boundingClientRect((rect) => {
-          let recordsH = []
-          for (let i = 0; i < rect.length; i++) {
-            recordsH.push(rect[i].height - 30)
-          }
-          this.recordListH = recordsH
-        }).exec()
-        // 整个temp的高度，防止留白也防止被点击
-        query.select('.me_template_bd').boundingClientRect((rect) => {
-          this.templateListH = rect.height
-        }).exec()
-      })
-    },
 
     getRequest: function (isRefresh) {
-      if (isRefresh) {
+      if (isRefresh && this.categoryCur === 0) {
         net.reqGet({
           url: 'user/info'
         }).then(data => {
@@ -164,6 +134,7 @@
           this.isShowNoticeRedDot = count > 0
         })
       }
+      this.changeCategoryData(true)
       if (this.categoryCur === 0) {
         let pageNum = isRefresh ? 0 : this.httpsData[0].nextPage
         net.reqGet({
@@ -176,7 +147,7 @@
             wx.stopPullDownRefresh()
             this.recordsTotal = data.data.total
             if (data.data.total <= 0) {
-              this.creattemplateList()
+              this.creatTemplateList()
               return
             }
           }
@@ -184,9 +155,9 @@
           let records = isRefresh ? [] : this.recordList
           records = records.concat(common.getRecordListFrom(data.data.list))
           this.httpsData[0] = data.data
-          this.setData({
-            recordList: records
-          }, (res) => {
+
+          this.recordList = records
+          this.$nextTick(() => {
             const query = wx.createSelectorQuery().in(this)
             query.selectAll('.record_item').boundingClientRect((rect) => {
               let recordsH = []
@@ -196,13 +167,7 @@
               this.recordListH = recordsH
             }).exec()
           })
-        })
-        net.reqGet({
-          url: 'dailyRecord/info/listByPerson',
-          query: {
-            pageNum: 0
-          }
-        }).then(data => {
+          this.changeCategoryData(false, !data.data.hasNextPage, records.length)
         })
       } else if (this.categoryCur === 1) {
         let pageNum = isRefresh ? 0 : this.httpsData[1].nextPage
@@ -212,16 +177,45 @@
             pageNum: pageNum
           }
         }).then(data => {
+          let dailyRecords = isRefresh ? [] : this.dailyRecordList
+          this.httpsData[1] = data.data
+          this.dailyRecordList = dailyRecords.concat(data.data.list)
+          this.changeCategoryData(false, !data.data.hasNextPage, data.data.total)
         })
       }
     },
-    swipeTo (e) {
-      console.log(e)
-      this.categoryCur = parseInt(e.detail.categoryCur)
-      // const childP = this.childPages[this.categoryCur]
-      // if (typeof childP.swipeToHere === 'function') {
-      //   childP.swipeToHere()
-      // }
+
+    creatTemplateList: function () {
+      let templateList = []
+      for (let i in templates) {
+        templateList.push({
+          content: templates[i].content,
+          location: templates[i].location,
+          distance: ' 1314km',
+          isLiked: true,
+          isFavorited: false,
+          locStr: 'N:5°20′ E:13°14′',
+          love: 666,
+          timeStr: '以前'
+        })
+      }
+      this.templateList = templateList
+      this.$nextTick(() => {
+        const query = wx.createSelectorQuery().in(this)
+        // 计算各个cell高度来确定线条长度
+        query.selectAll('.record_item').boundingClientRect((rect) => {
+          let recordsH = []
+          for (let i = 0; i < rect.length; i++) {
+            recordsH.push(rect[i].height - 30)
+          }
+          this.recordListH = recordsH
+        }).exec()
+        // 整个temp的高度，防止留白也防止被点击
+        query.select('.me_template_bd').boundingClientRect((rect) => {
+          this.templateListH = rect.height
+        }).exec()
+      })
+      this.changeCategoryData(false, true)
     },
     closeGallery () {
       this.isShowGallery = false
@@ -304,7 +298,6 @@
 </script>
 
 <style>
-  .container {}
   #cardCanvas {
     position: fixed;
     left: 30000px;
@@ -320,7 +313,7 @@
 
 <script  type='application/json' lang='json'>
   {
-    "enablePullDownRefresh": true,
+    "disableScroll": true,
     "usingComponents": {
       "dialog": "../components/dialog",
       "navigationBar": "../components/navigationBar",

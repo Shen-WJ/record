@@ -14,7 +14,8 @@
         style="padding-bottom: {{bottomSize}}rpx;padding-top: {{top}}rpx;"
         scroll-y="{{refreshStatus == 1}}"
         lower-threshold="750rpx"
-        bindscrolltolower="more">
+        bindscrolltolower="more"
+        bindscroll="scroll">
         <view id="refresh"
             class="scroll__refresh {{successShow ? 'scroll__refresh--hidden' : ''}}"
             style="height: {{refreshSize}}rpx;padding: {{(refreshSize - 50) / 2}}rpx 0;">
@@ -92,7 +93,7 @@
       // 空状态的文字提示
       emptyText: {
         type: String,
-        value: '未找到数据'
+        value: '暂无内容'
       },
       // 距离顶部距离，一般为header高度，千万不可与refreshSize混淆
       top: {
@@ -119,9 +120,14 @@
       mode: 'refresh', // refresh 和 more 两种模式
       successShow: false, // 显示success
       successTran: false, // 过度success
-      refreshStatus: 0, // 1: 下拉刷新, 2: 松开刷新, 3: 加载中, 4: 加载完成
-      move: -40, // movable-view 偏移量
-      scrollTop: 0
+      /**
+      * 1: 等待下拉刷新（正常处于此态）,
+      * 2: 松开刷新（成功下拉到刷新所要求的位移并触发刷新）,
+      * 3: 加载中（触发刷新后等待返回结果，并且页面不可滑动）,
+      * 4: 加载完成（结果被通知后立即进入4，开始渲染“加载完成”的动画，页面不可滑动，结束动画后进入1）
+      */
+      refreshStatus: 0,
+      move: -40 // movable-view 偏移量
     },
     methods: {
       /**
@@ -130,14 +136,23 @@
       change (e) {
         const { refreshStatus } = this
 
-        // 判断如果状态大于3则返回
+        // 判断如果状态加载中或者是完成中的动画则无视
         if (refreshStatus >= 3) {
           return
         }
 
         let diff = e.detail.y
+        if (diff > (this.scrollHeight1 + 5) && this.scrollStatus === 'onFullScreen') {
+          console.log('++++++++++++++++++++++++change', this.scrollStatus)
+          this.scrollStatus = 'onPartScreen'
+          this.triggerEvent('overRefresh')
+        } else if (diff < (this.scrollHeight1 - 5) && this.scrollStatus === 'onPartScreen') {
+          console.log('++++++++++++++++++++++++change', this.scrollStatus)
+          this.scrollStatus = 'onFullScreen'
+          this.triggerEvent('pullUpFromTop')
+        }
 
-        if (diff > -10) {
+        if (diff > -10) { // 下拉刷新的最少位移
           this.refreshStatus = 2
         } else {
           this.refreshStatus = 1
@@ -149,22 +164,33 @@
       touchend () {
         const { refreshStatus } = this
 
-        if (refreshStatus >= 3) {
-          return
-        }
-
         if (refreshStatus === 2) {
           wx.vibrateShort()
           this.refreshStatus = 3
-          this.setData({
+          this.$forceUpdate({
             move: 0
           })
           this.mode = 'refresh'
           this.triggerEvent('refresh')
         } else if (refreshStatus === 1) {
-          this.setData({
+          this.$forceUpdate({
             move: this.scrollHeight1
           })
+        }
+      },
+      /**
+      * scroll-view 滚动
+      */
+      scroll (e) {
+        const diff = e.detail.scrollTop
+        if (diff < 20 && this.scrollStatus === 'onFullScreen') {
+          console.log('++++++++++++++++++++++++scroll', this.scrollStatus)
+          this.scrollStatus = 'onPartScreen'
+          this.triggerEvent('overRefresh')
+        } else if (diff > 20 && this.scrollStatus === 'onPartScreen') {
+          console.log('++++++++++++++++++++++++scroll', this.scrollStatus)
+          this.scrollStatus = 'onFullScreen'
+          this.triggerEvent('pullUpFromTop')
         }
       },
       /**
@@ -186,22 +212,22 @@
 
         if (oldVal === true && newVal === false) {
           this.refreshStatus = 4
-          this.setData({
+          this.$forceUpdate({
             move: this.scrollHeight2
           })
           setTimeout(() => {
             this.successShow = true
             setTimeout(() => {
               this.successTran = true
-              this.setData({
+              this.$forceUpdate({
                 move: this.scrollHeight1
               })
               setTimeout(() => {
                 this.refreshStatus = 1
                 this.successShow = false
                 this.successTran = false
-                // 此处必须用setData，否则不刷新
-                this.setData({
+                // 此处必须用$forceUpdate，否则不刷新
+                this.$forceUpdate({
                   move: this.scrollHeight1
                 })
               }, 350)
@@ -210,7 +236,7 @@
         } else {
           if (this.refreshStatus !== 3) {
             this.refreshStatus = 3
-            this.setData({
+            this.$forceUpdate({
               move: 0
             })
           }
@@ -231,16 +257,18 @@
       * 初始化scroll组件参数, 动态获取 下拉刷新区域 和 success 的高度
       */
       init () {
-        let query = this.createSelectorQuery()
+        // 默认onPartScreen，要考虑me和otherPeople不可随意修改，
+        // 1: 过度下拉10px，触发overRefresh，2: 开始从顶部上拉浏览，触发pullUpFromTop，3: 全屏滑动中无视2
+        this.scrollStatus = 'onPartScreen'
 
+        let query = this.createSelectorQuery()
         query.select('#refresh').boundingClientRect()
         query.select('#success').boundingClientRect()
-
         query.exec(function (res) {
           this.scrollHeight1 = -res[0].height // refresh view 高度负值
           this.scrollHeight2 = res[1].height - res[0].height // refresh view - success view 高度负值
-          this.setData({
-            move: -res[0].height
+          this.$forceUpdate({
+            move: this.scrollHeight1
           })
         }.bind(this))
       }
