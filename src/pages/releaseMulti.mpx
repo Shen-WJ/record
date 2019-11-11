@@ -477,7 +477,7 @@
 <style >
   .container {} 
   .top_buttons{
-    height: 70rpx;
+    height: 90rpx;
     width: 100%;
     overflow: hidden;
     position: relative;
@@ -491,22 +491,21 @@
     background-color: transparent;
     font-size: 30rpx;
     text-align: center;
+    box-sizing: border-box;
   }
   .btn_clear{
     color: red;
     position: absolute;
     left: -30rpx;
-    top: 5rpx;
+    top: 20rpx;
     border:3rpx solid red;
-
   }
   .btn_release{
     color: #2ab3f3;
     position: absolute;
     right: -30rpx;
-    top: 5rpx;
+    top: 20rpx;
     border:3rpx solid #2ab3f3;
-
   }
   .touch_btn{
     color: white;
@@ -514,7 +513,7 @@
   }
 
   .release_content {
-    margin: 0 10rpx;
+    margin: 40rpx 10rpx 10rpx;
   }
   .location {
     display: flex;
@@ -650,7 +649,7 @@
   .wx-switch-input::after{width: 18px !important;height: 18px !important;} */
 
   .bottom_btn{
-    margin-top: 50rpx;
+    margin-top: 40rpx;
     margin-bottom: 20rpx;
     color: white;
     background-color: #2ab3f3;

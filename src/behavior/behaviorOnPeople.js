@@ -360,6 +360,7 @@ export const behaviorOnPeople = Behavior({
     },
 
     pressDailyRecord (e) {
+      if (this.pageType !== 'me') return
       const index = e.currentTarget.dataset.index
       let dailyRecord = this.dailyRecordList[index]
       wx.showActionSheet({

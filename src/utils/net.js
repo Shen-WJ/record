@@ -19,10 +19,12 @@ function json2UrlEncoded (element, key, paramList) {
   return list.join('&')
 }
 
-const http = ({ url = '', query = {}, body = {}, method = '', ...other } = {}) => {
-  wx.showLoading({
-    title: ''
-  })
+const http = ({ url = '', query = {}, body = {}, method = '', isLoading = false, ...other } = {}) => {
+  if (isLoading) {
+    wx.showLoading({
+      title: ''
+    })
+  }
 
   let timeStart = Date.now()
   let sign = ''
@@ -69,8 +71,9 @@ const http = ({ url = '', query = {}, body = {}, method = '', ...other } = {}) =
       ...other,
       complete: (res) => {
         delete requestingList[url]
-
-        wx.hideLoading()
+        if (isLoading) {
+          wx.hideLoading()
+        }
         console.log(`\n*************************\nRequest of ${method}：${url + queryStr} | 耗时${Date.now() - timeStart}\nbody:`, body, '\nres:', res, '\n*************************\n')
 
         if (res.statusCode >= 200 && res.statusCode < 300) {
@@ -112,42 +115,46 @@ const getUrl = (url) => {
   return url
 }
 
-const reqGet = ({ url, query, body, ...other } = {}) => {
+const reqGet = ({ url, query, body, isLoading, ...other } = {}) => {
   return http({
     url,
     query,
     body,
     method: 'GET',
+    isLoading,
     ...other
   })
 }
 
-const reqPost = ({ url, query, body, ...other } = {}) => {
+const reqPost = ({ url, query, body, isLoading, ...other } = {}) => {
   return http({
     url,
     query,
     body,
     method: 'POST',
+    isLoading,
     ...other
   })
 }
 
-const reqPut = ({ url, query, body, ...other } = {}) => {
+const reqPut = ({ url, query, body, isLoading, ...other } = {}) => {
   return http({
     url,
     query,
     body,
     method: 'PUT',
+    isLoading,
     ...other
   })
 }
 
-const reqDelete = ({ url, query, body, ...other } = {}) => {
+const reqDelete = ({ url, query, body, isLoading, ...other } = {}) => {
   return http({
     url,
     query,
     body,
     method: 'DELETE',
+    isLoading,
     ...other
   })
 }

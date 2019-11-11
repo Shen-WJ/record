@@ -2,12 +2,12 @@
   <view class='releaseMask'>
     <view class="release_box" animation="{{animations[0]}}" catchtap="clickToRelease" data-type="0">
       <image class="circle circleMulti" src="../image/icon/multi.png" mode="aspectFit" />
-      <text>地点图文</text>
+      <text>图文点迹</text>
     </view>
     <view class="release_box" animation="{{animations[1]}}" catchtap="clickToRelease" data-type="1">
       <!-- #f4ea2a -->
       <image class="circle circleSign" src="../image/icon/sign.png" mode="aspectFit" />
-      <text>地点打卡</text>
+      <text>快速打卡</text>
     </view>
     <view class="circle circleClose" style="bottom: calc({{tabBarBottom}}px + 40rpx);" catchtap="clickClose">×</view>
     <policyText wx:if="{{needAgreePolicy}}" class="policyText" style="bottom: calc({{tabBarBottom}}px + 5rpx);" id="policy_text" action='点击“发布”' textColor="#ababab" canClickColor='#2ab3f3'/>
@@ -16,7 +16,7 @@
       bindsuccess='clickReleaseSign' bindcancel="clickCancelSign">
       <view class="dialog_sign">
         <view class="location">
-          <input class="location_input fontColorW1" focus="{{true}}" value="{{locationName}}" bindinput="locationInput" maxlength="{{loactionNameLength}}" placeholder="这里，是哪里？(1~{{loactionNameLength}}字)" placeholder-style="color:#555;"/>
+          <input class="location_input fontColorW1" focus="{{true}}" value="{{locationName}}" bindinput="locationInput" maxlength="{{loactionNameLength}}" placeholder="填写打卡的地名(1~{{loactionNameLength}}字)" placeholder-style="color:#555;"/>
           <image class="location_choose" mode="aspectFit" src="../image/icon/toMap.png" catchtap="chooseLocation" />
           <text class="location_chooseText" catchtap="chooseLocation">地图选点</text>
         </view>
@@ -314,10 +314,12 @@
     margin-right: 20rpx;
   }
   .location_choose {
+    flex-shrink: 0;
     width: 50rpx;
     height: 50rpx;
   }
   .location_chooseText {
+    flex-shrink: 0;
     font-size: 26rpx;
     color: #2ab3f3;
   }

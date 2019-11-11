@@ -32,7 +32,7 @@
       tabBarBottom: app.globalData.tabBarBottom,
       isShowDialog: false,
 
-      categoryMenu: ['综合', 'PicFlow', '校园卡'],
+      categoryMenu: ['综合', 'PicFlow'],
       categoryData: [
         {
           name: '综合',
@@ -43,13 +43,6 @@
         },
         {
           name: 'PicFlow',
-          requesting: false,
-          end: false,
-          emptyShow: false,
-          total: 0
-        },
-        {
-          name: '校园卡',
           requesting: false,
           end: false,
           emptyShow: false,
