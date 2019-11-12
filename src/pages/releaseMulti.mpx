@@ -340,7 +340,14 @@
         this.isRequesting = false
         this.clickBtnClear()
         for (let key in app.globalData.isTabbarPageRefresh) {
-          app.globalData.isTabbarPageRefresh[key] = true
+          if (key === 'me') {
+            app.globalData.isTabbarPageRefresh[key] = {
+              categoryCur: 0,
+              isRefresh: true
+            }
+          } else {
+            app.globalData.isTabbarPageRefresh[key] = true
+          }
         }
         wx.showToast({
           title: '成功',

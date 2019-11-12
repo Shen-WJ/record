@@ -209,7 +209,13 @@
         wx.showToast({
           title: '成功',
           complete: res => {
-            this.circlesHide(false)
+            app.globalData.isTabbarPageRefresh['me'] = {
+              categoryCur: 1,
+              isRefresh: true
+            }
+            wx.switchTab({
+              url: './me?categoryCur=1'
+            })
           }
         })
       })

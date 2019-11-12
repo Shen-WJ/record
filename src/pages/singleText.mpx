@@ -12,8 +12,10 @@
     <block wx:elif="{{pageType == 'about'}}">
       <view class="about_content {{darkMode?'fontColorW2':'fontColorB2'}}">
         <image class="about_logo" src="../image/global/logo1.jpg" mode="aspectFill" />
-        <text>点迹  v1.1.0
+        <text>点迹  v1.1.2
         让附近离你更近</text>
+        <text style="font-size: 22rpx;" catch:tap="clickAboutText">任何问题与建议欢迎加QQ群(428699780)反馈
+        [点击复制]</text>
       </view>
       <view class="cell1 about_cell {{darkMode?'fontColorW1 bgColorB1':'fontColorB1 bgColorW1'}}" bindtap="clickToPolicy" data-type="userAgreement">
         <text>用户使用协议</text>
@@ -84,6 +86,16 @@
         filePath: this.policyType + '-1.txt'
       }).then(data => {
         this.nodesContent = data
+      })
+    },
+    clickAboutText () {
+      wx.setClipboardData({
+        data: '428699780',
+        success: (res) => {
+          wx.showToast({
+            title: '群号复制成功'
+          })
+        }
       })
     }
   })

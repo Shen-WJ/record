@@ -12,13 +12,17 @@
       <view class="iFhead_time">{{record.timeStr}}</view>
     </view>
     <view class="iFBody">
-      <swiper class="iFBody_swiper" style="height: 1000rpx;" indicator-dots="{{true}}" duration="{{500}}">
+      <view wx:if="{{record.imageList.length > 1}}" class="iFBody_counter">■  {{record.imageList.length}}
+        <text>■</text>
+      </view>
+      <swiper class="iFBody_swiper" indicator-dots="{{true}}" indicator-color="rgba(255, 255, 255, .5)" indicator-active-color="rgba(0, 0, 0, .5)" duration="{{500}}">
         <swiper-item wx:for="{{record.imageList}}" wx:key="index" class="iFBody_swiperItem">
           <image lazy-load="{{true}}" class="iFBody_swiperItem_Img" src="{{item}}" mode="aspectFill"  data-src="{{item}}" data-index="{{rcdIndex}}" catchtap="previewImage"/>
         </swiper-item>
       </swiper>
     </view>
     <view class="iFActions">
+      <!-- 此处catchtap="blankTap"只是为了阻止事件冒泡到clickToDetail -->
       <view class="iFActions_left" catchtap="blankTap">
         <view class="iFActions_box" catchtap="clickLike" data-index="{{rcdIndex}}">
           <image wx:if="{{record.isLiked}}" class="iFActions_img" src="../image/icon/like1.png"></image>
@@ -28,7 +32,6 @@
 
         <button hidden="{{true}}" open-type="share" catchtap="clickShare" id="hidedBtn{{record.recordId}}" data-index="{{rcdIndex}}" />
         <label class="iFActions_box" for="hidedBtn{{record.recordId}}">
-          <!-- 此处catchtap="clickShare"只是为了阻止事件冒泡到clickToDetail -->
           <image class="iFActions_img" src="../image/icon/share.png" />
         </label>
       </view>

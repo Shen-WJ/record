@@ -162,7 +162,10 @@
         'locality': false,
         'find': false,
         'following': false,
-        'me': false
+        'me': {
+          categoryCur: 0,
+          isRefresh: true
+        }
       } // 是否刷新数据，一般在定位移动了1km或者发布了新内容等时需要刷新
     }
   })

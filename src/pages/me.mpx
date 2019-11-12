@@ -93,13 +93,16 @@
       }
 
       // 显示后相应其他页面要求的刷新
-      if (app.globalData.isTabbarPageRefresh['me']) {
-        wx.pageScrollTo({
-          scrollTop: 0,
-          duration: 0
-        })
+      if (app.globalData.isTabbarPageRefresh['me'].isRefresh) {
+        this.categoryCur = app.globalData.isTabbarPageRefresh['me'].categoryCur
+        // todo 修改回到顶部
+        // wx.pageScrollTo({
+        //   scrollTop: 0,
+        //   duration: 0
+        // })
+        // 此处处理滚动
         this.getRequest(true)
-        app.globalData.isTabbarPageRefresh['me'] = false
+        app.globalData.isTabbarPageRefresh['me'] = {}
       }
     },
 
