@@ -5,7 +5,7 @@
     "urlCheck": true,
     "es6": false,
     "postcss": true,
-    "minified": false,
+    "minified": true,
     "autoAudits": false
   },
   "appid": "wx542e500f892d36a6",
