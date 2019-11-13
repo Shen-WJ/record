@@ -36,7 +36,8 @@
       </image>
     </view>
 
-    <swipeList categoryMenu="{{categoryMenu}}" categoryData="{{categoryData}}" isTabFixed="{{isTabFixed}}"
+    <swipeList id="swipeList" categoryMenu="{{categoryMenu}}" categoryData="{{categoryData}}" isTabFixed="{{isTabFixed}}"
+      emptyText="{{pageType !== 'me'?'世界那么大，ta却懒得看':''}}"
       bind:swipeTo="swipeTo" bind:pullDownOverRefresh="pullDownOverRefresh" bind:pullUpFromTop="pullUpFromTop"
       bind:pullDownRefresh="pullDownRefresh" bind:reachBottom="reachBottom">
       <view slot="{{categoryMenu[0]}}">
@@ -66,14 +67,14 @@
           <view wx:for="{{dailyRecordList}}" wx:key="{{index}}" wx:for-item="dailyRecordItem"
             class="dailyRecordItem" catch:longpress="pressDailyRecord" data-index="{{index}}">
             <view class="dri_time">
-              <view class="dri_time_day">20</view>
-              <view class="dri_time_month">10月</view>
-              <view class="dri_time_year">2019年</view>
+              <view class="dri_time_day">{{dailyRecordItem.date.day}}</view>
+              <view class="dri_time_month">{{dailyRecordItem.date.month}}</view>
+              <view class="dri_time_year">{{dailyRecordItem.date.year}}</view>
             </view>
             <view class="dri_loc" catch:tap="clickDailyRecord" data-index="{{index}}">{{dailyRecordItem.location}}</view>
           </view>
         </view>
-        <template wx:if="{{pageType === 'me'}}" is="emptyView" data="{{isShow: !dailyRecordList.length, type:0, textArr:['你在全世界留下的足迹都是弥足珍贵的，快去','打卡','发布吧～0v0']}}"/>
+        <template wx:if="{{pageType === 'me'}}" is="emptyView" data="{{isShow: !dailyRecordList.length, type:0, textArr:['世界那么大，我想去看看。\\n顺便','打个卡','']}}"/>
       </view>
     </swipeList>
     <dialog isShow="{{isShowDialog}}" title="{{pageType==='me'?'获取信息':'关注需要昵称/头像'}}" content="{{pageType==='me'?'个人页面的展示需要昵称和头像。之后可以点击头像/昵称进行修改。':'你还没有昵称头像，关注不了哦OvO～快去授权吧！'}}" showCancel="{{false}}" confirmText="去授权" open_type="getUserInfo" bindsuccess='authorizeUserInfo'></dialog>

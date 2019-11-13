@@ -12,6 +12,9 @@
       <scroll-view
         class="scroll__view"
         style="padding-bottom: {{bottomSize}}rpx;padding-top: {{top}}rpx;"
+        enable-back-to-top
+        scroll-with-animation
+        scroll-into-view="{{toView}}"
         scroll-y="{{refreshStatus == 1}}"
         lower-threshold="750rpx"
         bindscrolltolower="more"
@@ -113,11 +116,9 @@
       }
     },
     data: {
-      navH: app.globalData.navHeight,
       movableAreaH: app.globalData.windowHeight - app.globalData.navHeight,
       tabBarBottom: app.globalData.tabBarBottom,
-
-      mode: 'refresh', // refresh 和 more 两种模式
+      toView: '',
       successShow: false, // 显示success
       successTran: false, // 过度success
       /**
@@ -206,11 +207,11 @@
       * 监听 requesting 字段变化, 来处理下拉刷新对应的状态变化
       */
       requestingEnd (newVal, oldVal) {
-        if (this.mode === 'more') {
+        if (this.mode === 'more') { // 加载不需要回到顶部和刷新动画等
           return
         }
 
-        if (oldVal === true && newVal === false) {
+        if (oldVal === true && newVal === false) { // 刷新的网络请求结束
           this.refreshStatus = 4
           this.$forceUpdate({
             move: this.scrollHeight2
@@ -229,6 +230,10 @@
                 // 此处必须用$forceUpdate，否则不刷新
                 this.$forceUpdate({
                   move: this.scrollHeight1
+                }, () => {
+                  this.$forceUpdate({
+                    toView: 'refresh'
+                  })
                 })
               }, 350)
             }, 1000)
@@ -260,6 +265,7 @@
         // 默认onPartScreen，要考虑me和otherPeople不可随意修改，
         // 1: 过度下拉10px，触发overRefresh，2: 开始从顶部上拉浏览，触发pullUpFromTop，3: 全屏滑动中无视2
         this.scrollStatus = 'onPartScreen'
+        this.mode = 'refresh' // refresh 和 more 两种模式
 
         let query = this.createSelectorQuery()
         query.select('#refresh').boundingClientRect()
@@ -271,6 +277,9 @@
             move: this.scrollHeight1
           })
         }.bind(this))
+      },
+      changeMode (mode) {
+        this.mode = mode
       }
     },
     ready () {

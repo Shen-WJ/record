@@ -61,7 +61,7 @@ function _strToJson (str) {
   return JSON.parse(str)
 }
 
-function _timeToStr (time) {
+function _timeToStr (time, isObject = false) {
   let now = new Date()
   let nowTime = now.getTime()
   let difference = nowTime - time
@@ -69,15 +69,45 @@ function _timeToStr (time) {
   let diffMinutes = difference / 1000 / 60
   if (diffHours >= 24) {
     let date = new Date(time)
-    return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()
+    if (isObject) {
+      return {
+        year: date.getFullYear() + '年',
+        month: (date.getMonth() + 1) + '月',
+        day: date.getDate()
+      }
+    } else return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()
   } else if (diffHours < 24 && diffHours >= 1) {
-    return Math.floor(diffHours) + '小时前'
+    if (isObject) {
+      return {
+        year: '',
+        month: '',
+        day: Math.floor(diffHours) + '小时前'
+      }
+    } else return Math.floor(diffHours) + '小时前'
   } else if (diffHours < 1 && diffMinutes >= 1) {
-    return Math.floor(diffMinutes) + '分钟前'
+    if (isObject) {
+      return {
+        year: '',
+        month: '',
+        day: Math.floor(diffMinutes) + '分钟前'
+      }
+    } else return Math.floor(diffMinutes) + '分钟前'
   } else if (diffMinutes < 1) {
-    return '刚刚'
+    if (isObject) {
+      return {
+        year: '',
+        month: '',
+        day: '刚刚'
+      }
+    } else return '刚刚'
   } else {
-    return '未知'
+    if (isObject) {
+      return {
+        year: '',
+        month: '',
+        day: '未知'
+      }
+    } else return '未知'
   }
 }
 

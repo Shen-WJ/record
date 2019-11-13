@@ -52,7 +52,7 @@
 
       dailyRecordList: [],
 
-      categoryMenu: ['我的点迹', '我的全世界'],
+      categoryMenu: ['点迹', '走过的世界'],
       categoryData: [
         {
           requesting: false, // 请求中，显示加载动画
@@ -95,12 +95,7 @@
       // 显示后相应其他页面要求的刷新
       if (app.globalData.isTabbarPageRefresh['me'].isRefresh) {
         this.categoryCur = app.globalData.isTabbarPageRefresh['me'].categoryCur
-        // todo 修改回到顶部
-        // wx.pageScrollTo({
-        //   scrollTop: 0,
-        //   duration: 0
-        // })
-        // 此处处理滚动
+        this.swipeList.changeCategoryCurAndMode(this.categoryCur, 'refresh')
         this.getRequest(true)
         app.globalData.isTabbarPageRefresh['me'] = {}
       }
@@ -182,7 +177,7 @@
         }).then(data => {
           let dailyRecords = isRefresh ? [] : this.dailyRecordList
           this.httpsData[1] = data.data
-          this.dailyRecordList = dailyRecords.concat(data.data.list)
+          this.dailyRecordList = dailyRecords.concat(this.formatDailyRecord(data.data.list))
           this.changeCategoryData(false, !data.data.hasNextPage, data.data.total)
         })
       }

@@ -12,9 +12,11 @@
 
   <swiper current="{{categoryCur}}" duration="{{duration}}" bindanimationfinish="swipeChange">
     <swiper-item wx:for="{{categoryData}}" wx:key="{{index}}">
-      <scroll requesting="{{item.requesting}}"
+      <scroll id="scroll_{{index}}"
+          requesting="{{item.requesting}}"
           end="{{item.end}}"
           empty-show="{{item.emptyShow}}"
+          empty-text="{{emptyText}}"
           list-count="{{item.total}}"
           top="{{isTabFixed?80:0}}"
           refresh-size="{{80}}"
@@ -49,6 +51,10 @@
       isTabFixed: {
         type: Boolean,
         value: true
+      },
+      emptyText: {
+        type: String,
+        value: '暂无内容'
       }
     },
     data: {
@@ -59,6 +65,14 @@
     },
     computed: {
       ...storeMode.mapState(['darkMode'])
+    },
+    lifetimes: {
+      attached () {
+        this.childScroll = []
+        for (let i = 0; i < this.categoryData.length; i++) {
+          this.childScroll.push(this.selectComponent('#scroll_' + i))
+        }
+      }
     },
     methods: {
       // 顶部tab切换事件
@@ -90,6 +104,10 @@
       // 加载更多
       more () {
         this.triggerEvent('reachBottom')
+      },
+      changeCategoryCurAndMode (categoryCur, mode) {
+        this.categoryCur = categoryCur
+        this.childScroll[categoryCur].changeMode(mode)
       }
     }
   })

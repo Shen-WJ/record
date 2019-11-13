@@ -21,6 +21,7 @@ export const behaviorOnPeople = Behavior({
       this.clickHead()
       this.categoryCur = 0
       this.httpsData = []
+      this.swipeList = this.selectComponent('#swipeList')
 
       if (option.otherUserId) { // otherPeople
         this.otherUserId = parseInt(option.otherUserId)
@@ -392,6 +393,15 @@ export const behaviorOnPeople = Behavior({
         latitude: dailyRecord.lat,
         longitude: dailyRecord.lng
       })
+    },
+    formatDailyRecord (list = []) {
+      let newList = []
+      for (let i in list) {
+        let item = list[i]
+        item.date = common.timeToStr(item.time, true)
+        newList.push(item)
+      }
+      return newList
     }
   }
 })

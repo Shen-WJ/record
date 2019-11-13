@@ -202,10 +202,7 @@
           lat: this.locationDigit.latitude
         }
       }).then(data => {
-        this.locationName = ''
-        this.locationGPS = ''
-        this.locationDigit = app.globalData.location
-        this.isShowSign = false
+        this.clearAndHideSign()
         wx.showToast({
           title: '成功',
           complete: res => {
@@ -221,8 +218,14 @@
       })
     },
     clickCancelSign () {
-      this.isShowSign = false
+      this.clearAndHideSign()
       this.circlesHide(false)
+    },
+    clearAndHideSign () {
+      this.locationName = ''
+      this.locationGPS = ''
+      this.locationDigit = app.globalData.location
+      this.isShowSign = false
     },
 
     authorizeUserInfo (e) {

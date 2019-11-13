@@ -48,7 +48,7 @@
       tabBarBottom: app.globalData.tabBarBottom,
       dailyRecordList: [],
 
-      categoryMenu: ['他的点迹', '他的全世界'],
+      categoryMenu: ['点迹', '走过的世界'],
       categoryData: [
         {
           requesting: false, // 请求中，显示加载动画
@@ -133,7 +133,7 @@
         }).then(data => {
           let dailyRecords = isRefresh ? [] : this.dailyRecordList
           this.httpsData[1] = data.data
-          this.dailyRecordList = dailyRecords.concat(data.data.list)
+          this.dailyRecordList = dailyRecords.concat(this.formatDailyRecord(data.data.list))
           this.changeCategoryData(false, !data.data.hasNextPage, data.data.total, data.data.total === 0)
         })
       }

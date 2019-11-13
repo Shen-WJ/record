@@ -53,10 +53,6 @@
     computed: {
       ...storeMode.mapState(['darkMode'])
     },
-    pageShow () {
-      // 所在页面显示之后就会执行一次
-      console.log('page show')
-    },
     methods: {
       pullDownRefresh: function () {
         if (typeof this.getRequest === 'function') {

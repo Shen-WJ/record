@@ -3,7 +3,7 @@
   <import src="../utils/common.wxml"/>
 
   <navigationBar pageName="发现" showBackIcon="{{false}}"/>
-  <swipeList categoryMenu="{{categoryMenu}}" categoryData="{{categoryData}}"
+  <swipeList id="swipeList" categoryMenu="{{categoryMenu}}" categoryData="{{categoryData}}"
     bind:swipeTo="swipeTo" bind:pullDownRefresh="pullDownRefresh" bind:reachBottom="reachBottom">
     <view slot="{{categoryMenu[0]}}">
       <findAll id="findAll" bind:changeRequestState="changeRequestState" />
@@ -58,6 +58,7 @@
       this.childPages = []
       this.childPages.push(this.selectComponent('#findAll'))
       this.childPages.push(this.selectComponent('#findImgFlow'))
+      this.swipeList = this.selectComponent('#swipeList')
 
       common.getLocation({
         success: (res) => {
@@ -75,8 +76,14 @@
         console.log('timer(', this.timer, ') fire!!!')
       }, 30000)
     },
-
-    onShow: function () {
+    onShow () {
+      // 查询有没有在其他页面的事件要求本页面更新
+      // 暂时只刷新‘综合’
+      if (app.globalData.isTabbarPageRefresh['find']) {
+        this.swipeList.changeCategoryCurAndMode(0, 'refresh')
+        this.childPages[0].getRequest(true)
+        app.globalData.isTabbarPageRefresh['find'] = false
+      }
     },
 
     onUnload: function () {
