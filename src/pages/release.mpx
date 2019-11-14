@@ -22,7 +22,7 @@
         </view>
         <view class="sub_text">
           <text class="location_digit">{{locationGPS}}\t</text>
-          <text class="location_length_count">{{loactionNameCount}}/{{loactionNameLength}}</text>
+          <text class="location_length_count">{{locationName.length}}/{{loactionNameLength}}</text>
         </view>
       </view>
     </dialog>
@@ -60,7 +60,6 @@
 
       isShowSign: false,
       locationName: '',
-      loactionNameCount: 0,
       loactionNameLength: 25,
       locationGPS: ''
     },
@@ -163,7 +162,6 @@
 
     locationInput: function (e) {
       this.locationName = e.detail.value
-      this.loactionNameCount = e.detail.value.length
     },
     chooseLocation: function (e) {
       wx.chooseLocation({

@@ -6,7 +6,7 @@
     <input wx:elif="{{pageType === 'nickname'}}" class="nickname_input {{darkMode?'fontColorW1':'fontColorB1'}}" value="{{contentText}}" bindinput="textInput" maxlength="{{contentTextLength}}" placeholder="{{placeHolder}}" placeholder-style="{{darkMode?'color:#555;':'color:#aaa;'}}"/>
 
     <view class="sub_text">
-      <text class="text_length_count">{{contentTextCount}}/{{contentTextLength}}</text>
+      <text class="text_length_count">{{contentText.length}}/{{contentTextLength}}</text>
     </view>
 
     <button class="bottom_btn" bindtap="clickBtnSend">{{btnName}}</button>
@@ -28,7 +28,6 @@
     data: {
       contentText: '',
       contentTextLength: 140,
-      contentTextCount: 0,
       pageType: '',
       btnName: '',
       placeHolder: '请输入...',
@@ -87,7 +86,6 @@
     textInput: function (e) {
       this.hasChanged = true
       this.contentText = e.detail.value
-      this.contentTextCount = e.detail.value.length
     },
 
     clickBtnSend: function () {

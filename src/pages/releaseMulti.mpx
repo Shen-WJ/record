@@ -16,7 +16,7 @@
       </view>
       <view class="sub_text">
         <text class="location_digit">{{locationGPS}}\t</text>
-        <text class="location_length_count">{{loactionNameCount}}/{{loactionNameLength}}</text>
+        <text class="location_length_count">{{loactionName.length}}/{{loactionNameLength}}</text>
       </view>
       <textarea class="text_area {{darkMode?'fontColorW1':'fontColorB1'}}" value="{{contentText}}" bindinput="textInput" maxlength="{{contentTextLength}}" placeholder="在这里，留下属于你的痕迹...(0~{{contentTextLength}}字)" placeholder-style="{{darkMode?'color:#555;':'color:#aaa;'}}"/>
       <view class="sub_text">
@@ -72,7 +72,6 @@
     data: {
       locationName: '',
       contentText: '',
-      loactionNameCount: 0,
       contentTextCount: 0,
       locationGPS: '',
       imageList: [],
@@ -91,7 +90,6 @@
       const name = wx.getStorageSync(strReleaseLocationName)
       if (name) {
         this.locationName = name
-        this.loactionNameCount = name.length
       }
 
       const digit = wx.getStorageSync(strReleaseLocationDigit)
@@ -192,7 +190,6 @@
 
       this.locationName = ''
       this.contentText = ''
-      this.loactionNameCount = 0
       this.contentTextCount = 0
       this.imageList = []
       this.privateTypeIndex = 0
@@ -368,7 +365,6 @@
 
     locationInput: function (e) {
       this.locationName = e.detail.value
-      this.loactionNameCount = e.detail.value.length
       this.autoSave(0)
     },
 
