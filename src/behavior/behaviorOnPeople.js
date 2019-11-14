@@ -87,6 +87,9 @@ export const behaviorOnPeople = Behavior({
       this.categoryCur = parseInt(e.detail.categoryCur)
       switch (this.categoryCur) {
         case 0: {
+          if (this.recordList.length <= 0 && !this.httpsData[0]) {
+            this.getRequest(true)
+          }
           break
         }
         case 1: {
@@ -109,7 +112,7 @@ export const behaviorOnPeople = Behavior({
       this.containerAni = ani.top('-410rpx').step().export()
       console.log('pullUpFromTop')
     },
-    changeCategoryData (requesting, end, total, emptyShow) {
+    changeCategoryData (categoryCur = 0, requesting, end, total, emptyShow) {
       let aData = {}
       if (typeof requesting === 'boolean') {
         aData.requesting = requesting
@@ -124,7 +127,7 @@ export const behaviorOnPeople = Behavior({
         aData.emptyShow = emptyShow
       }
       this.$forceUpdate({
-        [`categoryData[${this.categoryCur}]`]: {
+        [`categoryData[${categoryCur}]`]: {
           ...this.categoryData[this.categoryCur],
           ...aData
         }

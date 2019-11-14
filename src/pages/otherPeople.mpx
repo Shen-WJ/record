@@ -91,8 +91,8 @@
           this.otherIsFollowed = data.data.follow
         })
       }
-      this.changeCategoryData(true)
       if (this.categoryCur === 0) {
+        this.changeCategoryData(0, true)
         let pageNum = isRefresh ? 0 : this.httpsData[0].nextPage
         net.reqGet({
           url: 'record/list/other',
@@ -120,9 +120,10 @@
               this.recordListH = recordsH
             }).exec()
           })
-          this.changeCategoryData(false, !data.data.hasNextPage, records.length)
+          this.changeCategoryData(0, false, !data.data.hasNextPage, records.length)
         })
       } else if (this.categoryCur === 1) {
+        this.changeCategoryData(1, true)
         let pageNum = isRefresh ? 0 : this.httpsData[1].nextPage
         net.reqGet({
           url: 'dailyRecord/info/listByOther',
@@ -134,7 +135,7 @@
           let dailyRecords = isRefresh ? [] : this.dailyRecordList
           this.httpsData[1] = data.data
           this.dailyRecordList = dailyRecords.concat(this.formatDailyRecord(data.data.list))
-          this.changeCategoryData(false, !data.data.hasNextPage, data.data.total, data.data.total === 0)
+          this.changeCategoryData(1, false, !data.data.hasNextPage, data.data.total, data.data.total === 0)
         })
       }
     }

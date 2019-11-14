@@ -132,8 +132,8 @@
           this.isShowNoticeRedDot = count > 0
         })
       }
-      this.changeCategoryData(true)
       if (this.categoryCur === 0) {
+        this.changeCategoryData(0, true)
         let pageNum = isRefresh ? 0 : this.httpsData[0].nextPage
         net.reqGet({
           url: 'record/list/person',
@@ -165,9 +165,10 @@
               this.recordListH = recordsH
             }).exec()
           })
-          this.changeCategoryData(false, !data.data.hasNextPage, records.length)
+          this.changeCategoryData(0, false, !data.data.hasNextPage, records.length)
         })
       } else if (this.categoryCur === 1) {
+        this.changeCategoryData(1, true)
         let pageNum = isRefresh ? 0 : this.httpsData[1].nextPage
         net.reqGet({
           url: 'dailyRecord/info/listByPerson',
@@ -178,7 +179,7 @@
           let dailyRecords = isRefresh ? [] : this.dailyRecordList
           this.httpsData[1] = data.data
           this.dailyRecordList = dailyRecords.concat(this.formatDailyRecord(data.data.list))
-          this.changeCategoryData(false, !data.data.hasNextPage, data.data.total)
+          this.changeCategoryData(1, false, !data.data.hasNextPage, data.data.total)
         })
       }
     },
@@ -213,7 +214,7 @@
           this.templateListH = rect.height
         }).exec()
       })
-      this.changeCategoryData(false, true)
+      this.changeCategoryData(0, false, true)
     },
     closeGallery () {
       this.isShowGallery = false
