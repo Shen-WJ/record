@@ -187,6 +187,13 @@
       })
     },
     clickReleaseSign () {
+      if (common.isEmpty(this.locationName)) {
+        wx.showToast({
+          title: '地点不得为空',
+          icon: 'none'
+        })
+        return
+      }
       // 同意用户协议
       if (storeUser.state.needAgreePolicy) {
         this.selectComponent('#policy_text').agreePolicy()
@@ -209,7 +216,7 @@
               isRefresh: true
             }
             wx.switchTab({
-              url: './me?categoryCur=1'
+              url: './me'
             })
           }
         })
