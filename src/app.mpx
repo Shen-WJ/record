@@ -187,6 +187,7 @@
 <script type="application/json">
   {
     "pages": [
+      "./pages/releaseLostItem",
       "./pages/launch",
       "./pages/locality",
       "./pages/find",

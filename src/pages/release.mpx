@@ -309,6 +309,7 @@
     left: 315rpx;
     bottom: 0;
     background-color: #222;
+    z-index: 9001;
   }
   .policyText {
     position: absolute;

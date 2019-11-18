@@ -1,5 +1,5 @@
 <template>
-  <navigationBar pageName="发布图文" showCoverImg="{{false}}"/>
+  <navigationBar pageName="发布点迹" showCoverImg="{{false}}"/>
 
   <view class="container">
     <wxs module="common" src="../utils/common.wxs"></wxs>
@@ -23,16 +23,16 @@
         <text class="text_length_count">{{contentTextCount}}/{{contentTextLength}}</text>
       </view>  
       <view class="img_area">
-      <view class="img_files">
-        <block wx:for="{{imageList}}" wx:for-item="image" wx:key="{{index}}">
-        <view class="img_file">
-          <image class="img" mode="aspectFill" src="{{image}}" data-src="{{image}}" bindtap="previewImage"><image class="img_remove" src="../image/icon/img_remove.png" catchtap="removeImg" data-index="{{index}}"/></image>
+        <view class="img_files">
+          <block wx:for="{{imageList}}" wx:for-item="image" wx:key="{{index}}">
+          <view class="img_file">
+            <image class="img" mode="aspectFill" src="{{image}}" data-src="{{image}}" bindtap="previewImage"><image class="img_remove" src="../image/icon/img_remove.png" catchtap="removeImg" data-index="{{index}}"/></image>
+          </view>
+          </block>
         </view>
-        </block>
-      </view>
-      <view class="add_img_box">
-        <view class="add_img" bindtap="chooseImage"></view>
-      </view>
+        <view class="add_img_box">
+          <view class="add_img" bindtap="chooseImage"></view>
+        </view>
       </view>
     </view>
     <view class="private_choose {{darkMode?'fontColorW2':'fontColorB2'}}">

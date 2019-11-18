@@ -363,7 +363,7 @@ display: none;
 }
 .headerFilter_picker_btn image {
   display: inline-block;
-  transform:rotate(90deg);
+  transform: rotate(90deg);
   width: 40rpx;
   height: 40rpx;
 }

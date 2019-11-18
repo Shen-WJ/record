@@ -1,0 +1,446 @@
+<template>
+  <navigationBar pageName="发布校园卡丢失" showCoverImg="{{false}}"/>
+  <view class="container {{darkMode?'fontColorW1':'fontColorB1'}}">
+    <form bindsubmit="formSubmit" bindreset="formReset">
+      <view class="lost_item_cell">
+        <view class="lic_title">类型</view>
+        <view class="lic_select" wx:for="{{typeList}}" wx:key="{{index}}">
+          <view class="select_item" style="border:2rpx solid #{{currentType===index ? '2ab3f3': '888'}}" bindtap="selectType" data-index="{{index}}">
+            <view class="select_icon" style="background-color: #{{currentType===index ? '2ab3f3': '888'}};"></view>
+            <view class="select_text" style="color:#{{currentType===index ? '2ab3f3': '888'}}">{{item}}</view>
+          </view>
+        </view>
+      </view>
+      <block wx:for="{{table[currentType]}}" wx:for-item="cell" wx:key="{{index}}">
+        <view class="lost_item_cell">
+          <view class="lic_title">
+            <text class="lic_name">{{cell.name}}</text>
+            <text class="lic_desc">{{cell.desc}}</text>
+          </view>
+          <picker wx:if="{{cell.type===0}}" mode="selector" range="{{cell.data}}" range-key="name" value="{{provinceIdx}}" bindchange="changePrivateType">
+            <view class="lost_item_picker">
+              <view>{{cell.data[(cell.name==='省份'?provinceIdx:schoolIdx)].name}}</view>
+              <image src="../image/icon/arrow_right.png" mode="aspectFit" />
+            </view>
+          </picker>
+          <input wx:elif="{{cell.type===1}}" name="{{cell.name}}" />
+          <textarea wx:elif="{{cell.type===2}}" name="{{cell.name}}" />
+          <view wx:elif="{{cell.type===3}}" class="img_area">
+            <view class="img_files">
+              <view wx:if="{{cardImgPath.length>0}}" class="img_file">
+                <image class="img" mode="aspectFill" src="{{cardImgPath}}" bindtap="previewImage"><image class="img_remove" src="../image/icon/img_remove.png" catchtap="removeImg"/></image>
+              </view>
+            </view>
+            <view class="add_img_box">
+              <view class="add_img" bindtap="chooseImage"></view>
+            </view>
+          </view>
+        </view>
+      </block>
+      <button class="bottom_btn" formType="submit">确认</button>
+      <button formType="reset">清空</button>
+    </form>
+  </view>
+</template>
+
+<script>
+  import { createPage } from '@mpxjs/core'
+  import { behaviorOnPage } from '../behavior/behaviorOnPage'
+  import { storeMode } from '../stores/storeCommon'
+  import { storeUser } from '../stores/storeUser'
+  const provinceList = [
+    {
+      'code': 1001,
+      'name': '北京市'
+    },
+    {
+      'code': 1002,
+      'name': '天津市'
+    },
+    {
+      'code': 1003,
+      'name': '河北省'
+    },
+    {
+      'code': 1004,
+      'name': '山西省'
+    },
+    {
+      'code': 1005,
+      'name': '内蒙古'
+    },
+    {
+      'code': 1006,
+      'name': '辽宁省'
+    },
+    {
+      'code': 1007,
+      'name': '吉林省'
+    },
+    {
+      'code': 1008,
+      'name': '黑龙江'
+    },
+    {
+      'code': 1009,
+      'name': '上海市'
+    },
+    {
+      'code': 1010,
+      'name': '江苏省'
+    },
+    {
+      'code': 1011,
+      'name': '浙江省'
+    },
+    {
+      'code': 1012,
+      'name': '安徽省'
+    },
+    {
+      'code': 1013,
+      'name': '福建省'
+    },
+    {
+      'code': 1014,
+      'name': '山东省'
+    },
+    {
+      'code': 1015,
+      'name': '江西省'
+    },
+    {
+      'code': 1016,
+      'name': '河南省'
+    },
+    {
+      'code': 1017,
+      'name': '湖北省'
+    },
+    {
+      'code': 1018,
+      'name': '湖南省'
+    },
+    {
+      'code': 1019,
+      'name': '广东省'
+    },
+    {
+      'code': 1020,
+      'name': '广西区'
+    },
+    {
+      'code': 1021,
+      'name': '海南省'
+    },
+    {
+      'code': 1022,
+      'name': '重庆市'
+    },
+    {
+      'code': 1023,
+      'name': '四川省'
+    },
+    {
+      'code': 1024,
+      'name': '贵州省'
+    },
+    {
+      'code': 1026,
+      'name': '云南省'
+    },
+    {
+      'code': 1028,
+      'name': '西藏区'
+    },
+    {
+      'code': 1029,
+      'name': '陕西省'
+    },
+    {
+      'code': 1030,
+      'name': '甘肃省'
+    },
+    {
+      'code': 1031,
+      'name': '青海省'
+    },
+    {
+      'code': 1032,
+      'name': '宁夏区'
+    },
+    {
+      'code': 1033,
+      'name': '新疆区'
+    }
+  ]
+  createPage({
+    behaviors: [behaviorOnPage],
+    data: {
+      currentType: 0,
+      provinceList: provinceList,
+      provinceIdx: 0,
+      schoolList: [{ name: '苏大', code: 1 }, { name: '东大', code: 2 }],
+      schoolIdx: 0,
+      typeList: ['我捡到了', '我丢卡了'],
+      table: [
+        [
+          {
+            name: '省份',
+            desc: '必填',
+            type: 0,
+            data: provinceList
+          },
+          {
+            name: '学校',
+            desc: '必填',
+            type: 0,
+            data: [{ name: '苏大', code: 1 }, { name: '东大', code: 2 }]
+          },
+          {
+            name: '卡号',
+            desc: '必填',
+            type: 1,
+            data: []
+          },
+          {
+            name: '捡到地点',
+            desc: '必填',
+            type: 1,
+            data: []
+          },
+          {
+            name: '补充描述',
+            desc: '选填',
+            type: 2,
+            data: []
+          },
+          {
+            name: '给卡拍照',
+            desc: '必填',
+            type: 3,
+            data: []
+          }
+        ],
+        [
+          {
+            name: '省份',
+            desc: '必填',
+            type: 0,
+            data: provinceList
+          },
+          {
+            name: '学校',
+            desc: '必填',
+            type: 0,
+            data: [{ name: '苏大', code: 1 }, { name: '东大', code: 2 }]
+          },
+          {
+            name: '卡号',
+            desc: '必填',
+            type: 1,
+            data: []
+          }
+        ]
+      ],
+      cardImgPath: ''
+    },
+    computed: {
+      ...storeMode.mapState(['darkMode']),
+      ...storeUser.mapState(['needAgreePolicy'])
+    },
+    formSubmit: function (e) {
+      console.log('form发生了submit事件，携带数据为：', e.detail.value)
+    },
+    formReset: function () {
+      console.log('form发生了reset事件')
+    },
+    selectType (e) {
+      const index = parseInt(e.currentTarget.dataset.index)
+      this.currentType = index
+    },
+    chooseImage () {
+      wx.chooseImage({
+        sourceType: ['camera', 'album'],
+        sizeType: ['compressed'],
+        count: 1,
+        success: (res) => {
+          console.log(res)
+          if (res.tempFiles[0].size > 1000000) { // 大于1M则过滤并提示
+            let timer = setTimeout(() => {
+              clearTimeout(timer)
+              wx.showToast({
+                title: '图片太大，已被过滤',
+                icon: 'none'
+              })
+            }, 500)
+          } else {
+            this.cardImgPath = res.tempFiles[0].path
+          }
+        }
+      })
+    },
+    previewImage () {
+      wx.previewImage({
+        current: this.cardImgPath,
+        urls: [this.cardImgPath]
+      })
+    },
+    removeImg () {
+      this.cardImgPath = ''
+    }
+  })
+</script>
+
+<style>
+  input {
+    width: 480rpx;
+    border: 1rpx solid #888;
+    padding: 10rpx;
+  }
+  textarea {
+    width: 480rpx;
+    height: 120rpx;
+    border: 1rpx solid #888;
+    padding: 10rpx;
+  }
+  .lost_item_cell {
+    display: flex;
+    justify-content: start;
+    padding: 10rpx 30rpx;
+  }
+  .lic_title {
+    width: 150rpx;
+    font-size: 30rpx;
+  }
+  .lic_desc {
+    display: block;
+    padding-left: 5rpx;
+    color: #888;
+    font-size: 22rpx;
+  }
+  
+  .lic_select {
+    display: flex;
+  }
+  .select_item {
+    border-radius: 7rpx;
+    margin-right: 10rpx;
+    padding: 3rpx 10rpx;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    font-size: 26rpx;
+  }
+  .select_icon {
+    width: 15rpx;
+    height: 15rpx;
+    border-radius: 50%;
+    margin-right: 10rpx;
+  }
+
+  .lost_item_picker {
+    font-size: 28rpx;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+  }
+  .lost_item_picker view {
+    display: inline-block;
+  }
+  .lost_item_picker text {
+    display: inline-block;
+  }
+  .lost_item_picker image {
+    display: inline-block;
+    transform: rotate(90deg);
+    width: 40rpx;
+    height: 40rpx;
+  }
+
+  .img_area {
+    margin: 5rpx 47rpx 5rpx 0;
+    width: 500rpx;
+    overflow: hidden;
+  }
+  .img_area .img_file {
+    float: left;
+    margin: 5rpx 6rpx;
+  }
+  .img_area .img {
+    display: block;
+    position: relative;
+    width: 200rpx;
+    height: 200rpx;
+    border-radius: 5%;
+  }
+  .img_area .img_remove{
+    position: absolute;
+    height: 30rpx;
+    width: 30rpx;
+    right: 0rpx;
+    top: 0rpx;
+  }
+  .add_img_box {
+    float: left;
+    position: relative;
+    margin: 5rpx 6rpx;
+    width: 196rpx;
+    height: 196rpx;
+    border: 1px solid #888;
+  }
+  .add_img_box:before,
+  .add_img_box:after {
+    content: " ";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+    background-color: #888;
+  }
+  .add_img_box:before {
+    width: 4rpx;
+    height: 100rpx;
+  }
+  .add_img_box:after {
+    width: 100rpx;
+    height: 4rpx;
+  }
+  .add_img_box:active {
+    border-color: #d9d9d9;
+  }
+  .add_img_box:active:before,
+  .add_img_box:active:after {
+    background-color: #d9d9d9;
+  }
+  .add_img {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+  }
+
+  .bottom_btn{
+    margin-top: 40rpx;
+    margin-bottom: 20rpx;
+    color: white;
+    background-color: #2ab3f3;
+    width: 90%;
+  }
+</style>
+
+<script  type='application/json' lang='json'>
+  {
+    "usingComponents": {
+      "navigationBar": "../components/navigationBar",
+      "policyText": "../components/policyText"
+    }
+  }
+</script>
+
