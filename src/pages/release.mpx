@@ -16,7 +16,7 @@
       bindsuccess='clickReleaseSign' bindcancel="clickCancelSign">
       <view class="dialog_sign">
         <view class="location">
-          <input class="location_input fontColorW1" focus="{{true}}" value="{{locationName}}" bindinput="locationInput" maxlength="{{loactionNameLength}}" placeholder="填写打卡的地名(1~{{loactionNameLength}}字)" placeholder-style="color:#555;"/>
+          <input class="location_input {{darkMode?'fontColorW1':'fontColorB1'}}" focus="{{true}}" value="{{locationName}}" bindinput="locationInput" maxlength="{{loactionNameLength}}" placeholder="填写打卡的地名(1~{{loactionNameLength}}字)" placeholder-style="{{darkMode?'color:#555;':'color:#aaa;'}}"/>
           <image class="location_choose" mode="aspectFit" src="../image/icon/toMap.png" catchtap="chooseLocation" />
           <text class="location_chooseText" catchtap="chooseLocation">地图选点</text>
         </view>
@@ -40,6 +40,7 @@
   import { createPage } from '@mpxjs/core'
   import net from '../utils/net'
   import { storeUser } from '../stores/storeUser'
+  import { storeMode } from '../stores/storeCommon'
 
   const common = require('../utils/common.js')
   const app = getApp()
@@ -64,6 +65,7 @@
       locationGPS: ''
     },
     computed: {
+      ...storeMode.mapState(['darkMode']),
       ...storeUser.mapState(['needAgreePolicy'])
     },
     onLoad () {

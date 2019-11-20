@@ -159,6 +159,39 @@ const reqDelete = ({ url, query, body, isLoading, ...other } = {}) => {
   })
 }
 
+const uploadFile = ({ url = '', filePath = '', name = 'file', isShowLoading = true, ...other }) => {
+  if (isShowLoading) {
+    wx.showLoading({
+      title: ''
+    })
+  }
+  const timeStart = Date.now()
+
+  return new Promise((resolve, reject) => {
+    wx.uploadFile({
+      url: getUrl(url),
+      filePath: filePath,
+      name: name,
+      ...other,
+      complete: res => {
+        if (isShowLoading) wx.hideLoading()
+        console.log(`\n-------------------------\n Upload of ${filePath} | 耗时${Date.now() - timeStart}\nres:`, res, '\n-------------------------\n')
+
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          resolve(res.data)
+        } else {
+          console.log('!!! Request error, res statusCode: ', res.statusCode || 'none')
+          reject(res)
+          wx.showToast({
+            title: '网络出错，请重试',
+            icon: 'none'
+          })
+        }
+      }
+    })
+  })
+}
+
 const downloadFile = ({ filePath = '', isReadFile = true, isShowLoading = true, ...other }) => {
   if (isShowLoading) {
     wx.showLoading({
@@ -213,5 +246,6 @@ export default {
   reqPost,
   reqPut,
   reqDelete,
+  uploadFile,
   downloadFile
 }

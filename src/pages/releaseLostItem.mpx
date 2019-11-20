@@ -17,15 +17,30 @@
             <text class="lic_name">{{cell.name}}</text>
             <text class="lic_desc">{{cell.desc}}</text>
           </view>
-          <picker wx:if="{{cell.type===0}}" mode="selector" range="{{cell.data}}" range-key="name" value="{{provinceIdx}}" bindchange="changePrivateType">
-            <view class="lost_item_picker">
-              <view>{{cell.data[(cell.name==='省份'?provinceIdx:schoolIdx)].name}}</view>
-              <image src="../image/icon/arrow_right.png" mode="aspectFit" />
-            </view>
-          </picker>
-          <input wx:elif="{{cell.type===1}}" name="{{cell.name}}" />
-          <textarea wx:elif="{{cell.type===2}}" name="{{cell.name}}" />
-          <view wx:elif="{{cell.type===3}}" class="img_area">
+          <view wx:if="{{cell.type===0}}" class="lic_picker_group">
+            <picker mode="selector" range="{{provinceList}}" range-key="cityName" value="{{provinceIdx}}" bindchange="changePicker" data-type="province">
+              <view class="lost_item_picker">
+                <text style="max-width: 120rpx;">{{provinceList[provinceIdx].cityName}}</text>
+                <image src="../image/icon/arrow_right.png" mode="aspectFit" />
+              </view>
+            </picker>
+            <picker mode="selector" name="{{cell.key}}" range="{{schoolList}}" range-key="schoolName" value="{{schoolIdx}}" bindchange="changePicker" data-type="school">
+              <view class="lost_item_picker">
+                <text style="max-width: 280rpx;">{{schoolList[schoolIdx].schoolName}}</text>
+                <image src="../image/icon/arrow_right.png" mode="aspectFit" />
+              </view>
+            </picker>
+          </view>
+          <input wx:elif="{{cell.type===1}}" placeholder="{{cell.data}}" name="{{cell.key}}" />
+          <view wx:elif="{{cell.type===2}}" class="location">
+            <input class="location_input" name="{{cell.key}}"
+              value="{{locationName}}" maxlength="25"
+              placeholder="填写捡卡地点(1~25字)"/>
+            <image class="location_choose" mode="aspectFit" src="../image/icon/toMap.png" catchtap="chooseLocation" />
+            <text class="location_chooseText" catchtap="chooseLocation">地图选点</text>
+          </view>
+          <textarea wx:elif="{{cell.type===3}}" name="{{cell.key}}" placeholder="{{cell.data}}" />
+          <view wx:elif="{{cell.type===4}}" class="img_area">
             <view class="img_files">
               <view wx:if="{{cardImgPath.length>0}}" class="img_file">
                 <image class="img" mode="aspectFill" src="{{cardImgPath}}" bindtap="previewImage"><image class="img_remove" src="../image/icon/img_remove.png" catchtap="removeImg"/></image>
@@ -37,8 +52,10 @@
           </view>
         </view>
       </block>
-      <button class="bottom_btn" formType="submit">确认</button>
-      <button formType="reset">清空</button>
+      <view class="bottom_btns">
+        <button class="bottom_btn_left" formType="submit">确认</button>
+        <button class="bottom_btn_right" formType="reset">清空</button>
+      </view>
     </form>
   </view>
 </template>
@@ -48,132 +65,140 @@
   import { behaviorOnPage } from '../behavior/behaviorOnPage'
   import { storeMode } from '../stores/storeCommon'
   import { storeUser } from '../stores/storeUser'
+  import net from '../utils/net'
+  const common = require('../utils/common.js')
+  const app = getApp()
+
   const provinceList = [
     {
-      'code': 1001,
-      'name': '北京市'
+      'cityCode': 1001,
+      'cityName': '北京市'
     },
     {
-      'code': 1002,
-      'name': '天津市'
+      'cityCode': 1002,
+      'cityName': '天津市'
     },
     {
-      'code': 1003,
-      'name': '河北省'
+      'cityCode': 1003,
+      'cityName': '河北省'
     },
     {
-      'code': 1004,
-      'name': '山西省'
+      'cityCode': 1004,
+      'cityName': '山西省'
     },
     {
-      'code': 1005,
-      'name': '内蒙古'
+      'cityCode': 1005,
+      'cityName': '内蒙古自治区'
     },
     {
-      'code': 1006,
-      'name': '辽宁省'
+      'cityCode': 1006,
+      'cityName': '辽宁省'
     },
     {
-      'code': 1007,
-      'name': '吉林省'
+      'cityCode': 1007,
+      'cityName': '吉林省'
     },
     {
-      'code': 1008,
-      'name': '黑龙江'
+      'cityCode': 1008,
+      'cityName': '黑龙江省'
     },
     {
-      'code': 1009,
-      'name': '上海市'
+      'cityCode': 1009,
+      'cityName': '上海市'
     },
     {
-      'code': 1010,
-      'name': '江苏省'
+      'cityCode': 1010,
+      'cityName': '江苏省'
     },
     {
-      'code': 1011,
-      'name': '浙江省'
+      'cityCode': 1011,
+      'cityName': '浙江省'
     },
     {
-      'code': 1012,
-      'name': '安徽省'
+      'cityCode': 1012,
+      'cityName': '安徽省'
     },
     {
-      'code': 1013,
-      'name': '福建省'
+      'cityCode': 1013,
+      'cityName': '福建省'
     },
     {
-      'code': 1014,
-      'name': '山东省'
+      'cityCode': 1014,
+      'cityName': '山东省'
     },
     {
-      'code': 1015,
-      'name': '江西省'
+      'cityCode': 1015,
+      'cityName': '江西省'
     },
     {
-      'code': 1016,
-      'name': '河南省'
+      'cityCode': 1016,
+      'cityName': '河南省'
     },
     {
-      'code': 1017,
-      'name': '湖北省'
+      'cityCode': 1017,
+      'cityName': '湖北省'
     },
     {
-      'code': 1018,
-      'name': '湖南省'
+      'cityCode': 1018,
+      'cityName': '湖南省'
     },
     {
-      'code': 1019,
-      'name': '广东省'
+      'cityCode': 1019,
+      'cityName': '广东省'
     },
     {
-      'code': 1020,
-      'name': '广西区'
+      'cityCode': 1020,
+      'cityName': '广西自治区'
     },
     {
-      'code': 1021,
-      'name': '海南省'
+      'cityCode': 1021,
+      'cityName': '海南省'
     },
     {
-      'code': 1022,
-      'name': '重庆市'
+      'cityCode': 1022,
+      'cityName': '重庆市'
     },
     {
-      'code': 1023,
-      'name': '四川省'
+      'cityCode': 1023,
+      'cityName': '四川省'
     },
     {
-      'code': 1024,
-      'name': '贵州省'
+      'cityCode': 1024,
+      'cityName': '贵州省'
     },
     {
-      'code': 1026,
-      'name': '云南省'
+      'cityCode': 1026,
+      'cityName': '云南省'
     },
     {
-      'code': 1028,
-      'name': '西藏区'
+      'cityCode': 1028,
+      'cityName': '西藏自治区'
     },
     {
-      'code': 1029,
-      'name': '陕西省'
+      'cityCode': 1029,
+      'cityName': '陕西省'
     },
     {
-      'code': 1030,
-      'name': '甘肃省'
+      'cityCode': 1030,
+      'cityName': '甘肃省'
     },
     {
-      'code': 1031,
-      'name': '青海省'
+      'cityCode': 1031,
+      'cityName': '青海省'
     },
     {
-      'code': 1032,
-      'name': '宁夏区'
+      'cityCode': 1032,
+      'cityName': '宁夏自治区'
     },
     {
-      'code': 1033,
-      'name': '新疆区'
+      'cityCode': 1033,
+      'cityName': '新疆自治区'
     }
   ]
+  const allowedDistance = 1 // 单位km
+  const strSchoolIdx = 'lostItem_schoolIdx'
+  const strProvinceIdx = 'lostItem_provinceIdx'
+
   createPage({
     behaviors: [behaviorOnPage],
     data: {
@@ -186,71 +211,109 @@
       table: [
         [
           {
-            name: '省份',
-            desc: '必填',
-            type: 0,
-            data: provinceList
-          },
-          {
             name: '学校',
             desc: '必填',
             type: 0,
-            data: [{ name: '苏大', code: 1 }, { name: '东大', code: 2 }]
+            data: [],
+            key: 'school'
           },
           {
             name: '卡号',
             desc: '必填',
             type: 1,
-            data: []
+            data: '请正确填写卡上号码(用于匹配,不公开)',
+            key: 'cardNo'
           },
           {
             name: '捡到地点',
             desc: '必填',
-            type: 1,
-            data: []
+            type: 2,
+            data: [],
+            key: 'location'
           },
           {
             name: '补充描述',
             desc: '选填',
-            type: 2,
-            data: []
+            type: 3,
+            data: '可描述卡片当前所在\n！！！不得在此填写卡号，此补充描述不做任何遮挡！！！',
+            key: 'content'
           },
           {
             name: '给卡拍照',
-            desc: '必填',
-            type: 3,
-            data: []
+            desc: '必填(请遮挡卡号)',
+            type: 4,
+            data: [],
+            key: 'img'
           }
         ],
         [
           {
-            name: '省份',
-            desc: '必填',
-            type: 0,
-            data: provinceList
-          },
-          {
             name: '学校',
             desc: '必填',
             type: 0,
-            data: [{ name: '苏大', code: 1 }, { name: '东大', code: 2 }]
+            data: [],
+            key: 'school'
           },
           {
             name: '卡号',
             desc: '必填',
             type: 1,
-            data: []
+            data: [],
+            key: 'cardNo'
           }
         ]
       ],
+      locationName: '',
       cardImgPath: ''
     },
     computed: {
       ...storeMode.mapState(['darkMode']),
       ...storeUser.mapState(['needAgreePolicy'])
     },
+    onLoad () {
+      this.locationDigit = app.globalData.location
+      if (typeof wx.getStorageSync(strProvinceIdx) === 'number') {
+        this.provinceIdx = wx.getStorageSync(strProvinceIdx)
+      }
+      this.getSchoolList(true)
+    },
     formSubmit: function (e) {
       console.log('form发生了submit事件，携带数据为：', e.detail.value)
+      const formData = e.detail.value
+      if (this.type === 0) {
+        net.uploadFile({
+          url: 'upload',
+          filePath: this.cardImgPath
+        }).then(data => {
+          console.log('first')
+          let jsonData = common.strToJson(data)
+          let imgUrl = jsonData.data
+          net.reqPost({
+            url: 'card/find/info',
+            body: {
+              cardNo: formData.cardNo,
+              content: formData.content,
+              img1: imgUrl,
+              lat: this.locationDigit.latitude,
+              lng: this.locationDigit.longitude,
+              location: formData.location,
+              schoolCode: this.schoolList[this.schoolIdx].schoolCode
+            }
+          })
+        }).then(data => {
+          console.log('second')
+        })
+      } else {
+        net.reqPost({
+          url: 'card/lost/info',
+          body: {
+            cardNo: formData.cardNo,
+            schoolCode: this.schoolList[this.schoolIdx].schoolCode
+          }
+        }).then(data => {
+        })
+      }
+
     },
     formReset: function () {
       console.log('form发生了reset事件')
@@ -258,6 +321,43 @@
     selectType (e) {
       const index = parseInt(e.currentTarget.dataset.index)
       this.currentType = index
+    },
+    changePicker (e) {
+      const type = e.currentTarget.dataset.type
+      switch (type) {
+        case 'province': {
+          this.provinceIdx = parseInt(e.detail.value)
+          wx.setStorageSync(strProvinceIdx, this.provinceIdx)
+          this.getSchoolList()
+          break
+        }
+        case 'school': {
+          this.schoolIdx = parseInt(e.detail.value)
+          wx.setStorageSync(strSchoolIdx, this.schoolIdx)
+          break
+        }
+      }
+    },
+    chooseLocation () {
+      wx.chooseLocation({
+        success: choose => {
+          common.getLocation({
+            success: (res) => {
+              let distance = common.getKilometerDistance(choose.latitude, choose.longitude, res.latitude, res.longitude)
+              if (distance > allowedDistance) {
+                wx.showToast({
+                  title: '可不能选超过' + allowedDistance + 'km远的地方哦',
+                  icon: 'none',
+                  duration: 5000
+                })
+              } else {
+                this.locationName = choose.name
+                this.locationDigit = { latitude: choose.latitude, longitude: choose.longitude }
+              }
+            }
+          })
+        }
+      })
     },
     chooseImage () {
       wx.chooseImage({
@@ -288,17 +388,35 @@
     },
     removeImg () {
       this.cardImgPath = ''
+    },
+    getSchoolList (isFromLoad = false) {
+      net.reqGet({
+        url: 'school/list',
+        query: {
+          cityCode: provinceList[this.provinceIdx].cityCode
+        }
+      }).then(data => {
+        this.schoolList = data.data
+        if (isFromLoad) {
+          this.schoolIdx = wx.getStorageSync(strSchoolIdx) || 0
+        } else {
+          this.schoolIdx = 0
+          wx.setStorageSync(strSchoolIdx, this.schoolIdx)
+        }
+      })
     }
   })
 </script>
 
 <style>
   input {
+    font-size: 28rpx;
     width: 480rpx;
     border: 1rpx solid #888;
     padding: 10rpx;
   }
   textarea {
+    font-size: 28rpx;
     width: 480rpx;
     height: 120rpx;
     border: 1rpx solid #888;
@@ -341,23 +459,49 @@
     margin-right: 10rpx;
   }
 
+  .lic_picker_group {
+    display: flex;
+  }
   .lost_item_picker {
+    margin-right: 20rpx;
     font-size: 28rpx;
     display: flex;
     justify-content: start;
     align-items: center;
   }
-  .lost_item_picker view {
-    display: inline-block;
-  }
   .lost_item_picker text {
-    display: inline-block;
+    text-overflow: -o-ellipsis-lastline;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-all;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
   }
   .lost_item_picker image {
     display: inline-block;
     transform: rotate(90deg);
     width: 40rpx;
     height: 40rpx;
+  }
+
+  .location {
+    display: flex;
+    align-items: center;
+  }
+  .location_input {
+    width: 300rpx;
+    margin-right: 20rpx;
+  }
+  .location_choose {
+    flex-shrink: 0;
+    width: 50rpx;
+    height: 50rpx;
+  }
+  .location_chooseText {
+    flex-shrink: 0;
+    font-size: 26rpx;
+    color: #2ab3f3;
   }
 
   .img_area {
@@ -426,12 +570,25 @@
     opacity: 0;
   }
 
-  .bottom_btn{
-    margin-top: 40rpx;
-    margin-bottom: 20rpx;
+  .bottom_btns {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .bottom_btns button {
+    margin: 20rpx;
+    width: 200rpx;
+    height: 70rpx;
+    line-height: 70rpx;
+    font-size: 30rpx;
+  }
+  .bottom_btn_left {
     color: white;
     background-color: #2ab3f3;
-    width: 90%;
+  }
+  .bottom_btn_right {
+    color: white;
+    background-color: red;
   }
 </style>
 
