@@ -187,7 +187,6 @@
 <script type="application/json">
   {
     "pages": [
-      "./pages/releaseLostItem",
       "./pages/launch",
       "./pages/locality",
       "./pages/find",
@@ -203,7 +202,8 @@
       "./pages/settings",
       "./pages/mapPage",
       "./pages/otherPeople",
-      "./pages/releaseMulti"
+      "./pages/releaseMulti",
+      "./pages/releaseLostItem"
     ],
     "window": {
       "backgroundTextStyle": "light",

@@ -1,6 +1,10 @@
 <template>
   <navigationBar pageName="发布校园卡丢失" showCoverImg="{{false}}"/>
   <view class="container {{darkMode?'fontColorW1':'fontColorB1'}}">
+    <view class="top_tip" catchtap="clickTopTip">
+      <view>关于校园卡寻回</view>
+      <text>?</text>
+    </view>
     <form bindsubmit="formSubmit" bindreset="formReset">
       <view class="lost_item_cell">
         <view class="lic_title">类型</view>
@@ -31,15 +35,17 @@
               </view>
             </picker>
           </view>
-          <input wx:elif="{{cell.type===1}}" placeholder="{{cell.data}}" name="{{cell.key}}" />
+          <input wx:elif="{{cell.type===1}}" name="{{cell.key}}" hold-keyboard="{{true}}"
+             placeholder="{{cell.data.holder}}" maxlength="{{cell.data.maxLength}}"/>
           <view wx:elif="{{cell.type===2}}" class="location">
-            <input class="location_input" name="{{cell.key}}"
-              value="{{locationName}}" maxlength="25"
-              placeholder="填写捡卡地点(1~25字)"/>
+            <input class="location_input" name="{{cell.key}}" hold-keyboard="{{true}}"
+              value="{{locationName}}" maxlength="{{cell.data.maxLength}}"
+              placeholder="{{cell.data.holder}}"/>
             <image class="location_choose" mode="aspectFit" src="../image/icon/toMap.png" catchtap="chooseLocation" />
             <text class="location_chooseText" catchtap="chooseLocation">地图选点</text>
           </view>
-          <textarea wx:elif="{{cell.type===3}}" name="{{cell.key}}" placeholder="{{cell.data}}" />
+          <textarea wx:elif="{{cell.type===3}}" name="{{cell.key}}" hold-keyboard="{{true}}"
+            placeholder="{{cell.data.holder}}" maxlength="{{cell.data.maxLength}}"/>
           <view wx:elif="{{cell.type===4}}" class="img_area">
             <view class="img_files">
               <view wx:if="{{cardImgPath.length>0}}" class="img_file">
@@ -53,10 +59,14 @@
         </view>
       </block>
       <view class="bottom_btns">
-        <button class="bottom_btn_left" formType="submit">确认</button>
+        <button class="bottom_btn_left" formType="submit">发布</button>
         <button class="bottom_btn_right" formType="reset">清空</button>
       </view>
     </form>
+    <policyText wx:if="{{needAgreePolicy}}" id="policy_text" action='点击“发布”' textColor="{{darkMode?'#ababab':'#777'}}" canClickColor='#2ab3f3'/>
+    <dialog isShow="{{dialog.isShow}}" showCancel="{{dialog.showCancel}}"
+      title="{{dialog.title}}" content="{{dialog.content}}" confirmText="我知道了"
+      bind:success="navBack"/>
   </view>
 </template>
 
@@ -221,21 +231,30 @@
             name: '卡号',
             desc: '必填',
             type: 1,
-            data: '请正确填写卡上号码(用于匹配,不公开)',
+            data: {
+              holder: '请正确填写卡号(用于匹配,不公开)',
+              maxLength: 20
+            },
             key: 'cardNo'
           },
           {
             name: '捡到地点',
             desc: '必填',
             type: 2,
-            data: [],
+            data: {
+              holder: '填写捡卡地点(1~25字)',
+              maxLength: 25
+            },
             key: 'location'
           },
           {
             name: '补充描述',
             desc: '选填',
             type: 3,
-            data: '可描述卡片当前所在\n！！！不得在此填写卡号，此补充描述不做任何遮挡！！！',
+            data: {
+              holder: '可描述卡片当前所在\n！！！不得在此填写卡号，此补充描述不做任何遮挡！！！',
+              maxLength: 50
+            },
             key: 'content'
           },
           {
@@ -258,34 +277,65 @@
             name: '卡号',
             desc: '必填',
             type: 1,
-            data: [],
+            data: {
+              holder: '请正确填写卡号(用于匹配,不公开)',
+              maxLength: 20
+            },
             key: 'cardNo'
           }
         ]
       ],
       locationName: '',
-      cardImgPath: ''
+      cardImgPath: '',
+
+      dialog: {
+        isShow: false,
+        title: '发布成功',
+        content: '如果失主在此挂失卡片，我们将尽可能通知到您！'
+      }
     },
     computed: {
       ...storeMode.mapState(['darkMode']),
       ...storeUser.mapState(['needAgreePolicy'])
     },
     onLoad () {
-      this.locationDigit = app.globalData.location
+      common.getLocation({
+        success: res => {
+          this.locationDigit = app.globalData.location
+        }
+      })
       if (typeof wx.getStorageSync(strProvinceIdx) === 'number') {
         this.provinceIdx = wx.getStorageSync(strProvinceIdx)
       }
       this.getSchoolList(true)
     },
+    clickTopTip () {
+      this.canBack = false
+      this.dialog = {
+        isShow: true,
+        title: '关于本寻回系统',
+        content: '我们一年前也是学生，也丢过卡，所以我们很希望帮助到你。\n在此发布的丢失/捡到卡片信息会在后台进行匹配，一旦找到会通知到您。'
+      }
+    },
     formSubmit: function (e) {
       console.log('form发生了submit事件，携带数据为：', e.detail.value)
       const formData = e.detail.value
-      if (this.type === 0) {
+      if (formData.cardNo === '' || formData.location === '' || this.cardImgPath === '') {
+        wx.showToast({
+          title: '必填项不得为空',
+          icon: 'none'
+        })
+        return
+      }
+      // 同意用户协议
+      if (storeUser.state.needAgreePolicy) {
+        this.selectComponent('#policy_text').agreePolicy()
+      }
+      if (this.currentType === 0) {
         net.uploadFile({
           url: 'upload',
           filePath: this.cardImgPath
         }).then(data => {
-          console.log('first')
           let jsonData = common.strToJson(data)
           let imgUrl = jsonData.data
           net.reqPost({
@@ -301,7 +351,12 @@
             }
           })
         }).then(data => {
-          console.log('second')
+          this.canBack = true
+          this.dialog = {
+            isShow: true,
+            title: '发布成功',
+            content: '如果失主在此挂失卡片，我们将尽可能通知到您！'
+          }
         })
       } else {
         net.reqPost({
@@ -311,11 +366,17 @@
             schoolCode: this.schoolList[this.schoolIdx].schoolCode
           }
         }).then(data => {
+          this.canBack = true
+          this.dialog = {
+            isShow: true,
+            title: '发布成功',
+            content: '您的挂失已经记录，如有人捡到并在此发布，将尽可能通知到您。'
+          }
         })
       }
     },
     formReset: function () {
-      console.log('form发生了reset事件')
+      this.cardImgPath = ''
     },
     selectType (e) {
       const index = parseInt(e.currentTarget.dataset.index)
@@ -403,6 +464,16 @@
           wx.setStorageSync(strSchoolIdx, this.schoolIdx)
         }
       })
+    },
+    navBack () {
+      if (this.canBack) {
+        wx.navigateBack({
+          delta: 1,
+          fail: (res) => {
+            common.navToHomePage()
+          }
+        })
+      }
     }
   })
 </script>
@@ -421,10 +492,27 @@
     border: 1rpx solid #888;
     padding: 10rpx;
   }
+  .top_tip {
+    margin: 20rpx 30rpx;
+    font-size: 24rpx;
+    display: flex;
+    align-items: center;
+  }
+  .top_tip text {
+    display: inline-block;
+    margin-left: 5rpx;
+    text-align: center;
+    font-size: 20rpx;
+    width: 24rpx;
+    height: 24rpx;
+    line-height: 24rpx;
+    border-radius: 50%;
+    border: 3rpx solid #888;
+  }
   .lost_item_cell {
     display: flex;
     justify-content: start;
-    padding: 10rpx 30rpx;
+    padding: 20rpx 30rpx;
   }
   .lic_title {
     width: 150rpx;
@@ -595,6 +683,7 @@
   {
     "usingComponents": {
       "navigationBar": "../components/navigationBar",
+      "dialog": "../components/dialog",
       "policyText": "../components/policyText"
     }
   }

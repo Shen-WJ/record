@@ -119,9 +119,7 @@
         wx.switchTab({
           url: app.globalData.routeOfRelease,
           fail: (res) => {
-            wx.switchTab({
-              url: './find'
-            })
+            common.navToHomePage()
           }
         })
       }, 300)
